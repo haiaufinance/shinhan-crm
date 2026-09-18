@@ -577,7 +577,7 @@
     };
 
     // -------------------------------------------------------------
-    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (API CLIENT MANAGER)
+    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (CHỐNG CORS FAILED TO FETCH)
     // -------------------------------------------------------------
     const ApiClient = {
       async request(payload, method = "POST") {
@@ -585,11 +585,21 @@
           if (method === "GET") {
             let url = new URL(CONFIG.API_ENDPOINT);
             Object.keys(payload).forEach(k => url.searchParams.append(k, payload[k]));
-            let res = await fetch(url.toString(), { method: "GET" });
+            let res = await fetch(url.toString(), {
+              method: "GET",
+              mode: "cors",
+              redirect: "follow"
+            });
             return await res.json();
           } else {
+            // [NEW] - Chuẩn Simple Request qua text/plain để triệt tiêu OPTIONS Preflight & CORS
             let res = await fetch(CONFIG.API_ENDPOINT, {
               method: "POST",
+              mode: "cors",
+              redirect: "follow",
+              headers: {
+                "Content-Type": "text/plain;charset=utf-8"
+              },
               body: JSON.stringify(payload)
             });
             return await res.json();
@@ -600,7 +610,6 @@
         }
       }
     };
-
     // -------------------------------------------------------------
     // MODULE 3: KHỞI TẠO & ĐIỀU KHIỂN GIAO DIỆN (UI CONTROLLER)
     // -------------------------------------------------------------
