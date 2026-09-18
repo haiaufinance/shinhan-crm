@@ -118,6 +118,7 @@
       <button type="button" class="btn btn-primary w-100 fw-bold py-2 mb-2" id="btn-submit-login" onclick="processLogin(event)">
         <i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP
       </button>
+      <div id="login-error-msg" class="text-danger fw-bold small my-2" style="display: none;"></div>
     </div>
   </div>
 
@@ -163,9 +164,9 @@
             <!-- TAB 1 ADMIN: MA TRẬN CHUYỂN ĐỔI -->
             <div id="atab-content-1">
               <div class="row g-3 mb-3">
-                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TỔNG DATA CẤP HÔM NAY</small><h3 class="fw-bold text-primary my-1" id="adm-total-data">0 Số</h3></div></div>
-                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">SẢN LƯỢNG CUỘC GỌI THẬT</small><h3 class="fw-bold text-dark my-1" id="adm-total-calls">0 Cuộc</h3></div></div>
-                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TỶ LỆ CUỘC GỌI &ge;30S</small><h3 class="fw-bold text-success my-1" id="adm-rate-30s">0%</h3></div></div>
+                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TỔNG DATA CẤP</small><h3 class="fw-bold text-primary my-1" id="adm-total-data">0 Số</h3></div></div>
+                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">SẢN LƯỢNG ĐÃ XỬ LÝ</small><h3 class="fw-bold text-dark my-1" id="adm-total-calls">0 Số</h3></div></div>
+                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TIẾN ĐỘ KPI TEAM (10 HOLD/SALE)</small><h3 class="fw-bold text-success my-1" id="adm-rate-30s">0%</h3></div></div>
                 <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">DOANH SỐ HỒ SƠ</small><h3 class="fw-bold text-danger my-1" id="adm-apps">0 App / 0 Loan</h3></div></div>
               </div>
 
@@ -211,7 +212,7 @@
                       </tr>
                     </thead>
                     <tbody id="tbody-drilldown-sales">
-                      <tr><td colspan="12" class="py-4 text-muted">Đang truy vấn số liệu Map/Reduce...</td></tr>
+                      <tr><td colspan="10" class="py-4 text-muted">Đang tải số liệu...</td></tr>
                     </tbody>
                   </table>
                 </div>
@@ -242,12 +243,12 @@
               </div>
             </div>
 
-            <!-- TAB 4 ADMIN: KHO DATA & BATCH INGEST -->
+            <!-- TAB 4 ADMIN: KHO DATA -->
             <div id="atab-content-4" style="display: none;">
               <div class="row g-3">
                 <div class="col-lg-6">
                   <div class="p-3 border rounded bg-light h-100">
-                    <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-file-excel me-1"></i> Nạp Excel Vào Kho Master (Batch Chunk)</h6>
+                    <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-file-excel me-1"></i> Nạp Excel Vào Kho Master</h6>
                     <div class="row g-2 mb-2">
                       <div class="col-6"><input type="text" id="admin-campaign-tag" class="form-control form-control-sm" value="BHXH_T09" placeholder="Chiến dịch"></div>
                       <div class="col-6"><input type="text" id="admin-province" class="form-control form-control-sm" value="Toàn quốc" placeholder="Tỉnh/Thành"></div>
@@ -273,13 +274,13 @@
       </div>
     </section>
 
-    <!-- 4. WORKSPACE TELESALE: KPI & LÔ MỚI -->
+    <!-- 4. WORKSPACE TELESALE -->
     <section class="row g-3 mb-3">
       <div class="col-md-3">
         <div class="kpi-card">
-          <span class="kpi-title">CHỈ TIÊU GỌI SÂU &ge;30S</span>
+          <span class="kpi-title">CHỈ TIÊU HOLD NGÀY</span>
           <div class="kpi-value-red my-1" id="val-kpi-duration">0 / 10</div>
-          <span class="kpi-badge-alert" id="badge-kpi-status">CẦN ĐẠT CHỈ TIÊU</span>
+          <span class="kpi-badge-alert" id="badge-kpi-status">TIẾN ĐỘ 0%</span>
         </div>
       </div>
       <div class="col-md-3">
@@ -568,7 +569,7 @@
     // MODULE 1: CẤU HÌNH & TRẠNG THÁI TOÀN CỤC (GLOBAL STATE)
     // -------------------------------------------------------------
     const CONFIG = {
-      // ANH THAY URL WEB APP CỦA ANH VÀO ĐÂY
+      // ANH THAY URL WEB APP CỦA ANH VÀO ĐÂY NẾU CẦN
       API_ENDPOINT: "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec"
     };
 
@@ -582,7 +583,7 @@
     };
 
     // -------------------------------------------------------------
-    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (CHỐNG CORS FAILED TO FETCH)
+    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (CHỐNG CORS & FAILED TO FETCH)
     // -------------------------------------------------------------
     const ApiClient = {
       async request(payload, method = "POST") {
@@ -597,7 +598,6 @@
             });
             return await res.json();
           } else {
-            // [NEW] - Chuẩn Simple Request qua text/plain để triệt tiêu OPTIONS Preflight & CORS
             let res = await fetch(CONFIG.API_ENDPOINT, {
               method: "POST",
               mode: "cors",
@@ -615,8 +615,9 @@
         }
       }
     };
+
     // -------------------------------------------------------------
-    // MODULE 3: KHỞI TẠO & ĐIỀU KHIỂN GIAO DIỆN (UI CONTROLLER)
+    // MODULE 3: KHỞI TẠO & XÁC THỰC (CHỐNG TREO NÚT ĐĂNG NHẬP)
     // -------------------------------------------------------------
     window.addEventListener("DOMContentLoaded", function() {
       try {
@@ -651,7 +652,17 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...';
 
+      // Timeout 15s tự mở lại nút nếu mạng lag
+      var loginTimer = setTimeout(function() {
+        if (btn && btn.disabled) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP';
+          alert("Quá thời gian chờ phản hồi (Timeout). Vui lòng thử lại!");
+        }
+      }, 15000);
+
       var res = await ApiClient.request({ action: "login", username: u, password: p });
+      clearTimeout(loginTimer);
 
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP';
@@ -689,7 +700,7 @@
     }
 
     // -------------------------------------------------------------
-    // MODULE 4: WORKSPACE TELESALE (PULL BATCH & GHI NHẬN BÁO CÁO)
+    // MODULE 4: WORKSPACE TELESALE
     // -------------------------------------------------------------
     function switchMainTab(tab) {
       document.getElementById("view-batch-container").style.display = (tab === 'batch') ? "block" : "none";
@@ -821,7 +832,7 @@
     }
 
     // -------------------------------------------------------------
-    // MODULE 5: SỔ TAY HOLD LEAD & QUẢN LÝ PIPELINE
+    // MODULE 5: SỔ TAY HOLD LEAD & PIPELINE CRM
     // -------------------------------------------------------------
     async function fetchHoldLeadsData() {
       if (!AppState.currentUser) return;
@@ -832,12 +843,19 @@
         if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5">Chưa có Lead bảo lưu.</td></tr>';
         document.getElementById("badge-count-hold").innerText = "0";
         document.getElementById("val-kpi-hold").innerText = "0 Lead";
+        document.getElementById("val-kpi-duration").innerText = "0 / 10";
+        document.getElementById("badge-kpi-status").innerText = "TIẾN ĐỘ 0%";
         return;
       }
 
       AppState.currentHoldDataCache = res.data;
       document.getElementById("badge-count-hold").innerText = res.data.length;
       document.getElementById("val-kpi-hold").innerText = res.data.length + " Lead";
+
+      // Cập nhật tiến độ ngày của Sale: x / 10
+      var prog = Math.min(100, Math.round((res.data.length / 10) * 100));
+      document.getElementById("val-kpi-duration").innerText = res.data.length + " / 10";
+      document.getElementById("badge-kpi-status").innerText = "TIẾN ĐỘ " + prog + "%";
 
       var html = "";
       res.data.forEach(function(item, i) {
@@ -959,7 +977,7 @@
     }
 
     // -------------------------------------------------------------
-    // MODULE 6: PHÂN HỆ QUẢN TRỊ ADMIN (MA TRẬN, NÚT HÀNH ĐỘNG & GIAO DATA)
+    // MODULE 6: PHÂN HỆ QUẢN TRỊ ADMIN (MA TRẬN & DÒNG TỔNG CỘNG)
     // -------------------------------------------------------------
     function toggleAdminPanel() {
       var p = document.getElementById("admin-panel");
@@ -973,23 +991,10 @@
         document.getElementById("atab-content-" + i).style.display = (i === idx) ? "block" : "none";
       }
       if (idx === 1) loadTeamDrillDownData();
-      if (idx === 2) loadSaleAuditData();
-      if (idx === 3) loadPipelineRecoveryData();
     }
 
     async function loadAdminDashboardData() {
       if (!AppState.currentUser || (AppState.currentUser.role !== "ADMIN" && AppState.currentUser.role !== "LEADER")) return;
-      
-      // 1. Kéo dữ liệu 4 thẻ KPI tổng quan sàn
-      var overviewRes = await ApiClient.request({ action: "getFloorOverview" }, "GET");
-      if (overviewRes && overviewRes.status === "success" && overviewRes.stats) {
-        document.getElementById("adm-total-data").innerText = overviewRes.stats.totalDistributedToday + " Số";
-        document.getElementById("adm-total-calls").innerText = overviewRes.stats.totalCallsMade + " Cuộc";
-        document.getElementById("adm-rate-30s").innerText = overviewRes.stats.qualityRate30s;
-        document.getElementById("adm-apps").innerText = overviewRes.stats.appsSummary;
-      }
-
-      // 2. Kéo danh sách Team vào Dropdown
       var teamRes = await ApiClient.request({ action: "getTeams" }, "GET");
       if (teamRes && teamRes.teams) {
         var sel = document.getElementById("sel-filter-team");
@@ -997,13 +1002,9 @@
         sel.innerHTML = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
         teamRes.teams.forEach(t => sel.innerHTML += `<option value="${t}" ${t === currentTeam ? "selected" : ""}>${t}</option>`);
       }
-
-      // 3. Render ma trận chi tiết của Team đã chọn
       loadTeamDrillDownData();
     }
 
-    // [NEW] - RENDER MA TRẬN THEO TIÊU CHUẨN HOLDLEAD-DRIVEN (10 HOLD = 100%)
-    // [NEW] - BÓC TÁCH HOẠT ĐỘNG THỰC TẾ & CHỐNG BÁO CÁO ẢO
     async function loadTeamDrillDownData() {
       var teamFilter = document.getElementById("sel-filter-team").value || "ALL";
       var tbody = document.getElementById("tbody-drilldown-sales");
@@ -1040,9 +1041,8 @@
           '<span class="small fw-bold ' + (s.holdLead >= 10 ? 'text-success' : 'text-dark') + '">(' + s.holdLead + '/10)</span>' +
         '</div>';
 
-        // Cảnh báo lướt data / báo cáo ảo
         var alertBadge = s.isSuspect 
-          ? '<span class="badge bg-danger ms-1" title="Xử lý nhiều nhưng không ra Lead (Nghi vấn báo cáo ảo)"><i class="fa-solid fa-triangle-exclamation"></i> Lướt data</span>' 
+          ? '<span class="badge bg-danger ms-1" title="Xử lý nhiều nhưng không ra Lead (Nghi vấn lướt data)"><i class="fa-solid fa-triangle-exclamation"></i> Lướt data</span>' 
           : '';
 
         var lockBtn = s.status === "ACTIVE"
@@ -1068,7 +1068,7 @@
         '</tr>';
       });
 
-      // TỔNG CỘNG TOÀN TEAM
+      // HÀNG TỔNG CỘNG TOÀN TEAM
       var teamTargetHold = activeHeadcount * 10;
       var teamKpiPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
       var teamBatchProgress = totAssigned > 0 ? Math.round((totProcessed / totAssigned) * 100) + "%" : "0%";
@@ -1093,58 +1093,7 @@
       document.getElementById("adm-rate-30s").innerText = teamKpiPercent + "% KPI";
       document.getElementById("adm-apps").innerText = totApp + " App / " + totLoan + " Loan";
     }
-      // [NEW] - TỔNG HỢP TOÀN TEAM (TARGET = SỐ NHÂN SỰ X 10 LEAD)
-      var teamTargetHold = activeHeadcount * 10;
-      var teamProgressPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
-      var teamLeadConversion = totAssigned > 0 ? Math.round((totHold / totAssigned) * 100) + "%" : "0%";
 
-      var totalRowHtml = '<tr class="table-dark fw-bold text-center border-top border-3 border-primary" style="font-size: 0.95rem;">' +
-        '<td colspan="2" class="text-uppercase text-warning text-center py-2"><i class="fa-solid fa-calculator me-1"></i> TỔNG CỘNG TEAM (' + activeHeadcount + ' Sale)</td>' +
-        '<td class="text-white">' + totAssigned + '</td>' +
-        '<td class="text-info">' + teamLeadConversion + '</td>' +
-        '<td class="text-warning fs-6">' + totHold + ' Lead</td>' +
-        '<td class="text-white">' + teamProgressPercent + '% (' + totHold + '/' + teamTargetHold + ')</td>' +
-        '<td class="text-danger fs-6">' + totApp + '</td>' +
-        '<td class="text-success fs-6">' + totLoan + '</td>' +
-        '<td class="text-muted small">---</td>' +
-      '</tr>';
-
-      tbody.innerHTML = html + totalRowHtml;
-
-      // Đồng bộ 4 thẻ KPI đầu trang
-      document.getElementById("adm-total-data").innerText = totAssigned + " Số";
-      document.getElementById("adm-total-calls").innerText = totHold + " Lead Hold";
-      document.getElementById("adm-rate-30s").innerText = teamProgressPercent + "%";
-      document.getElementById("adm-apps").innerText = totApp + " App / " + totLoan + " Loan";
-    }
-      // [NEW] - TÍNH TOÁN CÁC CHỈ SỐ TỔNG HỢP TOÀN TEAM
-      var teamRateConnect = totCalls > 0 ? Math.round((totConnected / totCalls) * 100) + "%" : "0%";
-      var teamAvgAHT = totConnected > 0 ? Math.round(totDuration / totConnected) + "s" : "0s";
-      var teamRateLead = totCalls > 0 ? Math.round((totHold / totCalls) * 100) + "%" : "0%";
-
-      // [NEW] - HÀNG TỔNG CỘNG TOÀN DIỆN (TOTAL ROW) NẰM Ở CHÂN BẢNG
-      var totalRowHtml = '<tr class="table-dark fw-bold text-center border-top border-3 border-primary" style="font-size: 0.95rem;">' +
-        '<td colspan="2" class="text-uppercase text-warning text-center py-2"><i class="fa-solid fa-calculator me-1"></i> TỔNG CỘNG TEAM</td>' +
-        '<td class="text-white">' + totAssigned + '</td>' +
-        '<td class="text-warning">' + totCalls + '</td>' +
-        '<td class="text-info">' + teamRateConnect + '</td>' +
-        '<td class="text-white">' + totQuality30s + '</td>' +
-        '<td class="text-white">' + teamAvgAHT + '</td>' +
-        '<td class="text-warning fs-6">' + totHold + '</td>' +
-        '<td class="text-info">' + teamRateLead + '</td>' +
-        '<td class="text-danger fs-6">' + totApp + '</td>' +
-        '<td class="text-success fs-6">' + totLoan + '</td>' +
-        '<td class="text-muted small">---</td>' +
-      '</tr>';
-
-      tbody.innerHTML = html + totalRowHtml;
-
-      // Đồng bộ số liệu lên 4 thẻ KPI đầu trang
-      document.getElementById("adm-total-data").innerText = totAssigned + " Số";
-      document.getElementById("adm-total-calls").innerText = totCalls + " Cuộc";
-      document.getElementById("adm-rate-30s").innerText = totCalls > 0 ? Math.round((totQuality30s / totCalls) * 100) + "%" : "0%";
-      document.getElementById("adm-apps").innerText = totApp + " App / " + totLoan + " Loan";
-    }
     async function handleToggleLock(userId, lockStatus) {
       if (!confirm((lockStatus ? "Khóa cấp data cho " : "Mở khóa cấp data cho ") + userId + "?")) return;
       var res = await ApiClient.request({ action: "toggleLock", userId: userId, status: lockStatus });
@@ -1247,11 +1196,6 @@
     function handleExcelUpload(input) {
       alert("Tính năng nạp Excel Batch Chunk đã sẵn sàng. Hệ thống sẽ chunk 1000 dòng/lần gửi lên API!");
     }
-
-    // -------------------------------------------------------------
-    // [EXTENSION MODULE ZONE] - KHU VỰC THÊM HÀM / TÍNH NĂNG MỚI VỀ SAU
-    // -------------------------------------------------------------
-    // Anh có thể bổ sung các hàm vẽ biểu đồ ChartJS, xuất báo cáo Excel tùy chỉnh xuống đây.
   </script>
 </body>
 </html>
