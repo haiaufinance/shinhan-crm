@@ -644,24 +644,29 @@
       var uInput = document.getElementById("login-username");
       var pInput = document.getElementById("login-password");
       var btn = document.getElementById("btn-submit-login");
+      var errEl = document.getElementById("login-error-msg");
 
       var u = uInput ? uInput.value.trim().toUpperCase() : "";
       var p = pInput ? pInput.value.trim() : "";
-      if (!u || !p) { alert("Vui lòng nhập đầy đủ Mã NV và Mật khẩu!"); return false; }
+      if (!u || !p) { 
+        alert("Vui lòng nhập đầy đủ Mã NV và Mật khẩu!"); 
+        return false; 
+      }
 
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...';
+      if (errEl) errEl.style.display = "none";
 
-      // Timeout 15s tự mở lại nút nếu mạng lag
       var loginTimer = setTimeout(function() {
         if (btn && btn.disabled) {
           btn.disabled = false;
           btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP';
-          alert("Quá thời gian chờ phản hồi (Timeout). Vui lòng thử lại!");
+          alert("Quá thời gian phản hồi từ máy chủ (Timeout). Vui lòng thử lại!");
         }
       }, 15000);
 
-      var res = await ApiClient.request({ action: "login", username: u, password: p });
+      // [NEW] - Gửi yêu cầu đăng nhập qua GET để vượt lỗi chuyển hướng 302
+      var res = await ApiClient.request({ action: "login", username: u, password: p }, "GET");
       clearTimeout(loginTimer);
 
       btn.disabled = false;
@@ -676,11 +681,16 @@
         loadAdminDashboardData();
         if (AppState.currentUser.role !== "ADMIN") claimNewBatch();
       } else {
-        alert(res ? res.message : "Đăng nhập thất bại!");
+        var msg = res ? res.message : "Đăng nhập thất bại!";
+        if (errEl) {
+          errEl.innerText = msg;
+          errEl.style.display = "block";
+        } else {
+          alert(msg);
+        }
       }
       return false;
     }
-
     function logoutSession() {
       sessionStorage.removeItem("SHN_CRM_USER");
       location.reload();
