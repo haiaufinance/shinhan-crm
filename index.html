@@ -1003,10 +1003,11 @@
     }
 
     // [NEW] - RENDER MA TRẬN THEO TIÊU CHUẨN HOLDLEAD-DRIVEN (10 HOLD = 100%)
+    // [NEW] - BÓC TÁCH HOẠT ĐỘNG THỰC TẾ & CHỐNG BÁO CÁO ẢO
     async function loadTeamDrillDownData() {
       var teamFilter = document.getElementById("sel-filter-team").value || "ALL";
       var tbody = document.getElementById("tbody-drilldown-sales");
-      tbody.innerHTML = '<tr><td colspan="9" class="py-4 text-primary"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tính toán KPI HoldLead...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="py-4 text-primary"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tính toán dữ liệu thực tế...</td></tr>';
 
       var res = await ApiClient.request({ action: "getStats", team: teamFilter }, "GET");
       if (!res || res.status !== "success" || !res.sales) return;
@@ -1016,27 +1017,33 @@
 
       var html = "";
       var totAssigned = 0;
+      var totProcessed = 0;
       var totHold = 0;
       var totApp = 0;
       var totLoan = 0;
       var activeHeadcount = res.sales.length;
 
       res.sales.forEach(function(s) {
-        totAssigned += s.assigned;
+        totAssigned += s.totalAssigned;
+        totProcessed += s.processedCount;
         totHold += s.holdLead;
         totApp += s.appCount;
         totLoan += s.loanCount;
 
-        // Tính thanh tiến độ % dựa trên 10 Hold
-        var progressPercent = Math.min(100, Math.round((s.holdLead / 10) * 100));
-        var progressBarColor = progressPercent >= 100 ? "bg-success" : (progressPercent >= 50 ? "bg-primary" : "bg-warning");
-        
-        var progressDisplay = '<div class="d-flex align-items-center justify-content-center gap-1">' +
-          '<div class="progress flex-grow-1" style="height: 14px; max-width: 80px;">' +
-            '<div class="progress-bar ' + progressBarColor + ' fw-bold" style="width: ' + progressPercent + '%; font-size: 9px;">' + progressPercent + '%</div>' +
+        // Thanh tiến độ KPI: 10 Hold = 100%
+        var kpiPercent = Math.min(100, Math.round((s.holdLead / 10) * 100));
+        var kpiBarColor = kpiPercent >= 100 ? "bg-success" : (kpiPercent >= 50 ? "bg-primary" : "bg-warning");
+        var kpiDisplay = '<div class="d-flex align-items-center justify-content-center gap-1">' +
+          '<div class="progress flex-grow-1" style="height: 14px; max-width: 75px;">' +
+            '<div class="progress-bar ' + kpiBarColor + ' fw-bold" style="width: ' + kpiPercent + '%; font-size: 9px;">' + kpiPercent + '%</div>' +
           '</div>' +
           '<span class="small fw-bold ' + (s.holdLead >= 10 ? 'text-success' : 'text-dark') + '">(' + s.holdLead + '/10)</span>' +
         '</div>';
+
+        // Cảnh báo lướt data / báo cáo ảo
+        var alertBadge = s.isSuspect 
+          ? '<span class="badge bg-danger ms-1" title="Xử lý nhiều nhưng không ra Lead (Nghi vấn báo cáo ảo)"><i class="fa-solid fa-triangle-exclamation"></i> Lướt data</span>' 
+          : '';
 
         var lockBtn = s.status === "ACTIVE"
           ? '<button class="btn btn-outline-danger btn-sm py-0 px-1" title="Khóa data" onclick="handleToggleLock(\'' + s.userId + '\', true)"><i class="fa-solid fa-lock"></i></button>'
@@ -1048,18 +1055,44 @@
         var transferBtn = '<button class="btn btn-outline-info btn-sm py-0 px-1 text-dark" title="Chuyển Lead của Sale này" onclick="openTransferHoldModal(\'' + s.userId + '\')"><i class="fa-solid fa-people-arrows"></i></button>';
 
         html += '<tr>' +
-          '<td class="text-start"><b>' + s.name + '</b><br><small class="text-muted">' + s.userId + '</small></td>' +
-          '<td>' + (s.ext || '<span class="badge bg-secondary">---</span>') + '</td>' +
-          '<td><b>' + s.assigned + '</b></td>' +
-          '<td><span class="badge bg-info text-dark">' + s.leadConversionRate + '</span></td>' +
+          '<td class="text-start"><b>' + s.name + '</b>' + alertBadge + '<br><small class="text-muted">' + s.userId + '</small></td>' +
+          '<td>' + (s.ext ? s.ext : '<span class="badge bg-secondary">---</span>') + '</td>' +
+          '<td><b>' + s.totalAssigned + '</b></td>' +
+          '<td><b class="text-primary">' + s.processedCount + '</b></td>' +
+          '<td><span class="badge bg-info text-dark">' + s.batchProgressRate + '</span></td>' +
           '<td class="text-warning fw-bold fs-6">' + s.holdLead + '</td>' +
-          '<td>' + progressDisplay + '</td>' +
+          '<td>' + kpiDisplay + '</td>' +
           '<td class="text-danger fw-bold">' + s.appCount + '</td>' +
           '<td class="text-success fw-bold">' + s.loanCount + '</td>' +
           '<td><div class="d-flex justify-content-center gap-1">' + lockBtn + editBtn + pushBtn + revokeBtn + transferBtn + '</div></td>' +
         '</tr>';
       });
 
+      // TỔNG CỘNG TOÀN TEAM
+      var teamTargetHold = activeHeadcount * 10;
+      var teamKpiPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
+      var teamBatchProgress = totAssigned > 0 ? Math.round((totProcessed / totAssigned) * 100) + "%" : "0%";
+
+      var totalRowHtml = '<tr class="table-dark fw-bold text-center border-top border-3 border-primary" style="font-size: 0.92rem;">' +
+        '<td colspan="2" class="text-uppercase text-warning text-center py-2"><i class="fa-solid fa-calculator me-1"></i> TỔNG CỘNG TEAM (' + activeHeadcount + ' Sale)</td>' +
+        '<td class="text-white">' + totAssigned + '</td>' +
+        '<td class="text-primary">' + totProcessed + '</td>' +
+        '<td class="text-info">' + teamBatchProgress + '</td>' +
+        '<td class="text-warning fs-6">' + totHold + ' Lead</td>' +
+        '<td class="text-white">' + teamKpiPercent + '% (' + totHold + '/' + teamTargetHold + ')</td>' +
+        '<td class="text-danger fs-6">' + totApp + '</td>' +
+        '<td class="text-success fs-6">' + totLoan + '</td>' +
+        '<td class="text-muted small">---</td>' +
+      '</tr>';
+
+      tbody.innerHTML = html + totalRowHtml;
+
+      // Đồng bộ 4 thẻ KPI đầu trang
+      document.getElementById("adm-total-data").innerText = totAssigned + " Số";
+      document.getElementById("adm-total-calls").innerText = totProcessed + " Đã Xử Lý";
+      document.getElementById("adm-rate-30s").innerText = teamKpiPercent + "% KPI";
+      document.getElementById("adm-apps").innerText = totApp + " App / " + totLoan + " Loan";
+    }
       // [NEW] - TỔNG HỢP TOÀN TEAM (TARGET = SỐ NHÂN SỰ X 10 LEAD)
       var teamTargetHold = activeHeadcount * 10;
       var teamProgressPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
