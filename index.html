@@ -17,194 +17,95 @@
     body {
       background-color: var(--shinhan-light);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0;
-      padding: 0;
+      margin: 0; padding: 0;
     }
     .header-nav {
       background: linear-gradient(135deg, var(--shinhan-navy), var(--shinhan-blue));
-      color: #fff;
-      padding: 12px 24px;
+      color: #fff; padding: 12px 24px;
       box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
-    .brand-title {
-      font-size: 1.15rem;
-      font-weight: 700;
-      letter-spacing: 0.5px;
-      margin: 0;
-    }
-    .user-tag {
-      font-size: 0.85rem;
-      opacity: 0.9;
-    }
+    .brand-title { font-size: 1.15rem; font-weight: 700; margin: 0; }
+    .user-tag { font-size: 0.85rem; opacity: 0.9; }
     .kpi-card {
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px;
+      background: #fff; border-radius: 8px; padding: 16px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border-left: 4px solid var(--shinhan-blue);
-      height: 100%;
+      border-left: 4px solid var(--shinhan-blue); height: 100%;
     }
-    .kpi-title {
-      font-size: 0.75rem;
-      font-weight: 700;
-      color: #64748b;
-      text-transform: uppercase;
-    }
-    .kpi-value-blue {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: var(--shinhan-blue);
-    }
-    .kpi-value-red {
-      font-size: 1.5rem;
-      font-weight: 700;
-      color: #dc2626;
-    }
-    .kpi-badge-alert {
-      font-size: 0.75rem;
-      font-weight: 600;
-      color: #dc2626;
-    }
-    .workspace-tabs {
-      display: flex;
-      gap: 8px;
-      margin-bottom: 12px;
-    }
+    .kpi-title { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
+    .kpi-value-blue { font-size: 1.5rem; font-weight: 700; color: var(--shinhan-blue); }
+    .kpi-value-red { font-size: 1.5rem; font-weight: 700; color: #dc2626; }
+    .kpi-badge-alert { font-size: 0.75rem; font-weight: 600; color: #dc2626; }
+    .workspace-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
     .tab-item-btn {
-      border: none;
-      background: #e2e8f0;
-      padding: 8px 16px;
-      border-radius: 6px;
-      font-weight: 600;
-      font-size: 0.9rem;
-      color: #334155;
-      cursor: pointer;
-      transition: all 0.2s;
+      border: none; background: #e2e8f0; padding: 8px 16px;
+      border-radius: 6px; font-weight: 600; font-size: 0.9rem;
+      color: #334155; cursor: pointer; transition: all 0.2s;
     }
-    .tab-item-btn.active {
-      background: var(--shinhan-blue);
-      color: #fff;
-    }
-    .tab-item-btn.hold-active {
-      background: #f59e0b;
-      color: #fff;
-    }
+    .tab-item-btn.active { background: var(--shinhan-blue); color: #fff; }
+    .tab-item-btn.hold-active { background: #f59e0b; color: #fff; }
     .content-box {
-      background: #fff;
-      border-radius: 8px;
-      padding: 16px;
+      background: #fff; border-radius: 8px; padding: 16px;
       box-shadow: 0 1px 3px rgba(0,0,0,0.08);
     }
-    .custom-table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.88rem;
-    }
+    .custom-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
     .custom-table th {
-      background: #f8fafc;
-      color: #475569;
-      padding: 10px;
-      border-bottom: 2px solid #e2e8f0;
-      text-align: center;
-      white-space: nowrap;
+      background: #f8fafc; color: #475569; padding: 10px;
+      border-bottom: 2px solid #e2e8f0; text-align: center; white-space: nowrap;
     }
     .custom-table td {
-      padding: 10px;
-      border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle;
-      text-align: center;
+      padding: 10px; border-bottom: 1px solid #f1f5f9;
+      vertical-align: middle; text-align: center;
     }
     .badge-phone-masked {
-      background: #e2e8f0;
-      color: #1e293b;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-weight: 600;
+      background: #e2e8f0; color: #1e293b; padding: 4px 8px;
+      border-radius: 4px; font-family: monospace; font-weight: 600;
     }
     .badge-phone-unmasked {
-      background: #dcfce7;
-      color: #15803d;
-      padding: 4px 8px;
-      border-radius: 4px;
-      font-family: monospace;
-      font-weight: 700;
+      background: #dcfce7; color: #15803d; padding: 4px 8px;
+      border-radius: 4px; font-family: monospace; font-weight: 700;
     }
     .btn-callio-call {
-      background: #0284c7;
-      color: #fff;
-      border: none;
-      padding: 4px 10px;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
+      background: #0284c7; color: #fff; border: none;
+      padding: 4px 10px; border-radius: 4px; font-size: 0.8rem;
+      font-weight: 600; cursor: pointer;
     }
-    .admin-nav-tabs {
-      display: flex;
-      border-bottom: 1px solid #cbd5e1;
-      background: #f8fafc;
-    }
+    .admin-nav-tabs { display: flex; border-bottom: 1px solid #cbd5e1; background: #f8fafc; }
     .admin-tab-btn {
-      border: none;
-      background: transparent;
-      padding: 10px 18px;
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #475569;
-      cursor: pointer;
+      border: none; background: transparent; padding: 10px 18px;
+      font-size: 0.85rem; font-weight: 600; color: #475569; cursor: pointer;
     }
     .admin-tab-btn.active {
-      color: var(--shinhan-blue);
-      border-bottom: 3px solid var(--shinhan-blue);
-      background: #fff;
+      color: var(--shinhan-blue); border-bottom: 3px solid var(--shinhan-blue); background: #fff;
     }
     #login-overlay {
-      position: fixed;
-      top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(15, 23, 42, 0.85);
-      z-index: 9999;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      backdrop-filter: blur(4px);
+      position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: rgba(15, 23, 42, 0.85); z-index: 9999;
+      display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
     }
     .login-box {
-      background: #fff;
-      border-radius: 12px;
-      padding: 32px;
-      width: 100%;
-      max-width: 400px;
-      box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3);
-      text-align: center;
+      background: #fff; border-radius: 12px; padding: 32px;
+      width: 100%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); text-align: center;
     }
     .dropzone-border {
-      border: 2px dashed #cbd5e1;
-      border-radius: 8px;
-      padding: 24px;
-      text-align: center;
-      cursor: pointer;
-      background: #f8fafc;
+      border: 2px dashed #cbd5e1; border-radius: 8px; padding: 24px;
+      text-align: center; cursor: pointer; background: #f8fafc;
     }
-    .dropzone-border:hover {
-      border-color: var(--shinhan-blue);
-      background: #f1f5f9;
-    }
+    .dropzone-border:hover { border-color: var(--shinhan-blue); background: #f1f5f9; }
   </style>
 </head>
 <body>
 
-  <!-- MÀN HÌNH ĐĂNG NHẬP -->
+  <!-- 1. MÀN HÌNH ĐĂNG NHẬP -->
   <div id="login-overlay">
     <div class="login-box">
       <i class="fa-solid fa-shield-halved fa-3x text-primary mb-3"></i>
       <h4 class="fw-bold mb-1">CRM SHINHAN FINANCE</h4>
-      <p class="text-muted small mb-4">Hệ Thống Quản Trị Dữ Liệu Telesale Enterprise</p>
+      <p class="text-muted small mb-4">Hệ Thống Quản Trị Dữ Liệu Telesale Enterprise V3.0</p>
       <div class="text-start mb-3">
         <label class="form-label fw-bold small">Mã Định Danh (Mã NV):</label>
         <div class="input-group">
           <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
-          <input type="text" id="login-username" class="form-control" placeholder="Ví dụ: ADMIN hoặc SALE_01" value="ADMIN">
+          <input type="text" id="login-username" class="form-control" placeholder="ADMIN hoặc SALE_01" value="ADMIN">
         </div>
       </div>
       <div class="text-start mb-3">
@@ -217,11 +118,10 @@
       <button type="button" class="btn btn-primary w-100 fw-bold py-2 mb-2" id="btn-submit-login" onclick="processLogin(event)">
         <i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP
       </button>
-      <div id="login-error-msg" class="text-danger fw-bold small my-2" style="display: none;"></div>
     </div>
   </div>
 
-  <!-- THANH ĐIỀU HƯỚNG TRÊN CÙNG -->
+  <!-- 2. THANH ĐIỀU HƯỚNG TOPBAR -->
   <header class="header-nav d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-3">
       <i class="fa-solid fa-headset fa-2x text-warning"></i>
@@ -244,7 +144,7 @@
   </header>
 
   <main class="container-fluid py-3 px-4">
-    <!-- KHỐI QUẢN TRỊ DÀNH CHO ADMIN / TEAMLEAD -->
+    <!-- 3. KHỐI QUẢN TRỊ ADMIN / LEADER -->
     <section id="admin-panel" class="mb-4" style="display: none;">
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-dark text-white fw-bold py-2 d-flex justify-content-between align-items-center">
@@ -306,14 +206,14 @@
                       </tr>
                     </thead>
                     <tbody id="tbody-drilldown-sales">
-                      <tr><td colspan="12" class="py-4 text-muted">Đang truy vấn số liệu từ Callio...</td></tr>
+                      <tr><td colspan="12" class="py-4 text-muted">Đang truy vấn số liệu Map/Reduce...</td></tr>
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
 
-            <!-- TAB 2 ADMIN: GIAN LẬN DATA -->
+            <!-- TAB 2 ADMIN: GIAN LẬN -->
             <div id="atab-content-2" style="display: none;">
               <div class="table-responsive">
                 <table class="table table-bordered align-middle text-center custom-table">
@@ -337,7 +237,7 @@
               </div>
             </div>
 
-            <!-- TAB 4 ADMIN: NẠP VÀ ĐIỀU PHỐI DATA -->
+            <!-- TAB 4 ADMIN: KHO DATA & BATCH INGEST -->
             <div id="atab-content-4" style="display: none;">
               <div class="row g-3">
                 <div class="col-lg-6">
@@ -352,17 +252,12 @@
                       <div class="fw-bold small" id="dropzone-file-name">Bấm để tải file Excel (.xlsx, .csv)...</div>
                       <input type="file" id="file-upload-excel" class="d-none" accept=".xlsx, .xls, .csv" onchange="handleExcelUpload(this)">
                     </div>
-                    <div class="progress" style="height: 8px;"><div id="bar-progress-stream" class="progress-bar bg-success" style="width: 0%"></div></div>
                   </div>
                 </div>
                 <div class="col-lg-6">
                   <div class="p-3 border rounded bg-light h-100">
                     <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-paper-plane me-1"></i> Phân Bổ Chủ Động (Push Mode)</h6>
                     <button type="button" class="btn btn-primary btn-sm fw-bold w-100 mb-3" onclick="openAdminDispatchModal()"><i class="fa-solid fa-share-nodes me-1"></i> Mở Bảng Giao Data</button>
-                    <hr>
-                    <h6 class="fw-bold text-warning mb-2"><i class="fa-solid fa-receipt me-1"></i> Đối Soát Callio CSV</h6>
-                    <input type="file" id="file-callio-log" class="form-control form-control-sm mb-2" accept=".csv, .txt">
-                    <button type="button" class="btn btn-warning btn-sm w-100 fw-bold" onclick="processCallLogReconciliation()">Bắt Đầu Đối Soát</button>
                   </div>
                 </div>
               </div>
@@ -373,7 +268,7 @@
       </div>
     </section>
 
-    <!-- DASHBOARD TELESALE: KPI & TIẾN ĐỘ -->
+    <!-- 4. WORKSPACE TELESALE: KPI & LÔ MỚI -->
     <section class="row g-3 mb-3">
       <div class="col-md-3">
         <div class="kpi-card">
@@ -423,14 +318,8 @@
         <table class="custom-table">
           <thead>
             <tr>
-              <th>STT</th>
-              <th>Khách Hàng</th>
-              <th>SĐT (Bảo Mật)</th>
-              <th>Đơn Vị / Lương</th>
-              <th>Chiến Dịch</th>
-              <th>Vòng Gọi</th>
-              <th>Hành Động</th>
-              <th style="min-width: 280px;">Báo Cáo Kết Quả</th>
+              <th>STT</th><th>Khách Hàng</th><th>SĐT (Bảo Mật)</th><th>Đơn Vị / Lương</th>
+              <th>Chiến Dịch</th><th>Vòng Gọi</th><th>Hành Động</th><th style="min-width: 280px;">Báo Cáo Kết Quả</th>
             </tr>
           </thead>
           <tbody id="tbody-batch-leads">
@@ -443,20 +332,13 @@
     <!-- BẢNG SỔ TAY HOLD LEAD -->
     <section id="view-hold-container" class="content-box" style="display: none;">
       <div class="p-2 mb-3 bg-light rounded border border-warning">
-        <i class="fa-solid fa-unlock-keyhole text-warning me-1"></i> <b>Sổ Tay Lead:</b> Đã gỡ mặt nạ số điện thoại để hỗ trợ tư vấn và kết bạn Zalo.
+        <i class="fa-solid fa-unlock-keyhole text-warning me-1"></i> <b>Sổ Tay Lead (30 Ngày):</b> Đã gỡ mặt nạ số điện thoại để hỗ trợ tư vấn và kết bạn Zalo.
       </div>
       <div class="table-responsive">
         <table class="custom-table">
           <thead>
             <tr>
-              <th>STT</th>
-              <th>Họ Tên</th>
-              <th>SĐT Gốc</th>
-              <th>Ngày Nhận</th>
-              <th>Đàm Thoại</th>
-              <th>Hạn Giữ</th>
-              <th>Zalo</th>
-              <th>Hồ Sơ Vay</th>
+              <th>STT</th><th>Họ Tên</th><th>SĐT Gốc</th><th>Ngày Nhận</th><th>Đàm Thoại</th><th>Hạn Giữ</th><th>Zalo</th><th>Hồ Sơ Vay</th>
             </tr>
           </thead>
           <tbody id="tbody-hold-leads">
@@ -467,7 +349,7 @@
     </section>
   </main>
 
-  <!-- MODAL CẤU HÌNH CALLIO -->
+  <!-- MODAL: CẤU HÌNH CALLIO -->
   <div class="modal fade" id="callioConfigModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -493,7 +375,7 @@
     </div>
   </div>
 
-  <!-- MODAL GIAO DATA DÀNH CHO ADMIN -->
+  <!-- MODAL: GIAO DATA DÀNH CHO ADMIN -->
   <div class="modal fade" id="adminDispatchModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -526,7 +408,7 @@
     </div>
   </div>
 
-  <!-- MODAL TẠO & SỬA NHÂN SỰ -->
+  <!-- MODAL: TẠO & SỬA NHÂN SỰ -->
   <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -562,7 +444,7 @@
     </div>
   </div>
 
-  <!-- MODAL PIPELINE CRM & THU THẬP HỒ SƠ -->
+  <!-- MODAL: PIPELINE CRM & HỒ SƠ APPROVE/REJECT -->
   <div class="modal fade" id="crmPipelineModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -588,33 +470,16 @@
           </ul>
 
           <div class="tab-content">
-            <!-- TAB 1: KHẢO SÁT -->
             <div class="tab-pane fade show active" id="tab-info">
               <div class="row g-3">
-                <div class="col-md-6">
-                  <label class="form-label fw-bold small">Công việc:</label>
-                  <input type="text" id="crm-job" class="form-control form-control-sm">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-bold small">Thu nhập (VNĐ):</label>
-                  <input type="text" id="crm-income" class="form-control form-control-sm">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-bold small">Nơi ở hiện tại:</label>
-                  <input type="text" id="crm-location" class="form-control form-control-sm">
-                </div>
-                <div class="col-md-6">
-                  <label class="form-label fw-bold small">Dư nợ tổ chức khác:</label>
-                  <input type="text" id="crm-debt" class="form-control form-control-sm">
-                </div>
-                <div class="col-12">
-                  <label class="form-label fw-bold small">Ghi chú chăm sóc:</label>
-                  <textarea id="crm-note" class="form-control form-control-sm" rows="3"></textarea>
-                </div>
+                <div class="col-md-6"><label class="form-label fw-bold small">Công việc:</label><input type="text" id="crm-job" class="form-control form-control-sm"></div>
+                <div class="col-md-6"><label class="form-label fw-bold small">Thu nhập (VNĐ):</label><input type="text" id="crm-income" class="form-control form-control-sm"></div>
+                <div class="col-md-6"><label class="form-label fw-bold small">Nơi ở hiện tại:</label><input type="text" id="crm-location" class="form-control form-control-sm"></div>
+                <div class="col-md-6"><label class="form-label fw-bold small">Dư nợ tổ chức khác:</label><input type="text" id="crm-debt" class="form-control form-control-sm"></div>
+                <div class="col-12"><label class="form-label fw-bold small">Ghi chú chăm sóc:</label><textarea id="crm-note" class="form-control form-control-sm" rows="3"></textarea></div>
               </div>
             </div>
 
-            <!-- TAB 2: PIPELINE & GIẢI NGÂN -->
             <div class="tab-pane fade" id="tab-pipeline">
               <div class="row g-3">
                 <div class="col-12">
@@ -623,12 +488,11 @@
                     <option value="Đang theo dõi">1. Đang theo dõi / Hẹn gọi lại</option>
                     <option value="Thu hồ sơ">2. Đang Thu Hồ Sơ</option>
                     <option value="Đã lên App">3. Đã lên App Shinhan (Chờ duyệt)</option>
-                    <option value="Giải ngân">4. Đã Giải Ngân (Loan)</option>
-                    <option value="Từ chối">5. Bị Từ Chối (Reject)</option>
+                    <option value="Giải ngân">4. Đã Giải Ngân (Approve - 120 Ngày)</option>
+                    <option value="Từ chối">5. Bị Từ Chối (Reject - 30-90 Ngày)</option>
                   </select>
                 </div>
 
-                <!-- CHECKLIST HỒ SƠ -->
                 <div class="col-12" id="box-checklist" style="display: none;">
                   <div class="card bg-white border">
                     <div class="card-body py-2">
@@ -643,7 +507,6 @@
                   </div>
                 </div>
 
-                <!-- KHOẢN VAY KÝ DUYỆT -->
                 <div class="col-12" id="box-loan-details" style="display: none;">
                   <div class="card border-success">
                     <div class="card-header bg-success text-white py-1 small fw-bold">THÔNG TIN KHOẢN VAY GIẢI NGÂN (APPROVE 120 NGÀY)</div>
@@ -658,13 +521,12 @@
                   </div>
                 </div>
 
-                <!-- LÝ DO TỪ CHỐI -->
                 <div class="col-12" id="box-reject-details" style="display: none;">
                   <div class="card border-danger">
                     <div class="card-header bg-danger text-white py-1 small fw-bold">CHI TIẾT TỪ CHỐI (REJECT REASON)</div>
                     <div class="card-body py-2">
                       <div class="row g-2">
-                        <div class="col-md-8"><label class="form-label small fw-bold mb-0">Mã Lỗi / Lý Do:</label><input type="text" id="crm-reject-reason" class="form-control form-control-sm" placeholder="Nợ chú ý, rớt thẩm định..."></div>
+                        <div class="col-md-8"><label class="form-label small fw-bold mb-0">Lý Do / Mã Lỗi:</label><input type="text" id="crm-reject-reason" class="form-control form-control-sm" placeholder="Nợ xấu, CIC chú ý, rớt thẩm định..."></div>
                         <div class="col-md-4">
                           <label class="form-label small fw-bold mb-0">Tái Lên Sau:</label>
                           <select class="form-select form-select-sm" id="crm-reject-cooldown">
@@ -693,52 +555,66 @@
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <!-- LOGIC SCRIPT THUẦN KẾT NỐI RESTFUL API GOOGLE APPS SCRIPT -->
+  <!-- ==============================================================================
+       LOGIC FRONTEND ENTERPRISE V3.0 (MODULAR ARCHITECTURE)
+       ============================================================================== -->
   <script>
-    // ==============================================================================
-    // [CẤU HÌNH API BACKEND] - ANH DÁN URL WEB APP CỦA ANH VÀO ĐÂY
-    // ==============================================================================
-    const API_ENDPOINT = "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec";
+    // -------------------------------------------------------------
+    // MODULE 1: CẤU HÌNH & TRẠNG THÁI TOÀN CỤC (GLOBAL STATE)
+    // -------------------------------------------------------------
+    const CONFIG = {
+      // ANH THAY URL WEB APP CỦA ANH VÀO ĐÂY
+      API_ENDPOINT: "https://script.google.com/macros/s/AKfycby_YOUR_DEPLOY_ID/exec"
+    };
 
-    var currentUser = null;
-    var activeBatchLeads = [];
-    var currentHoldDataCache = [];
-    var isNewLeadFlow = false;
-    var pendingLeadIndex = -1;
-    var lastReportTime = 0;
+    var AppState = {
+      currentUser: null,
+      activeBatchLeads: [],
+      currentHoldDataCache: [],
+      isNewLeadFlow: false,
+      pendingLeadIndex: -1,
+      lastReportTime: 0
+    };
 
-    // Helper gọi API chuẩn qua fetch()
-    async function callApi(payload, method = "POST") {
-      try {
-        if (method === "GET") {
-          let url = new URL(API_ENDPOINT);
-          Object.keys(payload).forEach(k => url.searchParams.append(k, payload[k]));
-          let res = await fetch(url.toString(), { method: "GET" });
-          return await res.json();
-        } else {
-          let res = await fetch(API_ENDPOINT, {
-            method: "POST",
-            body: JSON.stringify(payload)
-          });
-          return await res.json();
+    // -------------------------------------------------------------
+    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (API CLIENT MANAGER)
+    // -------------------------------------------------------------
+    const ApiClient = {
+      async request(payload, method = "POST") {
+        try {
+          if (method === "GET") {
+            let url = new URL(CONFIG.API_ENDPOINT);
+            Object.keys(payload).forEach(k => url.searchParams.append(k, payload[k]));
+            let res = await fetch(url.toString(), { method: "GET" });
+            return await res.json();
+          } else {
+            let res = await fetch(CONFIG.API_ENDPOINT, {
+              method: "POST",
+              body: JSON.stringify(payload)
+            });
+            return await res.json();
+          }
+        } catch (err) {
+          console.error("Lỗi ApiClient:", err);
+          return { status: "error", message: "Lỗi kết nối máy chủ API: " + err.toString() };
         }
-      } catch(err) {
-        console.error("Lỗi API:", err);
-        return { status: "error", message: "Lỗi kết nối máy chủ API: " + err.toString() };
       }
-    }
+    };
 
+    // -------------------------------------------------------------
+    // MODULE 3: KHỞI TẠO & ĐIỀU KHIỂN GIAO DIỆN (UI CONTROLLER)
+    // -------------------------------------------------------------
     window.addEventListener("DOMContentLoaded", function() {
       try {
         var saved = sessionStorage.getItem("SHN_CRM_USER");
         if (saved) {
-          currentUser = JSON.parse(saved);
-          if (currentUser && currentUser.userId) {
+          AppState.currentUser = JSON.parse(saved);
+          if (AppState.currentUser && AppState.currentUser.userId) {
             document.getElementById("login-overlay").style.display = "none";
             renderUserHeader();
             fetchHoldLeadsData();
             loadAdminDashboardData();
-            if (currentUser.role !== "ADMIN") claimNewBatch();
+            if (AppState.currentUser.role !== "ADMIN") claimNewBatch();
             return;
           }
         }
@@ -748,7 +624,6 @@
       document.getElementById("login-overlay").style.display = "flex";
     });
 
-    // 1. PHÂN HỆ XÁC THỰC
     async function processLogin(e) {
       if (e && e.preventDefault) e.preventDefault();
       var uInput = document.getElementById("login-username");
@@ -762,19 +637,19 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...';
 
-      var res = await callApi({ action: "login", username: u, password: p });
+      var res = await ApiClient.request({ action: "login", username: u, password: p });
 
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP';
 
       if (res && res.status === "success") {
-        currentUser = res.user;
-        sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+        AppState.currentUser = res.user;
+        sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(AppState.currentUser));
         document.getElementById("login-overlay").style.display = "none";
         renderUserHeader();
         fetchHoldLeadsData();
         loadAdminDashboardData();
-        if (currentUser.role !== "ADMIN") claimNewBatch();
+        if (AppState.currentUser.role !== "ADMIN") claimNewBatch();
       } else {
         alert(res ? res.message : "Đăng nhập thất bại!");
       }
@@ -787,19 +662,21 @@
     }
 
     function renderUserHeader() {
-      if (!currentUser) return;
-      var isAdmin = currentUser.role === "ADMIN";
-      var roleBadge = isAdmin ? '<span class="badge bg-danger">ADMIN TOÀN SÀN</span>' : '<span class="badge bg-primary">' + currentUser.role + '</span>';
-      document.getElementById("user-header-info").innerHTML = 'Tài khoản: <b>' + currentUser.name + '</b> | ' + roleBadge + ' | Nhánh: <b>' + currentUser.ext + '</b>';
-      document.getElementById("txt-active-ext").innerText = 'Nhánh: ' + currentUser.ext;
-      document.getElementById("cfg-ext-value").value = currentUser.ext;
+      if (!AppState.currentUser) return;
+      var isAdmin = AppState.currentUser.role === "ADMIN";
+      var roleBadge = isAdmin ? '<span class="badge bg-danger">ADMIN TOÀN SÀN</span>' : '<span class="badge bg-primary">' + AppState.currentUser.role + '</span>';
+      document.getElementById("user-header-info").innerHTML = 'Tài khoản: <b>' + AppState.currentUser.name + '</b> | ' + roleBadge + ' | Nhánh: <b>' + AppState.currentUser.ext + '</b>';
+      document.getElementById("txt-active-ext").innerText = 'Nhánh: ' + AppState.currentUser.ext;
+      document.getElementById("cfg-ext-value").value = AppState.currentUser.ext;
       
       var btnAdmin = document.getElementById("btn-toggle-admin");
-      if (btnAdmin) btnAdmin.style.display = (isAdmin || currentUser.role === "LEADER" || currentUser.role === "TEAMLEAD") ? "inline-block" : "none";
-      if (document.getElementById("adm-role-badge")) document.getElementById("adm-role-badge").innerText = currentUser.role;
+      if (btnAdmin) btnAdmin.style.display = (isAdmin || AppState.currentUser.role === "LEADER" || AppState.currentUser.role === "TEAMLEAD") ? "inline-block" : "none";
+      if (document.getElementById("adm-role-badge")) document.getElementById("adm-role-badge").innerText = AppState.currentUser.role;
     }
 
-    // 2. WORKSPACE SALE: PULL BATCH & NGHỊ ĐỊNH 91
+    // -------------------------------------------------------------
+    // MODULE 4: WORKSPACE TELESALE (PULL BATCH & GHI NHẬN BÁO CÁO)
+    // -------------------------------------------------------------
     function switchMainTab(tab) {
       document.getElementById("view-batch-container").style.display = (tab === 'batch') ? "block" : "none";
       document.getElementById("view-hold-container").style.display = (tab === 'hold') ? "block" : "none";
@@ -809,7 +686,7 @@
     }
 
     async function claimNewBatch() {
-      if (activeBatchLeads.length > 5) {
+      if (AppState.activeBatchLeads.length > 5) {
         alert("⚠️ BẠN CHƯA HOÀN THÀNH LÔ HIỆN TẠI!\nCần báo cáo đạt tối thiểu 90% (chỉ còn tồn tối đa 5 số) mới được nhận lô mới.");
         return;
       }
@@ -817,10 +694,10 @@
       btn.disabled = true;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang tải Data...';
 
-      var res = await callApi({
+      var res = await ApiClient.request({
         action: "claimBatch",
-        userId: currentUser.userId,
-        ext: currentUser.ext,
+        userId: AppState.currentUser.userId,
+        ext: AppState.currentUser.ext,
         batchSize: 50
       });
 
@@ -828,7 +705,7 @@
       btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down me-1"></i> Nhận Lô Mới';
 
       if (res && res.status === "success") {
-        activeBatchLeads = res.leads || [];
+        AppState.activeBatchLeads = res.leads || [];
         renderBatchTable();
         updateDashboardKpi();
       } else {
@@ -838,16 +715,16 @@
 
     function renderBatchTable() {
       var tbody = document.getElementById("tbody-batch-leads");
-      document.getElementById("badge-count-batch").innerText = activeBatchLeads.length;
+      document.getElementById("badge-count-batch").innerText = AppState.activeBatchLeads.length;
       if (!tbody) return;
 
-      if (activeBatchLeads.length === 0) {
+      if (AppState.activeBatchLeads.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-success fw-bold">Lô Data đã hoàn tất. Bấm nhận thêm lô mới!</td></tr>';
         return;
       }
 
       var html = "";
-      activeBatchLeads.forEach(function(l, idx) {
+      AppState.activeBatchLeads.forEach(function(l, idx) {
         html += '<tr>' +
           '<td>' + (idx + 1) + '</td>' +
           '<td><b>' + l.name + '</b></td>' +
@@ -894,7 +771,7 @@
     async function processLeadReport(idx) {
       var val = document.getElementById("sel-status-" + idx).value;
       if (!val) { alert("Vui lòng chọn kết quả cuộc gọi!"); return; }
-      var lead = activeBatchLeads[idx];
+      var lead = AppState.activeBatchLeads[idx];
 
       if (val === "POTENTIAL" || val === "FOLLOW_UP") {
         openCRMModalNewLead(lead, val);
@@ -902,12 +779,12 @@
       }
 
       var now = new Date().getTime();
-      var interval = (lastReportTime === 0) ? 10 : Math.round((now - lastReportTime) / 1000);
-      lastReportTime = now;
+      var interval = (AppState.lastReportTime === 0) ? 10 : Math.round((now - AppState.lastReportTime) / 1000);
+      AppState.lastReportTime = now;
 
-      await callApi({
+      await ApiClient.request({
         action: "recordReport",
-        userId: currentUser.userId,
+        userId: AppState.currentUser.userId,
         report: {
           leadId: lead.leadId,
           status: val,
@@ -916,23 +793,25 @@
         }
       });
 
-      activeBatchLeads.splice(idx, 1);
+      AppState.activeBatchLeads.splice(idx, 1);
       renderBatchTable();
       updateDashboardKpi();
     }
 
     function updateDashboardKpi() {
-      var pendingCount = activeBatchLeads.length;
+      var pendingCount = AppState.activeBatchLeads.length;
       document.getElementById("val-kpi-progress").innerText = pendingCount + " Số Tồn";
       var btn = document.getElementById("btn-claim-batch");
       if (pendingCount > 5) btn.classList.replace("btn-success", "btn-secondary");
       else btn.classList.replace("btn-secondary", "btn-success");
     }
 
-    // 3. SỔ TAY HOLD LEAD & PIPELINE
+    // -------------------------------------------------------------
+    // MODULE 5: SỔ TAY HOLD LEAD & QUẢN LÝ PIPELINE
+    // -------------------------------------------------------------
     async function fetchHoldLeadsData() {
-      if (!currentUser) return;
-      var res = await callApi({ action: "getHoldLeads", userId: currentUser.userId }, "GET");
+      if (!AppState.currentUser) return;
+      var res = await ApiClient.request({ action: "getHoldLeads", userId: AppState.currentUser.userId }, "GET");
       var tbody = document.getElementById("tbody-hold-leads");
       
       if (!res || !res.data || res.data.length === 0) {
@@ -942,7 +821,7 @@
         return;
       }
 
-      currentHoldDataCache = res.data;
+      AppState.currentHoldDataCache = res.data;
       document.getElementById("badge-count-hold").innerText = res.data.length;
       document.getElementById("val-kpi-hold").innerText = res.data.length + " Lead";
 
@@ -970,8 +849,8 @@
     }
 
     function openCRMModalNewLead(leadObj, initialStatus) {
-      isNewLeadFlow = true;
-      pendingLeadIndex = activeBatchLeads.findIndex(l => l.leadId === leadObj.leadId);
+      AppState.isNewLeadFlow = true;
+      AppState.pendingLeadIndex = AppState.activeBatchLeads.findIndex(l => l.leadId === leadObj.leadId);
       document.getElementById("crm-lead-id").value = leadObj.leadId;
       document.getElementById("crm-name").innerText = leadObj.name;
       document.getElementById("crm-phone").innerText = leadObj.maskedPhone;
@@ -981,8 +860,8 @@
     }
 
     function openCRMModalExisting(index) {
-      isNewLeadFlow = false;
-      var lead = currentHoldDataCache[index];
+      AppState.isNewLeadFlow = false;
+      var lead = AppState.currentHoldDataCache[index];
       document.getElementById("crm-lead-id").value = lead.leadId;
       document.getElementById("crm-name").innerText = lead.name;
       document.getElementById("crm-phone").innerText = lead.realPhone;
@@ -1012,13 +891,13 @@
 
       bootstrap.Modal.getInstance(document.getElementById("crmPipelineModal")).hide();
 
-      if (isNewLeadFlow) {
-        var leadObj = activeBatchLeads[pendingLeadIndex];
+      if (AppState.isNewLeadFlow) {
+        var leadObj = AppState.activeBatchLeads[AppState.pendingLeadIndex];
         var realPhoneDirect = atob(leadObj.rawPhoneRef);
 
-        await callApi({
+        await ApiClient.request({
           action: "saveHoldPipeline",
-          userId: currentUser.userId,
+          userId: AppState.currentUser.userId,
           leadData: {
             leadId: leadId,
             name: leadObj.name,
@@ -1031,16 +910,15 @@
           }
         });
 
-        activeBatchLeads.splice(pendingLeadIndex, 1);
+        AppState.activeBatchLeads.splice(AppState.pendingLeadIndex, 1);
         renderBatchTable();
         updateDashboardKpi();
         fetchHoldLeadsData();
       } else {
-        // Nếu là Approve hoặc Reject -> Đẩy vào Customer Ledger V3.0
         if (status === "Giải ngân" || status === "Từ chối") {
-          await callApi({
+          await ApiClient.request({
             action: "submitCustomerLifecycle",
-            userId: currentUser.userId,
+            userId: AppState.currentUser.userId,
             data: {
               leadId: leadId,
               name: document.getElementById("crm-name").innerText,
@@ -1057,16 +935,18 @@
           });
         }
 
-        await callApi({
+        await ApiClient.request({
           action: "saveHoldPipeline",
-          userId: currentUser.userId,
+          userId: AppState.currentUser.userId,
           leadData: { leadId: leadId, status: status, note: note, extraData: extraData }
         });
         fetchHoldLeadsData();
       }
     }
 
-    // 4. PHÂN HỆ QUẢN TRỊ ADMIN DRILL-DOWN REALTIME
+    // -------------------------------------------------------------
+    // MODULE 6: PHÂN HỆ QUẢN TRỊ ADMIN (MA TRẬN, NÚT HÀNH ĐỘNG & GIAO DATA)
+    // -------------------------------------------------------------
     function toggleAdminPanel() {
       var p = document.getElementById("admin-panel");
       p.style.display = (p.style.display === "none") ? "block" : "none";
@@ -1079,11 +959,13 @@
         document.getElementById("atab-content-" + i).style.display = (i === idx) ? "block" : "none";
       }
       if (idx === 1) loadTeamDrillDownData();
+      if (idx === 2) loadSaleAuditData();
+      if (idx === 3) loadPipelineRecoveryData();
     }
 
     async function loadAdminDashboardData() {
-      if (!currentUser || (currentUser.role !== "ADMIN" && currentUser.role !== "LEADER")) return;
-      var teamRes = await callApi({ action: "getTeams" }, "GET");
+      if (!AppState.currentUser || (AppState.currentUser.role !== "ADMIN" && AppState.currentUser.role !== "LEADER")) return;
+      var teamRes = await ApiClient.request({ action: "getTeams" }, "GET");
       if (teamRes && teamRes.teams) {
         var sel = document.getElementById("sel-filter-team");
         sel.innerHTML = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
@@ -1097,7 +979,7 @@
       var tbody = document.getElementById("tbody-drilldown-sales");
       tbody.innerHTML = '<tr><td colspan="12" class="py-4 text-primary"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tính toán Map/Reduce từ Call Logs...</td></tr>';
 
-      var res = await callApi({ action: "getStats", team: teamFilter }, "GET");
+      var res = await ApiClient.request({ action: "getStats", team: teamFilter }, "GET");
       if (!res || res.status !== "success" || !res.sales) return;
 
       document.getElementById("txt-selected-team-name").innerText = res.summary.teamName;
@@ -1114,6 +996,23 @@
           ? '<span class="badge bg-danger">' + s.avgSec + 's <i class="fa-solid fa-triangle-exclamation"></i></span>'
           : s.avgSec + 's';
 
+        // Nút Khóa / Mở khóa cấp data
+        var lockBtn = s.status === "ACTIVE"
+          ? '<button class="btn btn-outline-danger btn-sm py-0 px-1" title="Khóa data" onclick="handleToggleLock(\'' + s.userId + '\', true)"><i class="fa-solid fa-lock"></i></button>'
+          : '<button class="btn btn-success btn-sm py-0 px-1" title="Mở khóa" onclick="handleToggleLock(\'' + s.userId + '\', false)"><i class="fa-solid fa-lock-open"></i></button>';
+
+        // Nút Sửa nhân viên
+        var editBtn = '<button class="btn btn-outline-secondary btn-sm py-0 px-1" title="Sửa thông tin" onclick="openEditUserModal(\'' + s.userId + '\', \'' + s.name + '\', \'' + s.role + '\', \'' + s.ext + '\', \'' + s.team + '\')"><i class="fa-solid fa-pen"></i></button>';
+
+        // Nút Giao data
+        var pushBtn = '<button class="btn btn-outline-primary btn-sm py-0 px-1" title="Giao data" onclick="openAdminDispatchModalForUser(\'' + s.userId + '\')"><i class="fa-solid fa-paper-plane"></i></button>';
+
+        // Nút Thu hồi data dở dang
+        var revokeBtn = '<button class="btn btn-outline-warning btn-sm py-0 px-1" title="Thu hồi data chưa gọi" onclick="handleAdminRevokeBatch(\'' + s.userId + '\')"><i class="fa-solid fa-arrow-rotate-left"></i></button>';
+
+        // Nút Chuyển quyền Hold Lead sang Sale khác
+        var transferBtn = '<button class="btn btn-outline-info btn-sm py-0 px-1 text-dark" title="Chuyển Lead của Sale này" onclick="openTransferHoldModal(\'' + s.userId + '\')"><i class="fa-solid fa-people-arrows"></i></button>';
+
         html += '<tr>' +
           '<td class="text-start"><b>' + s.name + '</b><br><small class="text-muted">' + s.userId + '</small></td>' +
           '<td>' + s.ext + '</td>' +
@@ -1126,7 +1025,7 @@
           '<td><span class="badge bg-info text-dark">' + s.rateLeadHold + '</span></td>' +
           '<td class="text-danger fw-bold">' + s.appCount + '</td>' +
           '<td class="text-success fw-bold">' + s.loanCount + '</td>' +
-          '<td><button class="btn btn-outline-primary btn-sm py-0 px-2" onclick="openAdminDispatchModalForUser(\'' + s.userId + '\')"><i class="fa-solid fa-paper-plane"></i></button></td>' +
+          '<td><div class="d-flex justify-content-center gap-1">' + lockBtn + editBtn + pushBtn + revokeBtn + transferBtn + '</div></td>' +
         '</tr>';
       });
 
@@ -1135,17 +1034,113 @@
       document.getElementById("adm-total-calls").innerText = totalCalls + " Cuộc";
     }
 
+    async function handleToggleLock(userId, lockStatus) {
+      if (!confirm((lockStatus ? "Khóa cấp data cho " : "Mở khóa cấp data cho ") + userId + "?")) return;
+      var res = await ApiClient.request({ action: "toggleLock", userId: userId, status: lockStatus });
+      alert(res.message);
+      loadAdminDashboardData();
+    }
+
+    async function handleAdminRevokeBatch(saleId) {
+      if (!confirm("Thu hồi toàn bộ data chưa gọi của [" + saleId + "] về lại kho tổng?")) return;
+      var res = await ApiClient.request({ action: "revokeBatch", userId: saleId });
+      alert(res.message);
+      loadAdminDashboardData();
+    }
+
+    function openTransferHoldModal(fromSaleId) {
+      var leadId = prompt("Nhập mã LEAD_ID cần chuyển từ Sale [" + fromSaleId + "]:");
+      if (!leadId) return;
+      var toSaleId = prompt("Nhập MÃ SALE mới sẽ tiếp nhận:");
+      if (!toSaleId) return;
+      
+      ApiClient.request({
+        action: "transferHold",
+        leadId: leadId.trim(),
+        fromSaleId: fromSaleId.trim().toUpperCase(),
+        toSaleId: toSaleId.trim().toUpperCase()
+      }).then(res => {
+        alert(res.message);
+        loadAdminDashboardData();
+      });
+    }
+
     function openAdminDispatchModal() { new bootstrap.Modal(document.getElementById("adminDispatchModal")).show(); }
     function openAdminDispatchModalForUser(uid) { 
       openAdminDispatchModal(); 
       setTimeout(() => document.getElementById("dispatch-target-sale").value = uid, 500); 
     }
 
+    async function submitAdminDispatch() {
+      var targetSale = document.getElementById("dispatch-target-sale").value;
+      var batchSize = document.getElementById("dispatch-batch-size").value;
+      var tag = document.getElementById("dispatch-campaign-tag").value.trim() || "ALL";
+      var prov = document.getElementById("dispatch-province").value.trim() || "ALL";
+      if (!targetSale) { alert("Chưa chọn nhân sự nhận số!"); return; }
+
+      var res = await ApiClient.request({
+        action: "adminDispatch",
+        targetSaleId: targetSale,
+        batchSize: batchSize,
+        campaignTag: tag,
+        provinceFilter: prov
+      });
+
+      alert(res.message);
+      bootstrap.Modal.getInstance(document.getElementById("adminDispatchModal")).hide();
+      loadAdminDashboardData();
+    }
+
     function openCreateUserModal() { new bootstrap.Modal(document.getElementById("createUserModal")).show(); }
 
-    function handleExcelUpload(input) {
-      alert("Tính năng nạp Excel đã sẵn sàng. Hệ thống sẽ chunk 1000 dòng/lần gửi lên API!");
+    async function submitCreateNewUser() {
+      var payload = {
+        userId: document.getElementById("new-user-id").value.trim().toUpperCase(),
+        name: document.getElementById("new-user-name").value.trim(),
+        role: document.getElementById("new-user-role").value.trim().toUpperCase(),
+        ext: document.getElementById("new-user-ext").value.trim(),
+        hotline: document.getElementById("new-user-hotline").value.trim(),
+        team: document.getElementById("new-user-team").value.trim().toUpperCase(),
+        password: document.getElementById("new-user-password").value.trim()
+      };
+      if (!payload.userId || !payload.name) { alert("Vui lòng nhập đủ ID và Họ Tên!"); return; }
+
+      var res = await ApiClient.request({ action: "createUser", userData: payload });
+      alert(res.message);
+      if (res.status === "success") {
+        bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide();
+        loadAdminDashboardData();
+      }
     }
+
+    async function submitCallioConfig() {
+      var ext = document.getElementById("cfg-ext-value").value.trim();
+      var token = document.getElementById("cfg-token-value").value.trim();
+      if (!ext) { alert("Bắt buộc nhập số nhánh Ext!"); return; }
+
+      var res = await ApiClient.request({
+        action: "saveCallioConfig",
+        userId: AppState.currentUser.userId,
+        ext: ext,
+        token: token
+      });
+
+      alert(res.message);
+      if (res.status === "success") {
+        AppState.currentUser.ext = ext;
+        renderUserHeader();
+        bootstrap.Modal.getInstance(document.getElementById("callioConfigModal")).hide();
+      }
+    }
+
+    function handleExcelUpload(input) {
+      alert("Tính năng nạp Excel Batch Chunk đã sẵn sàng. Hệ thống sẽ chunk 1000 dòng/lần gửi lên API!");
+    }
+
+    // -------------------------------------------------------------
+    // [EXTENSION MODULE ZONE] - KHU VỰC THÊM HÀM / TÍNH NĂNG MỚI VỀ SAU
+    // -------------------------------------------------------------
+    // Anh có thể bổ sung các hàm vẽ biểu đồ ChartJS, xuất báo cáo Excel tùy chỉnh xuống đây.
   </script>
 </body>
 </html>
