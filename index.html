@@ -1003,28 +1003,73 @@
       if (idx === 1) loadTeamDrillDownData();
     }
 
+    // [NEW] - QUẢN TRỊ PHÂN QUYỀN RBAC CHO ADMIN & TEAM LEADER
     async function loadAdminDashboardData() {
-      if (!AppState.currentUser || (AppState.currentUser.role !== "ADMIN" && AppState.currentUser.role !== "LEADER")) return;
-      var teamRes = await ApiClient.request({ action: "getTeams" }, "GET");
-      if (teamRes && teamRes.teams) {
-        var sel = document.getElementById("sel-filter-team");
-        var currentTeam = sel.value || "TEAM_01";
-        sel.innerHTML = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
-        teamRes.teams.forEach(t => sel.innerHTML += `<option value="${t}" ${t === currentTeam ? "selected" : ""}>${t}</option>`);
+      if (!AppState.currentUser) return;
+      var role = (AppState.currentUser.role || "").toUpperCase();
+      if (role !== "ADMIN" && role !== "LEADER" && role !== "TEAMLEAD") return;
+
+      var currentUserId = AppState.currentUser.userId;
+
+      // 1. Kéo 4 thẻ KPI theo phạm vi của User (Leader chỉ thấy KPI nội bộ Team)
+      var overviewRes = await ApiClient.request({ 
+        action: "getFloorOverview", 
+        requesterId: currentUserId 
+      }, "GET");
+      
+      if (overviewRes && overviewRes.status === "success" && overviewRes.stats) {
+        document.getElementById("adm-total-data").innerText = overviewRes.stats.totalDistributedToday + " Số";
+        document.getElementById("adm-total-calls").innerText = overviewRes.stats.totalProcessedToday + " Đã Xử Lý";
+        document.getElementById("adm-rate-30s").innerText = overviewRes.stats.batchProgressRate;
+        document.getElementById("adm-apps").innerText = overviewRes.stats.appsSummary;
       }
+
+      // 2. Lấy danh sách Team được phép truy cập
+      var teamRes = await ApiClient.request({ 
+        action: "getTeams", 
+        requesterId: currentUserId 
+      }, "GET");
+
+      var sel = document.getElementById("sel-filter-team");
+      sel.innerHTML = "";
+
+      if (teamRes && teamRes.teams) {
+        if (teamRes.isRestricted) {
+          // VỚI LEADER: Khóa cứng Dropdown, chỉ hiện đúng 1 Team của mình, vô hiệu hóa việc chuyển Team
+          teamRes.teams.forEach(function(t) {
+            sel.innerHTML += '<option value="' + t + '" selected>🔒 ' + t + ' (Team của bạn)</option>';
+          });
+          sel.disabled = true; // Khóa dropdown
+        } else {
+          // VỚI ADMIN: Mở toàn quyền xem tất cả các Team
+          sel.disabled = false;
+          sel.innerHTML = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
+          teamRes.teams.forEach(function(t) {
+            sel.innerHTML += '<option value="' + t + '">' + t + '</option>';
+          });
+        }
+      }
+
+      // 3. Tải ma trận dữ liệu tương ứng với Team đã chọn
       loadTeamDrillDownData();
     }
 
+    // [NEW] - TRUY VẤN MA TRẬN CÓ TRUYỀN requesterId ĐỂ BACKEND BẢO MẬT
     async function loadTeamDrillDownData() {
       var teamFilter = document.getElementById("sel-filter-team").value || "ALL";
       var tbody = document.getElementById("tbody-drilldown-sales");
-      tbody.innerHTML = '<tr><td colspan="10" class="py-4 text-primary"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tính toán dữ liệu thực tế...</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="py-4 text-primary"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tải dữ liệu phạm vi Team...</td></tr>';
 
-      var res = await ApiClient.request({ action: "getStats", team: teamFilter }, "GET");
+      var res = await ApiClient.request({ 
+        action: "getStats", 
+        team: teamFilter,
+        requesterId: AppState.currentUser.userId
+      }, "GET");
+
       if (!res || res.status !== "success" || !res.sales) return;
 
       document.getElementById("txt-selected-team-name").innerText = res.summary.teamName;
-      document.getElementById("badge-team-headcount").innerText = res.summary.activeSales + " Nhân Sự";
+      document.getElementById("badge-team-headcount").innerText = res.sales.length + " Nhân Sự";
 
       var html = "";
       var totAssigned = 0;
@@ -1041,7 +1086,6 @@
         totApp += s.appCount;
         totLoan += s.loanCount;
 
-        // Thanh tiến độ KPI: 10 Hold = 100%
         var kpiPercent = Math.min(100, Math.round((s.holdLead / 10) * 100));
         var kpiBarColor = kpiPercent >= 100 ? "bg-success" : (kpiPercent >= 50 ? "bg-primary" : "bg-warning");
         var kpiDisplay = '<div class="d-flex align-items-center justify-content-center gap-1">' +
@@ -1052,7 +1096,7 @@
         '</div>';
 
         var alertBadge = s.isSuspect 
-          ? '<span class="badge bg-danger ms-1" title="Xử lý nhiều nhưng không ra Lead (Nghi vấn lướt data)"><i class="fa-solid fa-triangle-exclamation"></i> Lướt data</span>' 
+          ? '<span class="badge bg-danger ms-1" title="Xử lý nhiều nhưng không ra Lead"><i class="fa-solid fa-triangle-exclamation"></i> Lướt data</span>' 
           : '';
 
         var lockBtn = s.status === "ACTIVE"
@@ -1078,6 +1122,25 @@
         '</tr>';
       });
 
+      // TỔNG CỘNG THEO PHẠM VI TEAM ĐANG XEM
+      var teamTargetHold = activeHeadcount * 10;
+      var teamKpiPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
+      var teamBatchProgress = totAssigned > 0 ? Math.round((totProcessed / totAssigned) * 100) + "%" : "0%";
+
+      var totalRowHtml = '<tr class="table-dark fw-bold text-center border-top border-3 border-primary" style="font-size: 0.92rem;">' +
+        '<td colspan="2" class="text-uppercase text-warning text-center py-2"><i class="fa-solid fa-calculator me-1"></i> TỔNG CỘNG TEAM (' + activeHeadcount + ' Sale)</td>' +
+        '<td class="text-white">' + totAssigned + '</td>' +
+        '<td class="text-primary">' + totProcessed + '</td>' +
+        '<td class="text-info">' + teamBatchProgress + '</td>' +
+        '<td class="text-warning fs-6">' + totHold + ' Lead</td>' +
+        '<td class="text-white">' + teamKpiPercent + '% (' + totHold + '/' + teamTargetHold + ')</td>' +
+        '<td class="text-danger fs-6">' + totApp + '</td>' +
+        '<td class="text-success fs-6">' + totLoan + '</td>' +
+        '<td class="text-muted small">---</td>' +
+      '</tr>';
+
+      tbody.innerHTML = html + totalRowHtml;
+    }
       // HÀNG TỔNG CỘNG TOÀN TEAM
       var teamTargetHold = activeHeadcount * 10;
       var teamKpiPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
