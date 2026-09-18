@@ -974,12 +974,26 @@
 
     async function loadAdminDashboardData() {
       if (!AppState.currentUser || (AppState.currentUser.role !== "ADMIN" && AppState.currentUser.role !== "LEADER")) return;
+      
+      // 1. Kéo dữ liệu 4 thẻ KPI tổng quan sàn
+      var overviewRes = await ApiClient.request({ action: "getFloorOverview" }, "GET");
+      if (overviewRes && overviewRes.status === "success" && overviewRes.stats) {
+        document.getElementById("adm-total-data").innerText = overviewRes.stats.totalDistributedToday + " Số";
+        document.getElementById("adm-total-calls").innerText = overviewRes.stats.totalCallsMade + " Cuộc";
+        document.getElementById("adm-rate-30s").innerText = overviewRes.stats.qualityRate30s;
+        document.getElementById("adm-apps").innerText = overviewRes.stats.appsSummary;
+      }
+
+      // 2. Kéo danh sách Team vào Dropdown
       var teamRes = await ApiClient.request({ action: "getTeams" }, "GET");
       if (teamRes && teamRes.teams) {
         var sel = document.getElementById("sel-filter-team");
+        var currentTeam = sel.value || "TEAM_01";
         sel.innerHTML = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
-        teamRes.teams.forEach(t => sel.innerHTML += `<option value="${t}">${t}</option>`);
+        teamRes.teams.forEach(t => sel.innerHTML += `<option value="${t}" ${t === currentTeam ? "selected" : ""}>${t}</option>`);
       }
+
+      // 3. Render ma trận chi tiết của Team đã chọn
       loadTeamDrillDownData();
     }
 
