@@ -562,15 +562,15 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- ==============================================================================
-       LOGIC FRONTEND ENTERPRISE V3.0 (MODULAR ARCHITECTURE)
+       LOGIC FRONTEND ENTERPRISE V3.0 (CHỐNG TREO NÚT ĐĂNG NHẬP & CHỐNG CORS)
        ============================================================================== -->
   <script>
     // -------------------------------------------------------------
-    // MODULE 1: CẤU HÌNH & TRẠNG THÁI TOÀN CỤC (GLOBAL STATE)
+    // MODULE 1: CẤU HÌNH HỆ THỐNG
     // -------------------------------------------------------------
     const CONFIG = {
-      // ANH THAY URL WEB APP CỦA ANH VÀO ĐÂY NẾU CẦN
-      API_ENDPOINT: "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec"
+      // ANH DÁN ĐÚNG ĐƯỜNG LINK WEB APP /exec VÀO ĐÂY:
+      API_ENDPOINT: "https://script.google.com/macros/s/AKfycby_YOUR_DEPLOY_ID/exec"
     };
 
     var AppState = {
@@ -583,14 +583,18 @@
     };
 
     // -------------------------------------------------------------
-    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (CHỐNG CORS & FAILED TO FETCH)
+    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (TỰ ĐỘNG CHUYỂN GET/POST AN TOÀN)
     // -------------------------------------------------------------
     const ApiClient = {
-      async request(payload, method = "POST") {
+      async request(payload, method = "GET") {
         try {
           if (method === "GET") {
             let url = new URL(CONFIG.API_ENDPOINT);
-            Object.keys(payload).forEach(k => url.searchParams.append(k, payload[k]));
+            Object.keys(payload).forEach(k => {
+              if (payload[k] !== undefined && payload[k] !== null) {
+                url.searchParams.append(k, payload[k]);
+              }
+            });
             let res = await fetch(url.toString(), {
               method: "GET",
               mode: "cors",
@@ -598,26 +602,25 @@
             });
             return await res.json();
           } else {
+            // Dùng Simple Request qua text/plain để vượt qua rào cản OPTIONS Preflight
             let res = await fetch(CONFIG.API_ENDPOINT, {
               method: "POST",
               mode: "cors",
               redirect: "follow",
-              headers: {
-                "Content-Type": "text/plain;charset=utf-8"
-              },
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
               body: JSON.stringify(payload)
             });
             return await res.json();
           }
         } catch (err) {
           console.error("Lỗi ApiClient:", err);
-          return { status: "error", message: "Lỗi kết nối máy chủ API: " + err.toString() };
+          return { status: "error", message: "Không thể kết nối máy chủ GAS: " + err.toString() };
         }
       }
     };
 
     // -------------------------------------------------------------
-    // MODULE 3: KHỞI TẠO & XÁC THỰC (CHỐNG TREO NÚT ĐĂNG NHẬP)
+    // MODULE 3: XỬ LÝ ĐĂNG NHẬP (BỌC CHỐNG LIỆT GIAO DIỆN)
     // -------------------------------------------------------------
     window.addEventListener("DOMContentLoaded", function() {
       try {
@@ -648,50 +651,70 @@
 
       var u = uInput ? uInput.value.trim().toUpperCase() : "";
       var p = pInput ? pInput.value.trim() : "";
-      if (!u || !p) { 
-        alert("Vui lòng nhập đầy đủ Mã NV và Mật khẩu!"); 
-        return false; 
+
+      if (errEl) { errEl.style.display = "none"; errEl.innerText = ""; }
+
+      if (!u || !p) {
+        showLoginError("Vui lòng nhập đầy đủ Mã Định Danh và Mật khẩu!");
+        return false;
       }
 
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...';
-      if (errEl) errEl.style.display = "none";
+      if (CONFIG.API_ENDPOINT.indexOf("YOUR_DEPLOY_ID") !== -1) {
+        showLoginError("LỖI CẤU HÌNH: Bạn chưa thay thế link API_ENDPOINT trong code index.html!");
+        return false;
+      }
 
-      var loginTimer = setTimeout(function() {
+      // Khóa nút bấm và bật icon xoay trạng thái
+      btn.disabled = true;
+      var originalBtnText = btn.innerHTML;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...';
+
+      // Cơ chế Watchdog: Tự mở lại nút sau 12 giây nếu máy chủ phản hồi chậm
+      var watchdog = setTimeout(function() {
         if (btn && btn.disabled) {
           btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP';
-          alert("Quá thời gian phản hồi từ máy chủ (Timeout). Vui lòng thử lại!");
+          btn.innerHTML = originalBtnText;
+          showLoginError("Hết thời gian chờ phản hồi (Timeout). Vui lòng thử lại!");
         }
-      }, 15000);
+      }, 12000);
 
-      // [NEW] - Gửi yêu cầu đăng nhập qua GET để vượt lỗi chuyển hướng 302
-      var res = await ApiClient.request({ action: "login", username: u, password: p }, "GET");
-      clearTimeout(loginTimer);
+      try {
+        // Gửi yêu cầu xác thực qua GET để vượt lỗi 302 Redirect
+        var res = await ApiClient.request({ action: "login", username: u, password: p }, "GET");
+        clearTimeout(watchdog);
 
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP';
-
-      if (res && res.status === "success") {
-        AppState.currentUser = res.user;
-        sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(AppState.currentUser));
-        document.getElementById("login-overlay").style.display = "none";
-        renderUserHeader();
-        fetchHoldLeadsData();
-        loadAdminDashboardData();
-        if (AppState.currentUser.role !== "ADMIN") claimNewBatch();
-      } else {
-        var msg = res ? res.message : "Đăng nhập thất bại!";
-        if (errEl) {
-          errEl.innerText = msg;
-          errEl.style.display = "block";
+        if (res && res.status === "success" && res.user) {
+          AppState.currentUser = res.user;
+          sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(AppState.currentUser));
+          document.getElementById("login-overlay").style.display = "none";
+          renderUserHeader();
+          fetchHoldLeadsData();
+          loadAdminDashboardData();
+          if (AppState.currentUser.role !== "ADMIN") claimNewBatch();
         } else {
-          alert(msg);
+          showLoginError(res && res.message ? res.message : "Mã NV hoặc Mật khẩu không chính xác!");
         }
+      } catch (err) {
+        clearTimeout(watchdog);
+        showLoginError("Lỗi kết nối mạng: " + err.toString());
+      } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalBtnText;
       }
+
       return false;
     }
-    function logoutSession() {
+
+    function showLoginError(msg) {
+      var errEl = document.getElementById("login-error-msg");
+      if (errEl) {
+        errEl.innerText = msg;
+        errEl.style.display = "block";
+      } else {
+        alert(msg);
+      }
+    }
+  function logoutSession() {
       sessionStorage.removeItem("SHN_CRM_USER");
       location.reload();
     }
