@@ -112,7 +112,7 @@
         <label class="form-label fw-bold small">Mật khẩu:</label>
         <div class="input-group">
           <span class="input-group-text bg-light"><i class="fa-solid fa-key text-muted"></i></span>
-          <input type="password" id="login-password" class="form-control" placeholder="Nhập mật khẩu" value="123456" onkeydown="if(event.key==='Enter') processLogin(event)">
+          <input type="password" id="login-password" class="form-control" placeholder="Nhập mật khẩu" value="123456">
         </div>
       </div>
       <button type="button" class="btn btn-primary w-100 fw-bold py-2 mb-2" id="btn-submit-login" onclick="processLogin(event)">
@@ -122,7 +122,7 @@
     </div>
   </div>
 
-  <!-- 2. THANH ĐIỀU HƯỚNG TOPBAR -->
+  <!-- 2. TOPBAR -->
   <header class="header-nav d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-3">
       <i class="fa-solid fa-headset fa-2x text-warning"></i>
@@ -145,7 +145,7 @@
   </header>
 
   <main class="container-fluid py-3 px-4">
-    <!-- 3. KHỐI QUẢN TRỊ ADMIN / LEADER -->
+    <!-- 3. QUẢN TRỊ ADMIN / LEADER -->
     <section id="admin-panel" class="mb-4" style="display: none;">
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-dark text-white fw-bold py-2 d-flex justify-content-between align-items-center">
@@ -355,7 +355,7 @@
     </section>
   </main>
 
-  <!-- MODAL: CẤU HÌNH CALLIO -->
+  <!-- MODAL CẤU HÌNH CALLIO -->
   <div class="modal fade" id="callioConfigModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -381,7 +381,7 @@
     </div>
   </div>
 
-  <!-- MODAL: GIAO DATA DÀNH CHO ADMIN -->
+  <!-- MODAL GIAO DATA CHO ADMIN -->
   <div class="modal fade" id="adminDispatchModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -414,7 +414,7 @@
     </div>
   </div>
 
-  <!-- MODAL: TẠO & SỬA NHÂN SỰ -->
+  <!-- MODAL TẠO & SỬA NHÂN SỰ -->
   <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog">
       <div class="modal-content">
@@ -450,7 +450,7 @@
     </div>
   </div>
 
-  <!-- MODAL: PIPELINE CRM & HỒ SƠ APPROVE/REJECT -->
+  <!-- MODAL PIPELINE CRM & HỒ SƠ APPROVE/REJECT -->
   <div class="modal fade" id="crmPipelineModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-lg">
       <div class="modal-content">
@@ -562,14 +562,14 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- ==============================================================================
-       LOGIC FRONTEND ENTERPRISE V3.0 (CHỐNG TREO NÚT ĐĂNG NHẬP & CHỐNG CORS)
+       LOGIC FRONTEND ENTERPRISE V3.0 (SYNTAX CHECKED & PRODUCTION READY)
        ============================================================================== -->
   <script>
     // -------------------------------------------------------------
     // MODULE 1: CẤU HÌNH HỆ THỐNG
     // -------------------------------------------------------------
     const CONFIG = {
-      // ANH DÁN ĐÚNG ĐƯỜNG LINK WEB APP /exec VÀO ĐÂY:
+      // ANH DÁN ĐÚNG URL WEB APP APPS SCRIPT DẠNG /exec VÀO ĐÂY:
       API_ENDPOINT: "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec"
     };
 
@@ -583,46 +583,56 @@
     };
 
     // -------------------------------------------------------------
-    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (TỰ ĐỘNG CHUYỂN GET/POST AN TOÀN)
+    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (CHỐNG LỖI CHẶN REDIRECT 302)
     // -------------------------------------------------------------
     const ApiClient = {
-      async request(payload, method = "GET") {
+      async request(payload, method) {
+        var reqMethod = method || "GET";
         try {
-          if (method === "GET") {
-            let url = new URL(CONFIG.API_ENDPOINT);
-            Object.keys(payload).forEach(k => {
+          if (reqMethod === "GET") {
+            var url = new URL(CONFIG.API_ENDPOINT);
+            Object.keys(payload).forEach(function(k) {
               if (payload[k] !== undefined && payload[k] !== null) {
                 url.searchParams.append(k, payload[k]);
               }
             });
-            let res = await fetch(url.toString(), {
+            url.searchParams.append("_t", new Date().getTime());
+
+            var res = await fetch(url.toString(), {
               method: "GET",
               mode: "cors",
-              redirect: "follow"
+              redirect: "follow",
+              cache: "no-store"
             });
             return await res.json();
           } else {
-            // Dùng Simple Request qua text/plain để vượt qua rào cản OPTIONS Preflight
-            let res = await fetch(CONFIG.API_ENDPOINT, {
+            var resPost = await fetch(CONFIG.API_ENDPOINT, {
               method: "POST",
               mode: "cors",
               redirect: "follow",
               headers: { "Content-Type": "text/plain;charset=utf-8" },
               body: JSON.stringify(payload)
             });
-            return await res.json();
+            return await resPost.json();
           }
         } catch (err) {
           console.error("Lỗi ApiClient:", err);
-          return { status: "error", message: "Không thể kết nối máy chủ GAS: " + err.toString() };
+          return { status: "error", message: "Lỗi kết nối máy chủ API: " + err.toString() };
         }
       }
     };
 
     // -------------------------------------------------------------
-    // MODULE 3: XỬ LÝ ĐĂNG NHẬP (BỌC CHỐNG LIỆT GIAO DIỆN)
+    // MODULE 3: KHỞI TẠO & XỬ LÝ ĐĂNG NHẬP
     // -------------------------------------------------------------
     window.addEventListener("DOMContentLoaded", function() {
+      var passInput = document.getElementById("login-password");
+      if (passInput) {
+        passInput.addEventListener("keydown", function(e) {
+          if (e.key === "Enter") processLogin(e);
+        });
+      }
+
       try {
         var saved = sessionStorage.getItem("SHN_CRM_USER");
         if (saved) {
@@ -636,7 +646,7 @@
             return;
           }
         }
-      } catch(e) {
+      } catch (e) {
         sessionStorage.removeItem("SHN_CRM_USER");
       }
       document.getElementById("login-overlay").style.display = "flex";
@@ -644,6 +654,7 @@
 
     async function processLogin(e) {
       if (e && e.preventDefault) e.preventDefault();
+
       var uInput = document.getElementById("login-username");
       var pInput = document.getElementById("login-password");
       var btn = document.getElementById("btn-submit-login");
@@ -655,33 +666,28 @@
       if (errEl) { errEl.style.display = "none"; errEl.innerText = ""; }
 
       if (!u || !p) {
-        showLoginError("Vui lòng nhập đầy đủ Mã Định Danh và Mật khẩu!");
+        alert("Vui lòng nhập đầy đủ Mã NV và Mật khẩu!");
         return false;
       }
 
-      if (CONFIG.API_ENDPOINT.indexOf("YOUR_DEPLOY_ID") !== -1) {
-        showLoginError("LỖI CẤU HÌNH: Bạn chưa thay thế link API_ENDPOINT trong code index.html!");
-        return false;
-      }
-
-      // Khóa nút bấm và bật icon xoay trạng thái
       btn.disabled = true;
-      var originalBtnText = btn.innerHTML;
+      var originalText = btn.innerHTML;
       btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...';
 
-      // Cơ chế Watchdog: Tự mở lại nút sau 12 giây nếu máy chủ phản hồi chậm
       var watchdog = setTimeout(function() {
         if (btn && btn.disabled) {
           btn.disabled = false;
-          btn.innerHTML = originalBtnText;
-          showLoginError("Hết thời gian chờ phản hồi (Timeout). Vui lòng thử lại!");
+          btn.innerHTML = originalText;
+          alert("Hết thời gian chờ phản hồi (Timeout). Vui lòng kiểm tra lại mạng hoặc link API!");
         }
-      }, 12000);
+      }, 15000);
 
       try {
-        // Gửi yêu cầu xác thực qua GET để vượt lỗi 302 Redirect
         var res = await ApiClient.request({ action: "login", username: u, password: p }, "GET");
         clearTimeout(watchdog);
+
+        btn.disabled = false;
+        btn.innerHTML = originalText;
 
         if (res && res.status === "success" && res.user) {
           AppState.currentUser = res.user;
@@ -692,29 +698,24 @@
           loadAdminDashboardData();
           if (AppState.currentUser.role !== "ADMIN") claimNewBatch();
         } else {
-          showLoginError(res && res.message ? res.message : "Mã NV hoặc Mật khẩu không chính xác!");
+          var msg = res && res.message ? res.message : "Mã NV hoặc Mật khẩu không chính xác!";
+          if (errEl) {
+            errEl.innerText = msg;
+            errEl.style.display = "block";
+          } else {
+            alert(msg);
+          }
         }
       } catch (err) {
         clearTimeout(watchdog);
-        showLoginError("Lỗi kết nối mạng: " + err.toString());
-      } finally {
         btn.disabled = false;
-        btn.innerHTML = originalBtnText;
+        btn.innerHTML = originalText;
+        alert("Lỗi thực thi đăng nhập: " + err.toString());
       }
-
       return false;
     }
 
-    function showLoginError(msg) {
-      var errEl = document.getElementById("login-error-msg");
-      if (errEl) {
-        errEl.innerText = msg;
-        errEl.style.display = "block";
-      } else {
-        alert(msg);
-      }
-    }
-  function logoutSession() {
+    function logoutSession() {
       sessionStorage.removeItem("SHN_CRM_USER");
       location.reload();
     }
@@ -757,7 +758,7 @@
         userId: AppState.currentUser.userId,
         ext: AppState.currentUser.ext,
         batchSize: 50
-      });
+      }, "POST");
 
       btn.disabled = false;
       btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down me-1"></i> Nhận Lô Mới';
@@ -817,11 +818,11 @@
         var oldText = btnElem.innerHTML;
         btnElem.innerHTML = '<i class="fa-solid fa-check"></i> Đã Copy';
         btnElem.classList.replace('btn-callio-call', 'btn-success');
-        setTimeout(() => {
+        setTimeout(function() {
           btnElem.innerHTML = oldText;
           btnElem.classList.replace('btn-success', 'btn-callio-call');
         }, 1500);
-      } catch(e) {
+      } catch (e) {
         alert("Lỗi giải mã số điện thoại: " + e.toString());
       }
     }
@@ -849,7 +850,7 @@
           rawPhoneRef: lead.rawPhoneRef,
           reportIntervalSec: interval
         }
-      });
+      }, "POST");
 
       AppState.activeBatchLeads.splice(idx, 1);
       renderBatchTable();
@@ -885,7 +886,6 @@
       document.getElementById("badge-count-hold").innerText = res.data.length;
       document.getElementById("val-kpi-hold").innerText = res.data.length + " Lead";
 
-      // Cập nhật tiến độ ngày của Sale: x / 10
       var prog = Math.min(100, Math.round((res.data.length / 10) * 100));
       document.getElementById("val-kpi-duration").innerText = res.data.length + " / 10";
       document.getElementById("badge-kpi-status").innerText = "TIẾN ĐỘ " + prog + "%";
@@ -915,7 +915,7 @@
 
     function openCRMModalNewLead(leadObj, initialStatus) {
       AppState.isNewLeadFlow = true;
-      AppState.pendingLeadIndex = AppState.activeBatchLeads.findIndex(l => l.leadId === leadObj.leadId);
+      AppState.pendingLeadIndex = AppState.activeBatchLeads.findIndex(function(l) { return l.leadId === leadObj.leadId; });
       document.getElementById("crm-lead-id").value = leadObj.leadId;
       document.getElementById("crm-name").innerText = leadObj.name;
       document.getElementById("crm-phone").innerText = leadObj.maskedPhone;
@@ -973,7 +973,7 @@
             note: note,
             extraData: extraData
           }
-        });
+        }, "POST");
 
         AppState.activeBatchLeads.splice(AppState.pendingLeadIndex, 1);
         renderBatchTable();
@@ -997,14 +997,14 @@
               emi: document.getElementById("crm-loan-emi").value,
               note: note
             }
-          });
+          }, "POST");
         }
 
         await ApiClient.request({
           action: "saveHoldPipeline",
           userId: AppState.currentUser.userId,
           leadData: { leadId: leadId, status: status, note: note, extraData: extraData }
-        });
+        }, "POST");
         fetchHoldLeadsData();
       }
     }
@@ -1026,7 +1026,6 @@
       if (idx === 1) loadTeamDrillDownData();
     }
 
-    // [NEW] - QUẢN TRỊ PHÂN QUYỀN RBAC CHO ADMIN & TEAM LEADER
     async function loadAdminDashboardData() {
       if (!AppState.currentUser) return;
       var role = (AppState.currentUser.role || "").toUpperCase();
@@ -1034,12 +1033,7 @@
 
       var currentUserId = AppState.currentUser.userId;
 
-      // 1. Kéo 4 thẻ KPI theo phạm vi của User (Leader chỉ thấy KPI nội bộ Team)
-      var overviewRes = await ApiClient.request({ 
-        action: "getFloorOverview", 
-        requesterId: currentUserId 
-      }, "GET");
-      
+      var overviewRes = await ApiClient.request({ action: "getFloorOverview", requesterId: currentUserId }, "GET");
       if (overviewRes && overviewRes.status === "success" && overviewRes.stats) {
         document.getElementById("adm-total-data").innerText = overviewRes.stats.totalDistributedToday + " Số";
         document.getElementById("adm-total-calls").innerText = overviewRes.stats.totalProcessedToday + " Đã Xử Lý";
@@ -1047,24 +1041,17 @@
         document.getElementById("adm-apps").innerText = overviewRes.stats.appsSummary;
       }
 
-      // 2. Lấy danh sách Team được phép truy cập
-      var teamRes = await ApiClient.request({ 
-        action: "getTeams", 
-        requesterId: currentUserId 
-      }, "GET");
-
+      var teamRes = await ApiClient.request({ action: "getTeams", requesterId: currentUserId }, "GET");
       var sel = document.getElementById("sel-filter-team");
       sel.innerHTML = "";
 
       if (teamRes && teamRes.teams) {
         if (teamRes.isRestricted) {
-          // VỚI LEADER: Khóa cứng Dropdown, chỉ hiện đúng 1 Team của mình, vô hiệu hóa việc chuyển Team
           teamRes.teams.forEach(function(t) {
             sel.innerHTML += '<option value="' + t + '" selected>🔒 ' + t + ' (Team của bạn)</option>';
           });
-          sel.disabled = true; // Khóa dropdown
+          sel.disabled = true;
         } else {
-          // VỚI ADMIN: Mở toàn quyền xem tất cả các Team
           sel.disabled = false;
           sel.innerHTML = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
           teamRes.teams.forEach(function(t) {
@@ -1073,11 +1060,9 @@
         }
       }
 
-      // 3. Tải ma trận dữ liệu tương ứng với Team đã chọn
       loadTeamDrillDownData();
     }
 
-    // [NEW] - TRUY VẤN MA TRẬN CÓ TRUYỀN requesterId ĐỂ BACKEND BẢO MẬT
     async function loadTeamDrillDownData() {
       var teamFilter = document.getElementById("sel-filter-team").value || "ALL";
       var tbody = document.getElementById("tbody-drilldown-sales");
@@ -1145,7 +1130,6 @@
         '</tr>';
       });
 
-      // TỔNG CỘNG THEO PHẠM VI TEAM ĐANG XEM
       var teamTargetHold = activeHeadcount * 10;
       var teamKpiPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
       var teamBatchProgress = totAssigned > 0 ? Math.round((totProcessed / totAssigned) * 100) + "%" : "0%";
@@ -1163,43 +1147,18 @@
       '</tr>';
 
       tbody.innerHTML = html + totalRowHtml;
-    }
-      // HÀNG TỔNG CỘNG TOÀN TEAM
-      var teamTargetHold = activeHeadcount * 10;
-      var teamKpiPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
-      var teamBatchProgress = totAssigned > 0 ? Math.round((totProcessed / totAssigned) * 100) + "%" : "0%";
-
-      var totalRowHtml = '<tr class="table-dark fw-bold text-center border-top border-3 border-primary" style="font-size: 0.92rem;">' +
-        '<td colspan="2" class="text-uppercase text-warning text-center py-2"><i class="fa-solid fa-calculator me-1"></i> TỔNG CỘNG TEAM (' + activeHeadcount + ' Sale)</td>' +
-        '<td class="text-white">' + totAssigned + '</td>' +
-        '<td class="text-primary">' + totProcessed + '</td>' +
-        '<td class="text-info">' + teamBatchProgress + '</td>' +
-        '<td class="text-warning fs-6">' + totHold + ' Lead</td>' +
-        '<td class="text-white">' + teamKpiPercent + '% (' + totHold + '/' + teamTargetHold + ')</td>' +
-        '<td class="text-danger fs-6">' + totApp + '</td>' +
-        '<td class="text-success fs-6">' + totLoan + '</td>' +
-        '<td class="text-muted small">---</td>' +
-      '</tr>';
-
-      tbody.innerHTML = html + totalRowHtml;
-
-      // Đồng bộ 4 thẻ KPI đầu trang
-      document.getElementById("adm-total-data").innerText = totAssigned + " Số";
-      document.getElementById("adm-total-calls").innerText = totProcessed + " Đã Xử Lý";
-      document.getElementById("adm-rate-30s").innerText = teamKpiPercent + "% KPI";
-      document.getElementById("adm-apps").innerText = totApp + " App / " + totLoan + " Loan";
     }
 
     async function handleToggleLock(userId, lockStatus) {
       if (!confirm((lockStatus ? "Khóa cấp data cho " : "Mở khóa cấp data cho ") + userId + "?")) return;
-      var res = await ApiClient.request({ action: "toggleLock", userId: userId, status: lockStatus });
+      var res = await ApiClient.request({ action: "toggleLock", userId: userId, status: lockStatus }, "POST");
       alert(res.message);
       loadAdminDashboardData();
     }
 
     async function handleAdminRevokeBatch(saleId) {
       if (!confirm("Thu hồi toàn bộ data chưa gọi của [" + saleId + "] về lại kho tổng?")) return;
-      var res = await ApiClient.request({ action: "revokeBatch", userId: saleId });
+      var res = await ApiClient.request({ action: "revokeBatch", userId: saleId }, "POST");
       alert(res.message);
       loadAdminDashboardData();
     }
@@ -1215,7 +1174,7 @@
         leadId: leadId.trim(),
         fromSaleId: fromSaleId.trim().toUpperCase(),
         toSaleId: toSaleId.trim().toUpperCase()
-      }).then(res => {
+      }, "POST").then(function(res) {
         alert(res.message);
         loadAdminDashboardData();
       });
@@ -1224,7 +1183,7 @@
     function openAdminDispatchModal() { new bootstrap.Modal(document.getElementById("adminDispatchModal")).show(); }
     function openAdminDispatchModalForUser(uid) { 
       openAdminDispatchModal(); 
-      setTimeout(() => document.getElementById("dispatch-target-sale").value = uid, 500); 
+      setTimeout(function() { document.getElementById("dispatch-target-sale").value = uid; }, 500); 
     }
 
     async function submitAdminDispatch() {
@@ -1240,7 +1199,7 @@
         batchSize: batchSize,
         campaignTag: tag,
         provinceFilter: prov
-      });
+      }, "POST");
 
       alert(res.message);
       bootstrap.Modal.getInstance(document.getElementById("adminDispatchModal")).hide();
@@ -1261,7 +1220,7 @@
       };
       if (!payload.userId || !payload.name) { alert("Vui lòng nhập đủ ID và Họ Tên!"); return; }
 
-      var res = await ApiClient.request({ action: "createUser", userData: payload });
+      var res = await ApiClient.request({ action: "createUser", userData: payload }, "POST");
       alert(res.message);
       if (res.status === "success") {
         bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide();
@@ -1279,7 +1238,7 @@
         userId: AppState.currentUser.userId,
         ext: ext,
         token: token
-      });
+      }, "POST");
 
       alert(res.message);
       if (res.status === "success") {
