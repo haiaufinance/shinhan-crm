@@ -827,11 +827,16 @@
       }
     }
 
-    async function processLeadReport(idx) {
+   // [NEW] - TỐI ƯU HÓA GIAO DIỆN PHẢN HỒI TỨC THÌ (OPTIMISTIC UI - ĐỘ TRỄ 0 GIÂY)
+    function processLeadReport(idx) {
       var val = document.getElementById("sel-status-" + idx).value;
-      if (!val) { alert("Vui lòng chọn kết quả cuộc gọi!"); return; }
+      if (!val) { 
+        alert("Vui lòng chọn kết quả cuộc gọi!"); 
+        return; 
+      }
       var lead = AppState.activeBatchLeads[idx];
 
+      // Nếu là Lead Tiềm năng hoặc Hẹn gọi lại -> Mở Modal chi tiết
       if (val === "POTENTIAL" || val === "FOLLOW_UP") {
         openCRMModalNewLead(lead, val);
         return;
@@ -841,23 +846,33 @@
       var interval = (AppState.lastReportTime === 0) ? 10 : Math.round((now - AppState.lastReportTime) / 1000);
       AppState.lastReportTime = now;
 
-      await ApiClient.request({
+      // 1. TÁCH LEADER ĐANG BÁO CÁO RA KHỎI BỘ NHỚ LOCAL NGAY LẬP TỨC
+      var reportingLead = AppState.activeBatchLeads.splice(idx, 1)[0];
+
+      // 2. CẬP NHẬT GIAO DIỆN NGAY TRONG 0.01 GIÂY (SALE KHÔNG CẦN CHỜ SERVER)
+      renderBatchTable();
+      updateDashboardKpi();
+
+      // 3. ĐẨY DỮ LIỆU LÊN SERVER CHẠY NGẦM HOÀN TOÀN (BACKGROUND ASYNC)
+      ApiClient.request({
         action: "recordReport",
         userId: AppState.currentUser.userId,
         report: {
-          leadId: lead.leadId,
+          leadId: reportingLead.leadId,
           status: val,
-          rawPhoneRef: lead.rawPhoneRef,
-          reportIntervalSec: interval
+          rawPhoneRef: reportingLead.rawPhoneRef,
+          reportIntervalSec: interval,
+          rowIndex: reportingLead.rowIndex || -1 // [NEW] Gửi kèm Row Index nếu có để Backend ghi đè tức thì
         }
-      }, "POST");
-
-      AppState.activeBatchLeads.splice(idx, 1);
-      renderBatchTable();
-      updateDashboardKpi();
+      }, "POST").then(function(res) {
+        if (!res || res.status !== "success") {
+          console.warn("Lỗi đồng bộ ngầm cho lead:", reportingLead.leadId, res ? res.message : "");
+        }
+      }).catch(function(err) {
+        console.error("Lỗi mạng đồng bộ ngầm:", err);
+      });
     }
-
-    function updateDashboardKpi() {
+      function updateDashboardKpi() {
       var pendingCount = AppState.activeBatchLeads.length;
       document.getElementById("val-kpi-progress").innerText = pendingCount + " Số Tồn";
       var btn = document.getElementById("btn-claim-batch");
