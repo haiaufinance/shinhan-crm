@@ -2,268 +2,344 @@
 <html lang="vi">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>TRUNG TÂM QUẢN TRỊ CRM TELESALE - SHINHAN FINANCE</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+  
+  <!-- CSS Frameworks & Icon Fonts -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 
+  <!-- ==============================================================================
+       CSS DESIGN SYSTEM SHINHAN ENTERPRISE V3.0 (MOBILE-FIRST RESPONSIVE)
+       ============================================================================== -->
   <style>
     :root {
       --shinhan-blue: #004687;
-      --shinhan-navy: #002d62;
-      --shinhan-light: #f4f7fb;
+      --shinhan-navy: #002b54;
+      --shinhan-gold: #c5a059;
+      --shinhan-green: #10b981;
+      --shinhan-red: #dc2626;
+      --shinhan-warning: #f59e0b;
+      --bg-light: #f4f7fa;
+      --border-color: #e2e8f0;
+      --text-main: #1e293b;
+      --text-muted: #64748b;
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 14px;
+      --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.06);
     }
+
+    * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
     body {
-      background-color: var(--shinhan-light);
+      background-color: var(--bg-light);
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      margin: 0; padding: 0;
+      color: var(--text-main);
+      margin: 0; padding: 0; font-size: 13.5px; line-height: 1.5; overflow-x: hidden;
     }
-    .header-nav {
-      background: linear-gradient(135deg, var(--shinhan-navy), var(--shinhan-blue));
-      color: #fff; padding: 12px 24px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-    }
-    .brand-title { font-size: 1.15rem; font-weight: 700; margin: 0; }
-    .user-tag { font-size: 0.85rem; opacity: 0.9; }
-    .kpi-card {
-      background: #fff; border-radius: 8px; padding: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-      border-left: 4px solid var(--shinhan-blue); height: 100%;
-    }
-    .kpi-title { font-size: 0.75rem; font-weight: 700; color: #64748b; text-transform: uppercase; }
-    .kpi-value-blue { font-size: 1.5rem; font-weight: 700; color: var(--shinhan-blue); }
-    .kpi-value-red { font-size: 1.5rem; font-weight: 700; color: #dc2626; }
-    .kpi-badge-alert { font-size: 0.75rem; font-weight: 600; color: #dc2626; }
-    .workspace-tabs { display: flex; gap: 8px; margin-bottom: 12px; }
-    .tab-item-btn {
-      border: none; background: #e2e8f0; padding: 8px 16px;
-      border-radius: 6px; font-weight: 600; font-size: 0.9rem;
-      color: #334155; cursor: pointer; transition: all 0.2s;
-    }
-    .tab-item-btn.active { background: var(--shinhan-blue); color: #fff; }
-    .tab-item-btn.hold-active { background: #f59e0b; color: #fff; }
-    .content-box {
-      background: #fff; border-radius: 8px; padding: 16px;
-      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
-    }
-    .custom-table { width: 100%; border-collapse: collapse; font-size: 0.88rem; }
-    .custom-table th {
-      background: #f8fafc; color: #475569; padding: 10px;
-      border-bottom: 2px solid #e2e8f0; text-align: center; white-space: nowrap;
-    }
-    .custom-table td {
-      padding: 10px; border-bottom: 1px solid #f1f5f9;
-      vertical-align: middle; text-align: center;
-    }
-    .badge-phone-masked {
-      background: #e2e8f0; color: #1e293b; padding: 4px 8px;
-      border-radius: 4px; font-family: monospace; font-weight: 600;
-    }
-    .badge-phone-unmasked {
-      background: #dcfce7; color: #15803d; padding: 4px 8px;
-      border-radius: 4px; font-family: monospace; font-weight: 700;
-    }
-    .btn-callio-call {
-      background: #0284c7; color: #fff; border: none;
-      padding: 4px 10px; border-radius: 4px; font-size: 0.8rem;
-      font-weight: 600; cursor: pointer;
-    }
-    .admin-nav-tabs { display: flex; border-bottom: 1px solid #cbd5e1; background: #f8fafc; }
-    .admin-tab-btn {
-      border: none; background: transparent; padding: 10px 18px;
-      font-size: 0.85rem; font-weight: 600; color: #475569; cursor: pointer;
-    }
-    .admin-tab-btn.active {
-      color: var(--shinhan-blue); border-bottom: 3px solid var(--shinhan-blue); background: #fff;
-    }
+
     #login-overlay {
       position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
-      background: rgba(15, 23, 42, 0.85); z-index: 9999;
-      display: flex; align-items: center; justify-content: center; backdrop-filter: blur(4px);
+      background: rgba(0, 43, 84, 0.96); display: flex; justify-content: center;
+      align-items: center; z-index: 9999; padding: 16px; backdrop-filter: blur(6px);
     }
+
     .login-box {
-      background: #fff; border-radius: 12px; padding: 32px;
-      width: 100%; max-width: 400px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.3); text-align: center;
+      background: #ffffff; border-radius: var(--radius-lg); padding: 32px 24px;
+      width: 100%; max-width: 400px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35); text-align: center;
     }
-    .dropzone-border {
-      border: 2px dashed #cbd5e1; border-radius: 8px; padding: 24px;
-      text-align: center; cursor: pointer; background: #f8fafc;
+
+    .login-box .logo-icon { color: var(--shinhan-blue); margin-bottom: 12px; }
+
+    .header-nav {
+      background: linear-gradient(90deg, var(--shinhan-navy) 0%, var(--shinhan-blue) 100%);
+      color: #ffffff; padding: 10px 20px; box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+      position: sticky; top: 0; z-index: 1020;
     }
-    .dropzone-border:hover { border-color: var(--shinhan-blue); background: #f1f5f9; }
+
+    .brand-title { font-size: 14.5px; font-weight: 700; letter-spacing: 0.3px; margin: 0; white-space: nowrap; }
+    .user-tag { font-size: 11.5px; opacity: 0.95; margin-top: 2px; }
+
+    .badge-role-admin { background-color: var(--shinhan-warning); color: #000; font-weight: 700; font-size: 10.5px; padding: 2px 8px; border-radius: 4px; }
+    .badge-role-sale { background-color: #00e676; color: #003300; font-weight: 700; font-size: 10.5px; padding: 2px 8px; border-radius: 4px; }
+
+    .kpi-card {
+      background: #ffffff; border-radius: var(--radius-md); padding: 14px 12px;
+      border-top: 4px solid var(--shinhan-blue); text-align: center; height: 100%;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      box-shadow: var(--shadow-card); transition: transform 0.2s, box-shadow 0.2s;
+    }
+    .kpi-card:hover { transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08); }
+
+    .kpi-title { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
+    .kpi-value-red { font-size: 24px; font-weight: 800; color: var(--shinhan-red); line-height: 1.2; }
+    .kpi-value-blue { font-size: 24px; font-weight: 800; color: var(--shinhan-blue); line-height: 1.2; }
+    .kpi-badge-alert { background-color: #fee2e2; color: var(--shinhan-red); font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 4px; display: inline-block; }
+    .kpi-badge-success { background-color: #d1fae5; color: #065f46; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px; margin-top: 4px; display: inline-block; }
+
+    .admin-nav-tabs { display: flex; gap: 4px; background: #e2e8f0; padding: 6px 6px 0 6px; border-radius: var(--radius-md) var(--radius-md) 0 0; overflow-x: auto; scrollbar-width: none; }
+    .admin-nav-tabs::-webkit-scrollbar { display: none; }
+    .admin-tab-btn { border: none; background: transparent; padding: 9px 16px; font-weight: 700; font-size: 12.5px; border-radius: var(--radius-sm) var(--radius-sm) 0 0; color: #475569; cursor: pointer; white-space: nowrap; transition: all 0.2s; }
+    .admin-tab-btn.active { background: #ffffff; color: var(--shinhan-blue); border-bottom: 3px solid var(--shinhan-blue); }
+
+    .workspace-tabs { display: flex; gap: 6px; margin-top: 14px; overflow-x: auto; scrollbar-width: none; }
+    .workspace-tabs::-webkit-scrollbar { display: none; }
+    .tab-item-btn { border: none; background: #cbd5e1; padding: 10px 18px; font-weight: 700; font-size: 13px; color: #334155; border-radius: var(--radius-md) var(--radius-md) 0 0; cursor: pointer; display: flex; align-items: center; gap: 6px; white-space: nowrap; transition: all 0.2s; }
+    .tab-item-btn.active { background: var(--shinhan-blue); color: #ffffff; }
+    .tab-item-btn.hold-active { background: #0d47a1; color: #ffffff; }
+
+    .content-box { background: #ffffff; border-radius: 0 0 var(--radius-md) var(--radius-md); padding: 16px; box-shadow: var(--shadow-card); min-height: 480px; }
+
+    .custom-table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+    .custom-table th { background-color: #f8fafc; color: #475569; font-weight: 700; padding: 10px 8px; border-bottom: 2px solid var(--border-color); white-space: nowrap; text-align: center; }
+    .custom-table td { padding: 10px 8px; border-bottom: 1px solid var(--border-color); vertical-align: middle; text-align: center; }
+    .custom-table tr:hover { background-color: #f1f5f9; }
+
+    .badge-phone-masked { font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 700; background-color: #e0f2fe; color: #0369a1; padding: 4px 8px; border-radius: 4px; border: 1px solid #bae6fd; white-space: nowrap; }
+    .badge-phone-unmasked { font-family: SFMono-Regular, Menlo, Monaco, Consolas, monospace; font-weight: 800; background-color: #dcfce7; color: #15803d; padding: 4px 8px; border-radius: 4px; border: 1px solid #bbf7d0; white-space: nowrap; }
+
+    .btn-callio-call {
+      background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%); color: #ffffff !important; border: none;
+      font-weight: 700; padding: 6px 12px; min-height: 34px; border-radius: var(--radius-sm); font-size: 12px;
+      display: inline-flex; align-items: center; justify-content: center; gap: 6px; cursor: pointer;
+      box-shadow: 0 2px 4px rgba(3, 105, 161, 0.2); transition: all 0.15s ease-in-out;
+    }
+    .btn-callio-call:active { transform: scale(0.96); }
+
+    .btn-zalo-chat {
+      background-color: #0068ff; color: #ffffff !important; font-weight: 700; padding: 6px 12px; min-height: 34px;
+      border-radius: var(--radius-sm); font-size: 12px; display: inline-flex; align-items: center; justify-content: center;
+      gap: 6px; text-decoration: none; transition: all 0.15s ease-in-out;
+    }
+    .btn-zalo-chat:active { transform: scale(0.96); }
+
+    .dropzone-border { border: 2px dashed #94a3b8; border-radius: var(--radius-md); padding: 20px; text-align: center; background-color: #f8fafc; cursor: pointer; transition: border-color 0.2s; }
+    .dropzone-border:hover { border-color: var(--shinhan-blue); background-color: #f1f5f9; }
+    .alert-banner-hold { background-color: #fffbeb; border: 1px solid #fef3c7; border-left: 4px solid var(--shinhan-warning); padding: 10px 14px; border-radius: 4px; margin-bottom: 14px; font-size: 12px; color: #92400e; }
+    .table-drilldown th, .table-drilldown td { font-size: 11.5px; padding: 6px 4px; }
+
+    @media (max-width: 767.98px) {
+      body { font-size: 13px; }
+      .header-nav { flex-direction: column; align-items: flex-start !important; gap: 8px; }
+      .header-nav > div:last-child { width: 100%; justify-content: space-between; }
+      .brand-title { font-size: 13px; white-space: normal; line-height: 1.3; }
+      .row.g-2.g-md-3.mb-3 > div[class*="col-"] { width: 50% !important; padding: 4px !important; }
+      .kpi-card { padding: 10px 6px; min-height: 96px; }
+      .kpi-value-red, .kpi-value-blue { font-size: 19px; }
+      .tab-item-btn { padding: 8px 14px; font-size: 12px; flex: 1; justify-content: center; }
+      .content-box { padding: 10px 8px; }
+      .table-responsive { border: 1px solid var(--border-color); border-radius: var(--radius-sm); -webkit-overflow-scrolling: touch; margin-bottom: 8px; }
+      .custom-table th, .custom-table td { padding: 8px 6px; font-size: 11.5px; }
+      .custom-table td select.form-select { font-size: 11.5px; padding: 4px 6px; min-width: 130px; }
+      .custom-table td .btn-sm { padding: 5px 10px; font-size: 12px; }
+      .btn-callio-call, .btn-zalo-chat { padding: 6px 10px; min-height: 36px; font-size: 11.5px; }
+      .modal-dialog { margin: 8px; max-width: 100% !important; }
+      #box-checklist .d-flex.flex-wrap { display: grid !important; grid-template-columns: 1fr 1fr; gap: 8px !important; }
+      .table-drilldown th, .table-drilldown td { font-size: 10px; padding: 5px 2px; }
+    }
   </style>
 </head>
 <body>
 
-  <!-- 1. MÀN HÌNH ĐĂNG NHẬP -->
+  <!-- ==============================================================================
+       1. MÀN HÌNH ĐĂNG NHẬP
+       ============================================================================== -->
   <div id="login-overlay">
     <div class="login-box">
-      <i class="fa-solid fa-shield-halved fa-3x text-primary mb-3"></i>
-      <h4 class="fw-bold mb-1">CRM SHINHAN FINANCE</h4>
-      <p class="text-muted small mb-4">Hệ Thống Quản Trị Dữ Liệu Telesale Enterprise V3.0</p>
+      <i class="fa-solid fa-shield-halved fa-3x logo-icon"></i>
+      <h4 class="fw-bold mb-1" style="color: var(--shinhan-blue);">CRM SHINHAN FINANCE</h4>
+      <p class="text-muted small mb-4">Hệ Thống Quản Trị Telesale Enterprise V3.0</p>
+      
       <div class="text-start mb-3">
         <label class="form-label fw-bold small">Mã Định Danh (Mã NV):</label>
         <div class="input-group">
           <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
-          <input type="text" id="login-username" class="form-control" placeholder="ADMIN hoặc SALE_01" value="ADMIN">
+          <input type="text" id="login-username" class="form-control" placeholder="Ví dụ: ADMIN hoặc SALE_01" value="ADMIN" autocomplete="username">
         </div>
       </div>
+      
       <div class="text-start mb-3">
         <label class="form-label fw-bold small">Mật khẩu:</label>
         <div class="input-group">
           <span class="input-group-text bg-light"><i class="fa-solid fa-key text-muted"></i></span>
-          <input type="password" id="login-password" class="form-control" placeholder="Nhập mật khẩu" value="123456">
+          <input type="password" id="login-password" class="form-control" placeholder="Nhập mật khẩu" value="123456" onkeydown="if(event.key==='Enter') processLogin(event)" autocomplete="current-password">
         </div>
       </div>
-      <button type="button" class="btn btn-primary w-100 fw-bold py-2 mb-2" id="btn-submit-login" onclick="processLogin(event)">
-        <i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP
+      
+      <button type="button" class="btn btn-primary w-100 fw-bold py-2 mb-2 shadow-sm" id="btn-submit-login" onclick="processLogin(event)">
+        <i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG
       </button>
       <div id="login-error-msg" class="text-danger fw-bold small my-2" style="display: none;"></div>
     </div>
   </div>
 
-  <!-- 2. TOPBAR -->
+  <!-- ==============================================================================
+       2. TOPBAR HEADER NAV
+       ============================================================================== -->
   <header class="header-nav d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-3">
       <i class="fa-solid fa-headset fa-2x text-warning"></i>
       <div>
         <h1 class="brand-title">TRUNG TÂM QUẢN TRỊ CRM TELESALE - SHINHAN FINANCE</h1>
-        <div class="user-tag" id="user-header-info">Đang kết nối API...</div>
+        <div class="user-tag" id="user-header-info">Đang xác thực danh tính...</div>
       </div>
     </div>
     <div class="d-flex align-items-center gap-2">
-      <button type="button" class="btn btn-sm btn-outline-light" data-bs-toggle="modal" data-bs-target="#callioConfigModal">
-        <i class="fa-solid fa-key me-1"></i> Cấu hình Callio
+      <button type="button" class="btn btn-sm btn-outline-light fw-bold" data-bs-toggle="modal" data-bs-target="#callioConfigModal">
+        <i class="fa-solid fa-plug me-1"></i> Kết Nối Callio
       </button>
       <button type="button" class="btn btn-sm btn-warning fw-bold text-dark" id="btn-toggle-admin" onclick="toggleAdminPanel()" style="display: none;">
-        <i class="fa-solid fa-crown me-1"></i> Quản Trị Sàn
+        <i class="fa-solid fa-crown me-1"></i> Bảng Điều Hành Sàn
       </button>
-      <button type="button" class="btn btn-sm btn-danger" onclick="logoutSession()" title="Đăng xuất">
-        <i class="fa-solid fa-right-from-bracket"></i> Đăng xuất
+      <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="logoutSession()" title="Đăng xuất">
+        <i class="fa-solid fa-right-from-bracket"></i>
       </button>
     </div>
   </header>
 
-  <main class="container-fluid py-3 px-4">
-    <!-- 3. QUẢN TRỊ ADMIN / LEADER -->
+  <!-- ==============================================================================
+       3. WORKSPACE CONTAINER
+       ============================================================================== -->
+  <main class="container-fluid py-3 px-3 px-md-4">
+    
+    <!-- KHỐI QUẢN TRỊ ADMIN / LEADER -->
     <section id="admin-panel" class="mb-4" style="display: none;">
       <div class="card border-0 shadow-sm">
         <div class="card-header bg-dark text-white fw-bold py-2 d-flex justify-content-between align-items-center">
-          <span><i class="fa-solid fa-chess-king me-2 text-warning"></i> BỘ ĐIỀU HÀNH GIÁM SÁT SÀN (HEAD OF TELESALE)</span>
-          <span class="badge bg-danger" id="adm-role-badge">ADMIN</span>
+          <span><i class="fa-solid fa-chess-king me-2 text-warning"></i> BỘ ĐIỀU HÀNH GIÁM SÁT SÀN (HEAD OF TELESALE - HẢI ÂU)</span>
+          <span class="badge bg-danger">ADMIN TOÀN SÀN</span>
         </div>
         <div class="card-body bg-light p-0">
           <div class="admin-nav-tabs">
             <button type="button" class="admin-tab-btn active" id="atab-btn-1" onclick="switchAdminSubTab(1)"><i class="fa-solid fa-chart-pie me-1"></i> 1. Giám Sát Sàn & Team</button>
-            <button type="button" class="admin-tab-btn" id="atab-btn-2" onclick="switchAdminSubTab(2)"><i class="fa-solid fa-user-shield me-1"></i> 2. Bắt Gian Lận (Lướt Data)</button>
+            <button type="button" class="admin-tab-btn" id="atab-btn-2" onclick="switchAdminSubTab(2)"><i class="fa-solid fa-user-shield me-1"></i> 2. Theo Dõi Sale & Bắt Gian Lận</button>
             <button type="button" class="admin-tab-btn" id="atab-btn-3" onclick="switchAdminSubTab(3)"><i class="fa-solid fa-filter-circle-dollar me-1"></i> 3. Phễu Lead & Thu Hồi</button>
-            <button type="button" class="admin-tab-btn" id="atab-btn-4" onclick="switchAdminSubTab(4)"><i class="fa-solid fa-database me-1"></i> 4. Kho Master & Giao Data</button>
+            <button type="button" class="admin-tab-btn" id="atab-btn-4" onclick="switchAdminSubTab(4)"><i class="fa-solid fa-database me-1"></i> 4. Kho 3 Rổ Data & Điều Phối</button>
           </div>
 
           <div class="p-3 bg-white border-top">
-            <!-- TAB 1 ADMIN: MA TRẬN CHUYỂN ĐỔI -->
+            <!-- TAB 1: Ma trận giám sát -->
             <div id="atab-content-1">
-              <div class="row g-3 mb-3">
-                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TỔNG DATA CẤP</small><h3 class="fw-bold text-primary my-1" id="adm-total-data">0 Số</h3></div></div>
-                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">SẢN LƯỢNG ĐÃ XỬ LÝ</small><h3 class="fw-bold text-dark my-1" id="adm-total-calls">0 Số</h3></div></div>
-                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TIẾN ĐỘ KPI TEAM (10 HOLD/SALE)</small><h3 class="fw-bold text-success my-1" id="adm-rate-30s">0%</h3></div></div>
-                <div class="col-md-3"><div class="p-3 border rounded bg-light text-center"><small class="text-muted fw-bold">DOANH SỐ HỒ SƠ</small><h3 class="fw-bold text-danger my-1" id="adm-apps">0 App / 0 Loan</h3></div></div>
+              <div class="row g-2 g-md-3 mb-3">
+                <div class="col-6 col-md-3"><div class="p-2 p-md-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TỔNG DATA CẤP HÔM NAY</small><h3 class="fw-bold text-primary my-1" id="adm-total-data">0 Số</h3><small class="text-success fw-bold" id="adm-connect-rate">Đang trực tuyến</small></div></div>
+                <div class="col-6 col-md-3"><div class="p-2 p-md-3 border rounded bg-light text-center"><small class="text-muted fw-bold">SẢN LƯỢNG ĐÃ GỌI</small><h3 class="fw-bold text-dark my-1" id="adm-total-calls">0 Cuộc</h3><small class="text-muted">Tính theo ngày</small></div></div>
+                <div class="col-6 col-md-3"><div class="p-2 p-md-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TIẾN ĐỘ HOÀN THÀNH LÔ</small><h3 class="fw-bold text-success my-1" id="adm-rate-30s">0%</h3><small class="text-success fw-bold">Đạt chuẩn van 90%</small></div></div>
+                <div class="col-6 col-md-3"><div class="p-2 p-md-3 border rounded bg-light text-center"><small class="text-muted fw-bold">DOANH SỐ HỒ SƠ</small><h3 class="fw-bold text-danger my-1" id="adm-apps">0 App / 0 Loan</h3><small class="text-danger fw-bold">Pipeline giải ngân</small></div></div>
               </div>
 
-              <div class="d-flex justify-content-between align-items-center mb-2 p-2 bg-light rounded border">
-                <div class="d-flex align-items-center gap-2">
+              <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 p-2 bg-light rounded border">
+                <div class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0">
                   <i class="fa-solid fa-filter text-primary"></i>
-                  <label class="form-label fw-bold small mb-0">CHỌN TEAM:</label>
-                  <select class="form-select form-select-sm" id="sel-filter-team" style="width: 220px;" onchange="loadTeamDrillDownData()">
+                  <label class="form-label fw-bold small mb-0 text-nowrap">CHỌN TEAM:</label>
+                  <select class="form-select form-select-sm" id="sel-filter-team" style="min-width: 200px;" onchange="loadTeamDrillDownData()">
                     <option value="ALL">⭐ Xem Tất Cả Các Team</option>
                   </select>
                 </div>
-                <div class="d-flex gap-2">
+                <div class="d-flex gap-2 flex-wrap">
                   <button type="button" class="btn btn-sm btn-outline-primary fw-bold" onclick="loadTeamDrillDownData()"><i class="fa-solid fa-rotate me-1"></i> Làm Mới</button>
                   <button type="button" class="btn btn-sm btn-primary fw-bold" onclick="openCreateUserModal()"><i class="fa-solid fa-user-plus me-1"></i> Thêm Nhân Sự</button>
                   <button type="button" class="btn btn-sm btn-success fw-bold" onclick="openAdminDispatchModal()"><i class="fa-solid fa-paper-plane me-1"></i> Giao Data</button>
                 </div>
               </div>
 
-              <div class="card border mb-2">
+              <div class="card border mb-2 shadow-sm">
                 <div class="card-header bg-white py-2 d-flex justify-content-between align-items-center">
                   <span class="fw-bold text-dark"><i class="fa-solid fa-users-viewfinder text-primary me-1"></i> MA TRẬN CHUYỂN ĐỔI: <span id="txt-selected-team-name" class="text-danger">ALL</span></span>
-                  <span class="badge bg-primary" id="badge-team-headcount">0 Nhân sự</span>
+                  <span class="badge bg-primary" id="badge-team-headcount">0 Sale</span>
                 </div>
                 <div class="table-responsive">
-                  <table class="table table-bordered table-hover align-middle mb-0 text-center custom-table">
+                  <table class="table table-bordered table-hover align-middle mb-0 text-center table-drilldown">
                     <thead class="table-light">
                       <tr>
                         <th rowspan="2" class="align-middle">Mã NV / Họ Tên</th>
-                        <th rowspan="2" class="align-middle">Ext</th>
-                        <th colspan="3" class="bg-primary text-white py-1">1. TIẾN ĐỘ XỬ LÝ LÔ</th>
-                        <th colspan="2" class="bg-warning text-dark py-1">2. CHỈ TIÊU HOLD (KPI 10 LEAD)</th>
-                        <th colspan="2" class="bg-success text-white py-1">3. DOANH SỐ</th>
-                        <th rowspan="2" class="align-middle">HÀNH ĐỘNG</th>
+                        <th rowspan="2" class="align-middle">Callio Ext / Email</th>
+                        <th colspan="3" class="bg-primary text-white py-1">1. SẢN LƯỢNG TÁC CHIẾN</th>
+                        <th colspan="2" class="bg-warning text-dark py-1">2. CHẤT LƯỢNG & AHT</th>
+                        <th colspan="2" class="bg-info text-white py-1">3. LEAD HOLD (30 NGÀY)</th>
+                        <th colspan="2" class="bg-success text-white py-1">4. DOANH SỐ VAY</th>
+                        <th rowspan="2" class="align-middle" style="min-width: 140px;">HÀNH ĐỘNG</th>
                       </tr>
                       <tr>
-                        <th>Cấp</th>
-                        <th>Đã Xử Lý</th>
-                        <th>Tiến Độ Lô %</th>
-                        <th>Đang Hold</th>
-                        <th>Tiến Độ KPI (x/10)</th>
-                        <th>App</th>
-                        <th>Giải Ngân</th>
+                        <th>Cấp</th><th>Đã Gọi</th><th>Tiến Độ Lô %</th>
+                        <th>&ge;30s</th><th>AHT</th>
+                        <th>Hold</th><th>Lead %</th>
+                        <th>App</th><th>Giải Ngân</th>
                       </tr>
                     </thead>
                     <tbody id="tbody-drilldown-sales">
-                      <tr><td colspan="10" class="py-4 text-muted">Đang tải số liệu...</td></tr>
+                      <tr><td colspan="12" class="py-4 text-muted">Đang tải ma trận năng suất...</td></tr>
                     </tbody>
                   </table>
                 </div>
               </div>
             </div>
 
-            <!-- TAB 2 ADMIN: GIAN LẬN -->
+            <!-- TAB 2: Bắt gian lận -->
             <div id="atab-content-2" style="display: none;">
               <div class="table-responsive">
-                <table class="table table-bordered align-middle text-center custom-table">
+                <table class="table table-bordered align-middle text-center">
                   <thead class="table-light">
-                    <tr><th>Mã NV</th><th>Họ & Tên</th><th>Ext</th><th>Team</th><th>Tiến Độ Lô</th><th>Cuộc Gọi &ge;30s</th><th>AHT Trung Bình</th><th>Cảnh Báo Gian Lận</th><th>Thao Tác</th></tr>
+                    <tr><th>Mã NV</th><th>Họ & Tên</th><th>Callio Ext</th><th>Team</th><th>Tiến Độ Lô</th><th>Cuộc Gọi &ge;30s</th><th>AHT</th><th>Gian Lận Lướt Data</th><th>Thao Tác</th></tr>
                   </thead>
-                  <tbody id="tbody-sale-audit"><tr><td colspan="9">Đang tải...</td></tr></tbody>
+                  <tbody id="tbody-sale-audit">
+                    <tr><td colspan="9" class="py-3 text-muted">Đang tải dữ liệu kiểm toán...</td></tr>
+                  </tbody>
                 </table>
               </div>
             </div>
 
-            <!-- TAB 3 ADMIN: THU HỒI PHỄU LEAD -->
+            <!-- TAB 3: Phễu thu hồi -->
             <div id="atab-content-3" style="display: none;">
+              <div class="alert alert-warning py-2 small mb-2">
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> Danh sách Lead sắp hết hạn bảo lưu 30 ngày (còn &le; 7 ngày) hoặc chưa chuyển đổi. Bấm thu hồi để đưa về kho đấu trường.
+              </div>
               <div class="table-responsive">
-                <table class="table table-bordered align-middle text-center custom-table">
+                <table class="table table-bordered align-middle text-center">
                   <thead class="table-light">
-                    <tr><th>Lead ID</th><th>Sale Phụ Trách</th><th>Tên Khách</th><th>SĐT</th><th>Ngày Nhận</th><th>Trạng Thái</th><th>Hạn Còn</th><th>Cưỡng Chế</th></tr>
+                    <tr><th>Lead ID</th><th>Sale Phụ Trách</th><th>Khách Hàng</th><th>SĐT</th><th>Ngày Nhận</th><th>Trạng Thái Phễu</th><th>Thời Hạn Còn</th><th>Cưỡng Chế</th></tr>
                   </thead>
-                  <tbody id="tbody-lead-pipeline"><tr><td colspan="8">Đang tải...</td></tr></tbody>
+                  <tbody id="tbody-lead-pipeline">
+                    <tr><td colspan="8" class="py-3 text-muted">Đang quét phễu Lead...</td></tr>
+                  </tbody>
                 </table>
               </div>
             </div>
 
-            <!-- TAB 4 ADMIN: KHO DATA -->
+            <!-- TAB 4: Kho 3 Rổ Data -->
             <div id="atab-content-4" style="display: none;">
               <div class="row g-3">
                 <div class="col-lg-6">
                   <div class="p-3 border rounded bg-light h-100">
-                    <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-file-excel me-1"></i> Nạp Excel Vào Kho Master</h6>
+                    <h6 class="fw-bold text-success mb-2"><i class="fa-solid fa-file-excel me-1"></i> Nạp Excel Vào [RAW_POOL_NEW] (Rổ 1)</h6>
                     <div class="row g-2 mb-2">
-                      <div class="col-6"><input type="text" id="admin-campaign-tag" class="form-control form-control-sm" value="BHXH_T09" placeholder="Chiến dịch"></div>
-                      <div class="col-6"><input type="text" id="admin-province" class="form-control form-control-sm" value="Toàn quốc" placeholder="Tỉnh/Thành"></div>
+                      <div class="col-6"><input type="text" id="admin-campaign-tag" class="form-control form-control-sm" value="BHXH_DN_HCM_T09" placeholder="Tag Chiến dịch"></div>
+                      <div class="col-6"><input type="text" id="admin-province" class="form-control form-control-sm" value="Toàn quốc" placeholder="Tỉnh / Thành phố"></div>
                     </div>
                     <div class="dropzone-border mb-2" onclick="document.getElementById('file-upload-excel').click()">
                       <i class="fa-solid fa-cloud-arrow-up fa-2x text-primary mb-1"></i>
-                      <div class="fw-bold small" id="dropzone-file-name">Bấm để tải file Excel (.xlsx, .csv)...</div>
+                      <div class="fw-bold small" id="dropzone-file-name">Bấm để chọn file Excel (.xlsx, .csv)...</div>
                       <input type="file" id="file-upload-excel" class="d-none" accept=".xlsx, .xls, .csv" onchange="handleExcelUpload(this)">
                     </div>
+                    <div class="progress" style="height: 8px;"><div id="bar-progress-stream" class="progress-bar bg-success" style="width: 0%"></div></div>
+                    <small class="text-muted d-block mt-2"><i class="fa-solid fa-info-circle me-1"></i> Tự động loại bỏ SĐT rác và lọc Blacklist_DNC (Nghị định 91).</small>
                   </div>
                 </div>
+                
                 <div class="col-lg-6">
                   <div class="p-3 border rounded bg-light h-100">
-                    <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-paper-plane me-1"></i> Phân Bổ Chủ Động (Push Mode)</h6>
-                    <button type="button" class="btn btn-primary btn-sm fw-bold w-100 mb-3" onclick="openAdminDispatchModal()"><i class="fa-solid fa-share-nodes me-1"></i> Mở Bảng Giao Data</button>
+                    <h6 class="fw-bold text-primary mb-2"><i class="fa-solid fa-paper-plane me-1"></i> Giao Data Chủ Động Cho Sale</h6>
+                    <button type="button" class="btn btn-primary btn-sm fw-bold w-100 mb-3" onclick="openAdminDispatchModal()">
+                      <i class="fa-solid fa-share-nodes me-1"></i> Mở Bảng Giao Data Chủ Động
+                    </button>
+                    
+                    <hr>
+                    <h6 class="fw-bold text-warning mb-2"><i class="fa-solid fa-receipt me-1"></i> Nạp Call Log Callio Đối Soát Bù (CSV)</h6>
+                    <input type="file" id="file-callio-log" class="form-control form-control-sm mb-2" accept=".csv, .txt">
+                    <button type="button" class="btn btn-warning btn-sm w-100 fw-bold" onclick="processCallLogReconciliation()">
+                      <i class="fa-solid fa-check-double me-1"></i> Chạy Đối Soát CSV
+                    </button>
                   </div>
                 </div>
               </div>
@@ -274,36 +350,36 @@
       </div>
     </section>
 
-    <!-- 4. WORKSPACE TELESALE -->
-    <section class="row g-3 mb-3">
-      <div class="col-md-3">
+    <!-- DASHBOARD 4 THẺ KPI TÁC CHIẾN -->
+    <section class="row g-2 g-md-3 mb-3">
+      <div class="col-6 col-md-3">
         <div class="kpi-card">
-          <span class="kpi-title">CHỈ TIÊU HOLD NGÀY</span>
+          <span class="kpi-title">CHỈ TIÊU LEAD HOLD</span>
           <div class="kpi-value-red my-1" id="val-kpi-duration">0 / 10</div>
           <span class="kpi-badge-alert" id="badge-kpi-status">TIẾN ĐỘ 0%</span>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="kpi-card">
-          <span class="kpi-title">TIẾN ĐỘ XỬ LÝ LÔ</span>
+          <span class="kpi-title">TIẾN ĐỘ BÁO CÁO</span>
           <div class="kpi-value-blue my-1" id="val-kpi-progress">0 Số Tồn</div>
-          <button type="button" class="btn btn-success btn-sm w-100 fw-bold mt-1" id="btn-claim-batch" onclick="claimNewBatch()">
+          <button type="button" class="btn btn-success btn-sm w-100 fw-bold mt-1 shadow-sm" id="btn-claim-batch" onclick="claimNewBatch()">
             <i class="fa-solid fa-cloud-arrow-down me-1"></i> Nhận Lô Mới
           </button>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="kpi-card">
-          <span class="kpi-title">LEAD ĐANG CHĂM SÓC</span>
+          <span class="kpi-title">LEAD ĐANG BẢO LƯU</span>
           <div class="kpi-value-blue my-1 text-warning" id="val-kpi-hold">0 Lead</div>
-          <small class="text-muted">Bảo lưu 30 ngày</small>
+          <small class="text-muted" style="font-size: 11px;">Bảo lưu độc quyền 30 ngày</small>
         </div>
       </div>
-      <div class="col-md-3">
+      <div class="col-6 col-md-3">
         <div class="kpi-card">
-          <span class="kpi-title">KẾT NỐI TỔNG ĐÀI</span>
-          <div class="fs-6 fw-bold text-success my-1"><i class="fa-solid fa-circle-check"></i> Trực Tuyến</div>
-          <small class="text-muted" id="txt-active-ext">Nhánh: ---</small>
+          <span class="kpi-title">TỔNG ĐÀI CALLIO</span>
+          <div class="fs-6 fw-bold text-success my-1"><i class="fa-solid fa-check-circle"></i> Trực Tuyến</div>
+          <small class="text-muted" id="txt-active-ext" style="font-size: 11px;">Callio: Chưa kết nối</small>
         </div>
       </div>
     </section>
@@ -311,104 +387,145 @@
     <!-- WORKSPACE TABS -->
     <div class="workspace-tabs">
       <button type="button" class="tab-item-btn active" id="tab-btn-batch" onclick="switchMainTab('batch')">
-        <i class="fa-solid fa-list-check me-1"></i> Lô Mới Cấp (<span id="badge-count-batch">0</span>)
+        <i class="fa-solid fa-list-check"></i> Lô Mới Cấp (<span id="badge-count-batch">0</span>)
       </button>
       <button type="button" class="tab-item-btn" id="tab-btn-hold" onclick="switchMainTab('hold')">
-        <i class="fa-solid fa-star text-warning me-1"></i> Sổ Tay Hold Lead (<span id="badge-count-hold">0</span>)
+        <i class="fa-solid fa-star text-warning"></i> Sổ Tay Hold Lead (<span id="badge-count-hold">0</span>)
       </button>
     </div>
 
-    <!-- BẢNG LÔ DATA MỚI -->
+    <!-- BẢNG LÔ MỚI CẤP -->
     <section id="view-batch-container" class="content-box">
       <div class="table-responsive">
         <table class="custom-table">
           <thead>
             <tr>
-              <th>STT</th><th>Khách Hàng</th><th>SĐT (Bảo Mật)</th><th>Đơn Vị / Lương</th>
-              <th>Chiến Dịch</th><th>Vòng Gọi</th><th>Hành Động</th><th style="min-width: 280px;">Báo Cáo Kết Quả</th>
+              <th style="width: 45px;">STT</th>
+              <th style="min-width: 170px;">Khách Hàng</th>
+              <th style="min-width: 120px;">SĐT (Mask)</th>
+              <th style="min-width: 140px;">Lương / Công Ty</th>
+              <th style="min-width: 110px;">Chiến Dịch</th>
+              <th style="min-width: 80px;">Vòng Gọi</th>
+              <th style="min-width: 130px;">Hành Động</th>
+              <th style="min-width: 260px;">Báo Cáo Kết Quả</th>
             </tr>
           </thead>
           <tbody id="tbody-batch-leads">
-            <tr><td colspan="8" class="text-center py-5 text-muted">Bấm "Nhận Lô Mới" để bắt đầu làm việc.</td></tr>
+            <tr><td colspan="8" class="text-center py-5 text-muted">Bấm "Nhận Lô Mới" để hệ thống cấp 50 số!</td></tr>
           </tbody>
         </table>
       </div>
     </section>
 
-    <!-- BẢNG SỔ TAY HOLD LEAD -->
+    <!-- BẢNG SỔ TAY HOLD LEAD (30 NGÀY) -->
     <section id="view-hold-container" class="content-box" style="display: none;">
-      <div class="p-2 mb-3 bg-light rounded border border-warning">
-        <i class="fa-solid fa-unlock-keyhole text-warning me-1"></i> <b>Sổ Tay Lead (30 Ngày):</b> Đã gỡ mặt nạ số điện thoại để hỗ trợ tư vấn và kết bạn Zalo.
+      <div class="alert-banner-hold">
+        <i class="fa-solid fa-unlock-keyhole me-1"></i> <b>Sổ Tay Hold Lead (30 Ngày):</b> Đã gỡ mặt nạ số điện thoại để kết bạn Zalo và hoàn thiện hồ sơ vay.
       </div>
       <div class="table-responsive">
         <table class="custom-table">
           <thead>
             <tr>
-              <th>STT</th><th>Họ Tên</th><th>SĐT Gốc</th><th>Ngày Nhận</th><th>Đàm Thoại</th><th>Hạn Giữ</th><th>Zalo</th><th>Hồ Sơ Vay</th>
+              <th style="width: 45px;">STT</th>
+              <th style="min-width: 160px;">Khách Hàng</th>
+              <th style="min-width: 120px;">SĐT Gốc</th>
+              <th style="min-width: 100px;">Ngày Nhận</th>
+              <th style="min-width: 90px;">Đàm Thoại</th>
+              <th style="min-width: 100px;">Hạn Còn</th>
+              <th style="min-width: 90px;">Zalo</th>
+              <th style="min-width: 130px;">Cập Nhật CRM</th>
             </tr>
           </thead>
           <tbody id="tbody-hold-leads">
-            <tr><td colspan="8" class="text-center py-5 text-muted">Chưa có khách hàng tiềm năng nào được lưu.</td></tr>
+            <tr><td colspan="8" class="text-center py-5 text-muted">Chưa có khách hàng tiềm năng được bảo lưu.</td></tr>
           </tbody>
         </table>
       </div>
     </section>
+
   </main>
 
-  <!-- MODAL CẤU HÌNH CALLIO -->
+  <!-- ==============================================================================
+       4. HỆ THỐNG MODAL THAO TÁC
+       ============================================================================== -->
+
+  <!-- MODAL XÁC THỰC CALLIO TỪNG SALE -->
   <div class="modal fade" id="callioConfigModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-primary text-white py-2">
-          <h6 class="modal-title fw-bold">Cấu Hình Tổng Đài Callio</h6>
+          <h6 class="modal-title fw-bold">
+            <i class="fa-solid fa-headset me-1"></i> Kết Nối Tài Khoản Callio Cá Nhân
+          </h6>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
-        <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Số Nhánh Nội Bộ (Ext):</label>
-            <input type="text" id="cfg-ext-value" class="form-control">
+        <div class="modal-body bg-light">
+          <div class="alert alert-info py-2 small mb-3">
+            <i class="fa-solid fa-circle-info me-1"></i> Nhập Email và Mật khẩu Callio của riêng bạn một lần duy nhất để kích hoạt gọi trực tiếp 1-chạm từ CRM.
           </div>
           <div class="mb-3">
-            <label class="form-label small fw-bold">Token Callio Cá Nhân (Tùy chọn):</label>
-            <input type="password" id="cfg-token-value" class="form-control">
+            <label class="form-label small fw-bold">Email Đăng Nhập Callio:</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="fa-solid fa-envelope text-muted"></i></span>
+              <input type="email" id="cfg-callio-email" class="form-control" placeholder="VD: sale01@gmail.com">
+            </div>
           </div>
+          <div class="mb-3">
+            <label class="form-label small fw-bold">Mật Khẩu Callio:</label>
+            <div class="input-group">
+              <span class="input-group-text bg-white"><i class="fa-solid fa-lock text-muted"></i></span>
+              <input type="password" id="cfg-callio-password" class="form-control" placeholder="Nhập mật khẩu Callio của bạn">
+            </div>
+          </div>
+          <div id="callio-connect-status" class="small fw-bold text-center mt-2" style="display: none;"></div>
         </div>
-        <div class="modal-footer py-2">
+        <div class="modal-footer py-2 bg-white">
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
-          <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="submitCallioConfig()">Lưu Cấu Hình</button>
+          <button type="button" class="btn btn-primary btn-sm fw-bold" id="btn-submit-callio-auth" onclick="submitCallioHandshake()">
+            <i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL GIAO DATA CHO ADMIN -->
+  <!-- MODAL GIAO DATA ADMIN -->
   <div class="modal fade" id="adminDispatchModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-dark text-white py-2">
-          <h6 class="modal-title fw-bold">Phân Bổ Data Cho Sale</h6>
+          <h6 class="modal-title fw-bold"><i class="fa-solid fa-paper-plane me-1"></i> Giao Data Chủ Động Cho Nhân Sự</h6>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Chọn Nhân Sự Nhận:</label>
-            <select class="form-select form-select-sm" id="dispatch-target-sale"><option value="">-- Chọn Sale --</option></select>
-          </div>
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Số Lượng Số Giao:</label>
-            <select class="form-select form-select-sm" id="dispatch-batch-size">
-              <option value="30">30 Số</option>
-              <option value="50" selected>50 Số</option>
-              <option value="100">100 Số</option>
-            </select>
-          </div>
-          <div class="row g-2">
-            <div class="col-6"><input type="text" id="dispatch-campaign-tag" class="form-control form-control-sm" value="ALL" placeholder="Chiến dịch"></div>
-            <div class="col-6"><input type="text" id="dispatch-province" class="form-control form-control-sm" value="ALL" placeholder="Tỉnh thành"></div>
+          <label class="form-label small fw-bold mb-1">Nhân sự tiếp nhận:</label>
+          <select class="form-select form-select-sm mb-3" id="dispatch-target-sale">
+            <option value="">-- Đang tải danh sách nhân sự --</option>
+          </select>
+
+          <label class="form-label small fw-bold mb-1">Số lượng data cấp:</label>
+          <select class="form-select form-select-sm mb-3" id="dispatch-batch-size">
+            <option value="30">30 Số</option>
+            <option value="50" selected>50 Số (Chuẩn Lô)</option>
+            <option value="100">100 Số</option>
+          </select>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small fw-bold mb-1">Lọc Chiến dịch:</label>
+              <input type="text" id="dispatch-campaign-tag" class="form-control form-control-sm" value="ALL" placeholder="Tag Chiến dịch">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold mb-1">Lọc Tỉnh/Thành:</label>
+              <input type="text" id="dispatch-province" class="form-control form-control-sm" value="ALL" placeholder="Tỉnh / Thành phố">
+            </div>
           </div>
         </div>
-        <div class="modal-footer py-2">
-          <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="submitAdminDispatch()">Bắn Data</button>
+        <div class="modal-footer py-2 bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="submitAdminDispatch()">
+            <i class="fa-solid fa-paper-plane me-1"></i> Bắn Data Ngay
+          </button>
         </div>
       </div>
     </div>
@@ -416,129 +533,194 @@
 
   <!-- MODAL TẠO & SỬA NHÂN SỰ -->
   <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
         <div class="modal-header bg-primary text-white py-2">
-          <h6 class="modal-title fw-bold" id="modal-user-title"><i class="fa-solid fa-user-plus me-1"></i> Khởi Tạo Nhân Sự Mới</h6>
+          <h6 class="modal-title fw-bold" id="modal-user-title">
+            <i class="fa-solid fa-user-plus me-1"></i> Khởi Tạo Nhân Sự Mới
+          </h6>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
         <div class="modal-body">
           <div class="row g-2 mb-2">
-            <div class="col-6"><label class="form-label small fw-bold">Mã NV:</label><input type="text" id="new-user-id" class="form-control form-control-sm text-uppercase"></div>
-            <div class="col-6"><label class="form-label small fw-bold">Vai Trò:</label>
+            <div class="col-6">
+              <label class="form-label small fw-bold">Mã NV (Định danh):</label>
+              <input type="text" id="new-user-id" class="form-control form-control-sm text-uppercase" placeholder="VD: SALE_05">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold">Vai Trò (Role):</label>
               <select class="form-select form-select-sm" id="new-user-role">
                 <option value="SALE">Telesale</option>
-                <option value="LEADER">Leader</option>
-                <option value="ADMIN">Admin</option>
+                <option value="LEADER">Leader / Teamlead</option>
+                <option value="ADMIN">Admin Toàn Sàn</option>
               </select>
             </div>
           </div>
-          <div class="mb-2"><label class="form-label small fw-bold">Họ và Tên:</label><input type="text" id="new-user-name" class="form-control form-control-sm"></div>
-          <div class="row g-2 mb-2">
-            <div class="col-6"><label class="form-label small fw-bold">Nhánh Ext:</label><input type="text" id="new-user-ext" class="form-control form-control-sm"></div>
-            <div class="col-6"><label class="form-label small fw-bold">Hotline:</label><input type="text" id="new-user-hotline" class="form-control form-control-sm" value="0979531213"></div>
+
+          <div class="mb-2">
+            <label class="form-label small fw-bold">Họ và Tên Nhân Sự:</label>
+            <input type="text" id="new-user-name" class="form-control form-control-sm" placeholder="VD: Nguyễn Văn B">
           </div>
-          <div class="row g-2 mb-3">
-            <div class="col-6"><label class="form-label small fw-bold">Team:</label><input type="text" id="new-user-team" class="form-control form-control-sm text-uppercase" value="TEAM_01"></div>
-            <div class="col-6"><label class="form-label small fw-bold">Mật Khẩu:</label><input type="text" id="new-user-password" class="form-control form-control-sm" value="123456"></div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small fw-bold">Email / Nhánh Callio:</label>
+              <input type="text" id="new-user-ext" class="form-control form-control-sm" placeholder="sale02@gmail.com">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold">Hotline Nhân Hiệu:</label>
+              <input type="text" id="new-user-hotline" class="form-control form-control-sm" value="0979531213">
+            </div>
+          </div>
+
+          <div class="row g-2 mb-2">
+            <div class="col-6">
+              <label class="form-label small fw-bold">Đội Nhóm (Team):</label>
+              <input type="text" id="new-user-team" class="form-control form-control-sm text-uppercase" value="TEAM_01">
+            </div>
+            <div class="col-6">
+              <label class="form-label small fw-bold">Mật Khẩu CRM:</label>
+              <input type="text" id="new-user-password" class="form-control form-control-sm" value="123456" placeholder="Mật khẩu">
+            </div>
           </div>
         </div>
-        <div class="modal-footer py-2">
-          <button type="button" class="btn btn-success btn-sm fw-bold" id="btn-save-user" onclick="submitCreateNewUser()">Lưu Nhân Sự</button>
+        <div class="modal-footer py-2 bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-success btn-sm fw-bold" id="btn-save-user" onclick="submitCreateNewUser()">
+            <i class="fa-solid fa-floppy-disk me-1"></i> Lưu Nhân Sự
+          </button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- MODAL PIPELINE CRM & HỒ SƠ APPROVE/REJECT -->
+  <!-- MODAL QUẢN TRỊ PIPELINE CRM ĐA TẦNG (CHECKLIST & GIẢI NGÂN) -->
   <div class="modal fade" id="crmPipelineModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-      <div class="modal-content">
-        <div class="modal-header bg-dark text-white py-2">
-          <h6 class="modal-title fw-bold"><i class="fa-solid fa-address-card me-1"></i> Hồ Sơ Khách Hàng & Pipeline</h6>
+    <div class="modal-dialog modal-lg modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-navy text-white py-2" style="background-color: var(--shinhan-navy);">
+          <h6 class="modal-title fw-bold"><i class="fa-solid fa-address-card me-1"></i> Hồ Sơ Chi Tiết & Pipeline Khách Hàng</h6>
           <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
         </div>
+
         <div class="modal-body bg-light">
-          <div class="row mb-3 pb-2 border-bottom">
-            <div class="col-md-6">
+          <!-- Header thông tin khách -->
+          <div class="row mb-3 pb-2 border-bottom bg-white p-2 rounded shadow-sm">
+            <div class="col-6">
               <span class="text-muted small">Khách hàng:</span> <br>
               <strong class="text-primary fs-6" id="crm-name">---</strong>
             </div>
-            <div class="col-md-6 text-end">
+            <div class="col-6 text-end">
               <span class="text-muted small">Số điện thoại:</span> <br>
               <strong class="text-success fs-6" id="crm-phone">---</strong>
             </div>
           </div>
 
-          <ul class="nav nav-tabs mb-3">
-            <li class="nav-item"><button class="nav-link active fw-bold text-dark" data-bs-toggle="tab" data-bs-target="#tab-info">1. Khảo Sát Nhu Cầu</button></li>
-            <li class="nav-item"><button class="nav-link fw-bold text-dark" data-bs-toggle="tab" data-bs-target="#tab-pipeline">2. Thu Hồ Sơ & Khoản Vay</button></li>
+          <!-- 2 Tab Quản trị hồ sơ -->
+          <ul class="nav nav-tabs mb-3" id="crmTabs">
+            <li class="nav-item">
+              <button class="nav-link active fw-bold text-dark" data-bs-toggle="tab" data-bs-target="#tab-info">
+                <i class="fa-solid fa-clipboard-question me-1"></i> 1. Khảo Sát Tài Chính
+              </button>
+            </li>
+            <li class="nav-item">
+              <button class="nav-link fw-bold text-dark" data-bs-toggle="tab" data-bs-target="#tab-pipeline">
+                <i class="fa-solid fa-file-invoice-dollar me-1"></i> 2. Thu Hồ Sơ & Ký Duyệt
+              </button>
+            </li>
           </ul>
 
           <div class="tab-content">
+            <!-- TAB 1: THÔNG TIN KHẢO SÁT -->
             <div class="tab-pane fade show active" id="tab-info">
               <div class="row g-3">
-                <div class="col-md-6"><label class="form-label fw-bold small">Công việc:</label><input type="text" id="crm-job" class="form-control form-control-sm"></div>
-                <div class="col-md-6"><label class="form-label fw-bold small">Thu nhập (VNĐ):</label><input type="text" id="crm-income" class="form-control form-control-sm"></div>
-                <div class="col-md-6"><label class="form-label fw-bold small">Nơi ở hiện tại:</label><input type="text" id="crm-location" class="form-control form-control-sm"></div>
-                <div class="col-md-6"><label class="form-label fw-bold small">Dư nợ tổ chức khác:</label><input type="text" id="crm-debt" class="form-control form-control-sm"></div>
-                <div class="col-12"><label class="form-label fw-bold small">Ghi chú chăm sóc:</label><textarea id="crm-note" class="form-control form-control-sm" rows="3"></textarea></div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Công việc hiện tại:</label>
+                  <input type="text" id="crm-job" class="form-control form-control-sm" placeholder="VD: Công nhân may, NV Văn phòng...">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Thu nhập (VNĐ/Tháng):</label>
+                  <input type="text" id="crm-income" class="form-control form-control-sm" placeholder="VD: 15.000.000">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Nơi sống (Tỉnh/Thành):</label>
+                  <input type="text" id="crm-location" class="form-control form-control-sm" placeholder="VD: Tây Ninh, TP.HCM...">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label fw-bold small">Dư nợ hiện tại (FE, Home...):</label>
+                  <input type="text" id="crm-debt" class="form-control form-control-sm" placeholder="Ghi rõ tổ chức và số tiền dư nợ">
+                </div>
+                <div class="col-12">
+                  <label class="form-label fw-bold small">Ghi chú chăm sóc:</label>
+                  <textarea id="crm-note" class="form-control form-control-sm" rows="3" placeholder="Ghi chú lịch hẹn gọi lại, thời gian rảnh của khách..."></textarea>
+                </div>
               </div>
             </div>
 
+            <!-- TAB 2: THU HỒ SƠ & PIPELINE GIẢI NGÂN -->
             <div class="tab-pane fade" id="tab-pipeline">
               <div class="row g-3">
-                <div class="col-12">
-                  <label class="form-label fw-bold small text-danger">Trạng Thái Hồ Sơ:</label>
+                <div class="col-12 mb-2">
+                  <label class="form-label fw-bold small text-danger"><i class="fa-solid fa-bars-progress me-1"></i> Trạng Thái Phễu (Pipeline Stage):</label>
                   <select class="form-select border-danger fw-bold" id="crm-status" onchange="togglePipelineFields()">
                     <option value="Đang theo dõi">1. Đang theo dõi / Hẹn gọi lại</option>
-                    <option value="Thu hồ sơ">2. Đang Thu Hồ Sơ</option>
+                    <option value="Thu hồ sơ">2. Đang Thu Hồ Sơ (Checklist)</option>
                     <option value="Đã lên App">3. Đã lên App Shinhan (Chờ duyệt)</option>
-                    <option value="Giải ngân">4. Đã Giải Ngân (Approve - 120 Ngày)</option>
-                    <option value="Từ chối">5. Bị Từ Chối (Reject - 30-90 Ngày)</option>
+                    <option value="Giải ngân">4. Đã Giải Ngân (Thành công - Bảo lưu 120 ngày)</option>
+                    <option value="Từ chối">5. Khách Từ chối / Hủy (Đóng băng 30-90 ngày)</option>
                   </select>
                 </div>
 
+                <!-- Khối Checklist Chứng từ -->
                 <div class="col-12" id="box-checklist" style="display: none;">
-                  <div class="card bg-white border">
+                  <div class="card bg-light border">
                     <div class="card-body py-2">
-                      <strong class="small text-primary d-block mb-2">CHECKLIST CHỨNG TỪ THU THẬP</strong>
+                      <strong class="small text-primary d-block mb-2"><i class="fa-solid fa-list-check me-1"></i> CHECKLIST CHỨNG TỪ (Đánh dấu khi đã nhận file)</strong>
                       <div class="d-flex flex-wrap gap-3">
-                        <div class="form-check"><input class="form-check-input" type="checkbox" id="chk-cccd"><label class="form-check-label small fw-bold" for="chk-cccd">CCCD 2 mặt</label></div>
-                        <div class="form-check"><input class="form-check-input" type="checkbox" id="chk-vssid"><label class="form-check-label small fw-bold" for="chk-vssid">VssID Bảo hiểm</label></div>
-                        <div class="form-check"><input class="form-check-input" type="checkbox" id="chk-banking"><label class="form-check-label small fw-bold" for="chk-banking">Sao kê Banking</label></div>
-                        <div class="form-check"><input class="form-check-input" type="checkbox" id="chk-cic"><label class="form-check-label small fw-bold" for="chk-cic">Check CIC</label></div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="chk-cccd">
+                          <label class="form-check-label small fw-bold" for="chk-cccd">CCCD 2 mặt</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="chk-vssid">
+                          <label class="form-check-label small fw-bold" for="chk-vssid">App VssID</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="chk-banking">
+                          <label class="form-check-label small fw-bold" for="chk-banking">Sao kê Banking</label>
+                        </div>
+                        <div class="form-check">
+                          <input class="form-check-input" type="checkbox" id="chk-cic">
+                          <label class="form-check-label small fw-bold" for="chk-cic">Check CIC Sạch</label>
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
+                <!-- Khối Ký duyệt Giải Ngân -->
                 <div class="col-12" id="box-loan-details" style="display: none;">
-                  <div class="card border-success">
-                    <div class="card-header bg-success text-white py-1 small fw-bold">THÔNG TIN KHOẢN VAY GIẢI NGÂN (APPROVE 120 NGÀY)</div>
+                  <div class="card border-success shadow-sm">
+                    <div class="card-header bg-success text-white py-1 small fw-bold"><i class="fa-solid fa-money-bill-transfer me-1"></i> THÔNG TIN KHOẢN VAY KÝ DUYỆT THÀNH CÔNG</div>
                     <div class="card-body py-2">
                       <div class="row g-2">
-                        <div class="col-md-6"><label class="form-label small fw-bold mb-0">Hạn Mức Vay:</label><input type="text" id="crm-loan-amount" class="form-control form-control-sm"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold mb-0">Kỳ Hạn (Tháng):</label><input type="text" id="crm-loan-term" class="form-control form-control-sm"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold mb-0">Lãi Suất (%/năm):</label><input type="text" id="crm-loan-rate" class="form-control form-control-sm"></div>
-                        <div class="col-md-6"><label class="form-label small fw-bold mb-0">Số Tiền Đóng Hàng Tháng (EMI):</label><input type="text" id="crm-loan-emi" class="form-control form-control-sm"></div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="col-12" id="box-reject-details" style="display: none;">
-                  <div class="card border-danger">
-                    <div class="card-header bg-danger text-white py-1 small fw-bold">CHI TIẾT TỪ CHỐI (REJECT REASON)</div>
-                    <div class="card-body py-2">
-                      <div class="row g-2">
-                        <div class="col-md-8"><label class="form-label small fw-bold mb-0">Lý Do / Mã Lỗi:</label><input type="text" id="crm-reject-reason" class="form-control form-control-sm" placeholder="Nợ xấu, CIC chú ý, rớt thẩm định..."></div>
-                        <div class="col-md-4">
-                          <label class="form-label small fw-bold mb-0">Tái Lên Sau:</label>
-                          <select class="form-select form-select-sm" id="crm-reject-cooldown">
-                            <option value="30">30 Ngày</option>
-                            <option value="60">60 Ngày</option>
-                            <option value="90" selected>90 Ngày</option>
+                        <div class="col-md-6">
+                          <label class="form-label small fw-bold mb-0">Kỳ hạn vay (Tháng):</label>
+                          <input type="text" id="crm-loan-term" class="form-control form-control-sm" placeholder="VD: 12, 24, 36">
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label small fw-bold mb-0">Ngày đóng tiền hàng tháng:</label>
+                          <input type="text" id="crm-loan-date" class="form-control form-control-sm" placeholder="VD: Mùng 5 hàng tháng">
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label small fw-bold mb-0">Lãi suất (% / Năm):</label>
+                          <input type="text" id="crm-loan-rate" class="form-control form-control-sm" placeholder="VD: 18%">
+                        </div>
+                        <div class="col-md-6">
+                          <label class="form-label small fw-bold mb-0">Bảo hiểm khoản vay:</label>
+                          <select class="form-select form-select-sm" id="crm-loan-ins">
+                            <option value="Không">Không</option>
+                            <option value="Có" selected>Có</option>
                           </select>
                         </div>
                       </div>
@@ -549,112 +731,63 @@
               </div>
             </div>
           </div>
+          
           <input type="hidden" id="crm-lead-id">
         </div>
-        <div class="modal-footer py-2">
-          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
-          <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="saveCRMDetails()"><i class="fa-solid fa-floppy-disk me-1"></i> Lưu Cập Nhật</button>
+
+        <div class="modal-footer py-2 bg-white">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+          <button type="button" class="btn btn-primary btn-sm fw-bold" onclick="saveCRMDetails()">
+            <i class="fa-solid fa-floppy-disk me-1"></i> Lưu Cập Nhật CRM
+          </button>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- JavaScript Libraries -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- ==============================================================================
-       LOGIC FRONTEND ENTERPRISE V3.0 (SYNTAX CHECKED & PRODUCTION READY)
+       5. CLIENT CONTROLLER SCRIPT (ĐẦY ĐỦ 38 HÀM TOÀN BỘ NGHIỆP VỤ)
        ============================================================================== -->
   <script>
-    // -------------------------------------------------------------
-    // MODULE 1: CẤU HÌNH HỆ THỐNG
-    // -------------------------------------------------------------
-    const CONFIG = {
-      // ANH DÁN ĐÚNG URL WEB APP APPS SCRIPT DẠNG /exec VÀO ĐÂY:
-      API_ENDPOINT: "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec"
-    };
+    var currentUser = null;
+    var activeBatchLeads = [];
+    var reportedCount = 0;
+    var qualityCall30sCount = 0;
+    var lastReportTime = 0;
+    var currentHoldDataCache = []; 
+    var isNewLeadFlow = false;
+    var pendingLeadIndex = -1;
 
-    var AppState = {
-      currentUser: null,
-      activeBatchLeads: [],
-      currentHoldDataCache: [],
-      isNewLeadFlow: false,
-      pendingLeadIndex: -1,
-      lastReportTime: 0
-    };
-
-    // -------------------------------------------------------------
-    // MODULE 2: GIAO TIẾP MẠNG RESTFUL API (CHỐNG LỖI CHẶN REDIRECT 302)
-    // -------------------------------------------------------------
-    const ApiClient = {
-      async request(payload, method) {
-        var reqMethod = method || "GET";
-        try {
-          if (reqMethod === "GET") {
-            var url = new URL(CONFIG.API_ENDPOINT);
-            Object.keys(payload).forEach(function(k) {
-              if (payload[k] !== undefined && payload[k] !== null) {
-                url.searchParams.append(k, payload[k]);
-              }
-            });
-            url.searchParams.append("_t", new Date().getTime());
-
-            var res = await fetch(url.toString(), {
-              method: "GET",
-              mode: "cors",
-              redirect: "follow",
-              cache: "no-store"
-            });
-            return await res.json();
-          } else {
-            var resPost = await fetch(CONFIG.API_ENDPOINT, {
-              method: "POST",
-              mode: "cors",
-              redirect: "follow",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify(payload)
-            });
-            return await resPost.json();
-          }
-        } catch (err) {
-          console.error("Lỗi ApiClient:", err);
-          return { status: "error", message: "Lỗi kết nối máy chủ API: " + err.toString() };
-        }
-      }
-    };
-
-    // -------------------------------------------------------------
-    // MODULE 3: KHỞI TẠO & XỬ LÝ ĐĂNG NHẬP
-    // -------------------------------------------------------------
     window.addEventListener("DOMContentLoaded", function() {
-      var passInput = document.getElementById("login-password");
-      if (passInput) {
-        passInput.addEventListener("keydown", function(e) {
-          if (e.key === "Enter") processLogin(e);
-        });
-      }
-
       try {
         var saved = sessionStorage.getItem("SHN_CRM_USER");
         if (saved) {
-          AppState.currentUser = JSON.parse(saved);
-          if (AppState.currentUser && AppState.currentUser.userId) {
-            document.getElementById("login-overlay").style.display = "none";
+          currentUser = JSON.parse(saved);
+          if (currentUser && currentUser.userId) {
+            var overlay = document.getElementById("login-overlay");
+            if (overlay) overlay.style.display = "none";
             renderUserHeader();
             fetchHoldLeadsData();
             loadAdminDashboardData();
-            if (AppState.currentUser.role !== "ADMIN") claimNewBatch();
+            if (currentUser.role !== "ADMIN") {
+              claimNewBatch(); 
+            }
             return;
           }
         }
-      } catch (e) {
+      } catch(e) {
         sessionStorage.removeItem("SHN_CRM_USER");
       }
-      document.getElementById("login-overlay").style.display = "flex";
+      var overlay = document.getElementById("login-overlay");
+      if (overlay) overlay.style.display = "flex";
     });
 
-    async function processLogin(e) {
+    // 1. XÁC THỰC ĐĂNG NHẬP
+    function processLogin(e) {
       if (e && e.preventDefault) e.preventDefault();
-
       var uInput = document.getElementById("login-username");
       var pInput = document.getElementById("login-password");
       var btn = document.getElementById("btn-submit-login");
@@ -665,53 +798,60 @@
 
       if (errEl) { errEl.style.display = "none"; errEl.innerText = ""; }
 
-      if (!u || !p) {
-        alert("Vui lòng nhập đầy đủ Mã NV và Mật khẩu!");
-        return false;
+      if (!u || !p) { 
+        alert("Vui lòng nhập đầy đủ Mã NV và Mật khẩu!"); 
+        return false; 
+      }
+      
+      if (btn) { 
+        btn.disabled = true; 
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...'; 
       }
 
-      btn.disabled = true;
-      var originalText = btn.innerHTML;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...';
-
-      var watchdog = setTimeout(function() {
+      var loginTimer = setTimeout(function() {
         if (btn && btn.disabled) {
           btn.disabled = false;
-          btn.innerHTML = originalText;
-          alert("Hết thời gian chờ phản hồi (Timeout). Vui lòng kiểm tra lại mạng hoặc link API!");
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG';
+          alert("Kết nối máy chủ bị quá hạn (Timeout). Vui lòng thử lại!");
         }
       }, 15000);
 
-      try {
-        var res = await ApiClient.request({ action: "login", username: u, password: p }, "GET");
-        clearTimeout(watchdog);
-
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-
-        if (res && res.status === "success" && res.user) {
-          AppState.currentUser = res.user;
-          sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(AppState.currentUser));
-          document.getElementById("login-overlay").style.display = "none";
-          renderUserHeader();
-          fetchHoldLeadsData();
-          loadAdminDashboardData();
-          if (AppState.currentUser.role !== "ADMIN") claimNewBatch();
-        } else {
-          var msg = res && res.message ? res.message : "Mã NV hoặc Mật khẩu không chính xác!";
-          if (errEl) {
-            errEl.innerText = msg;
-            errEl.style.display = "block";
-          } else {
-            alert(msg);
+      google.script.run
+        .withSuccessHandler(function(res) {
+          clearTimeout(loginTimer);
+          if (btn) { 
+            btn.disabled = false; 
+            btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG'; 
           }
-        }
-      } catch (err) {
-        clearTimeout(watchdog);
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-        alert("Lỗi thực thi đăng nhập: " + err.toString());
-      }
+          if (res && res.status === "success") {
+            currentUser = res.user;
+            sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+            var overlay = document.getElementById("login-overlay");
+            if (overlay) overlay.style.display = "none";
+            renderUserHeader();
+            fetchHoldLeadsData();
+            loadAdminDashboardData();
+            if (currentUser.role !== "ADMIN") claimNewBatch();
+          } else {
+            var msg = res ? res.message : "Đăng nhập thất bại!";
+            if (errEl) {
+              errEl.innerText = msg;
+              errEl.style.display = "block";
+            } else {
+              alert(msg);
+            }
+          }
+        })
+        .withFailureHandler(function(err) {
+          clearTimeout(loginTimer);
+          if (btn) { 
+            btn.disabled = false; 
+            btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG'; 
+          }
+          alert("Lỗi máy chủ: " + err.toString());
+        })
+        .authenticateUser(u, p);
+        
       return false;
     }
 
@@ -721,89 +861,631 @@
     }
 
     function renderUserHeader() {
-      if (!AppState.currentUser) return;
-      var isAdmin = AppState.currentUser.role === "ADMIN";
-      var roleBadge = isAdmin ? '<span class="badge bg-danger">ADMIN TOÀN SÀN</span>' : '<span class="badge bg-primary">' + AppState.currentUser.role + '</span>';
-      document.getElementById("user-header-info").innerHTML = 'Tài khoản: <b>' + AppState.currentUser.name + '</b> | ' + roleBadge + ' | Nhánh: <b>' + AppState.currentUser.ext + '</b>';
-      document.getElementById("txt-active-ext").innerText = 'Nhánh: ' + AppState.currentUser.ext;
-      document.getElementById("cfg-ext-value").value = AppState.currentUser.ext;
+      if (!currentUser) return;
+      var isAdmin = currentUser.role === "ADMIN";
+      var roleBadge = isAdmin 
+        ? '<span class="badge-role-admin">ADMIN TOÀN SÀN</span>' 
+        : '<span class="badge-role-sale">' + currentUser.role + '</span>';
+        
+      var infoEl = document.getElementById("user-header-info");
+      var extDisplay = currentUser.ext || "Chưa kết nối";
+      if (infoEl) infoEl.innerHTML = 'Tài khoản: <b>' + currentUser.name + '</b> | Cấp: ' + roleBadge + ' | Callio: <b>' + extDisplay + '</b>';
       
+      var txtExt = document.getElementById("txt-active-ext");
+      if (txtExt) txtExt.innerText = 'Tài khoản Callio: ' + extDisplay;
+
+      var cfgEmail = document.getElementById("cfg-callio-email");
+      if (cfgEmail && currentUser.ext && currentUser.ext.indexOf("@") !== -1) {
+        cfgEmail.value = currentUser.ext;
+      }
+
       var btnAdmin = document.getElementById("btn-toggle-admin");
-      if (btnAdmin) btnAdmin.style.display = (isAdmin || AppState.currentUser.role === "LEADER" || AppState.currentUser.role === "TEAMLEAD") ? "inline-block" : "none";
-      if (document.getElementById("adm-role-badge")) document.getElementById("adm-role-badge").innerText = AppState.currentUser.role;
+      if (btnAdmin) btnAdmin.style.display = (isAdmin || currentUser.role === "LEADER" || currentUser.role === "TEAMLEAD") ? "inline-block" : "none";
     }
 
-    // -------------------------------------------------------------
-    // MODULE 4: WORKSPACE TELESALE
-    // -------------------------------------------------------------
+    // 2. PHÂN HỆ ADMIN / LEADER
+    function toggleAdminPanel() {
+      var p = document.getElementById("admin-panel");
+      if (!p) return;
+      p.style.display = p.style.display === "none" ? "block" : "none";
+      if (p.style.display === "block") loadAdminDashboardData();
+    }
+
+    function switchAdminSubTab(idx) {
+      for (var i = 1; i <= 4; i++) {
+        var btn = document.getElementById("atab-btn-" + i);
+        var content = document.getElementById("atab-content-" + i);
+        if (btn) btn.className = (i === idx) ? "admin-tab-btn active" : "admin-tab-btn";
+        if (content) content.style.display = (i === idx) ? "block" : "none";
+      }
+      if (idx === 1) loadTeamDrillDownData();
+      if (idx === 2) loadSaleAuditData();
+      if (idx === 3) loadPipelineRecoveryData();
+    }
+
+    function loadAdminDashboardData() {
+      if (!currentUser || (currentUser.role !== "ADMIN" && currentUser.role !== "LEADER" && currentUser.role !== "TEAMLEAD")) return;
+      
+      var reqId = currentUser.userId;
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (res && res.status === "success" && res.stats) {
+          var elData = document.getElementById("adm-total-data");
+          var elCalls = document.getElementById("adm-total-calls");
+          var el30s = document.getElementById("adm-rate-30s");
+          var elApps = document.getElementById("adm-apps");
+
+          if (elData) elData.innerText = res.stats.totalDistributedToday + " Số";
+          if (elCalls) elCalls.innerText = res.stats.totalProcessedToday + " Đã Xử Lý";
+          if (el30s) el30s.innerText = res.stats.batchProgressRate;
+          if (elApps) elApps.innerText = res.stats.appsSummary;
+        }
+      }).getFloorOverviewStats(reqId);
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (res && res.status === "success" && res.teams) {
+          var sel = document.getElementById("sel-filter-team");
+          if (sel) {
+            var currentVal = sel.value;
+            var html = "";
+            if (res.isRestricted) {
+              res.teams.forEach(function(t) {
+                html += '<option value="' + t + '" selected>🔒 ' + t + ' (Team của bạn)</option>';
+              });
+              sel.disabled = true;
+            } else {
+              sel.disabled = false;
+              html = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
+              res.teams.forEach(function(t) {
+                html += '<option value="' + t + '" ' + (t === currentVal ? "selected" : "") + '>' + t + '</option>';
+              });
+            }
+            sel.innerHTML = html;
+          }
+          loadTeamDrillDownData();
+        }
+      }).getExistingTeamsList(reqId);
+
+      loadSaleAuditData();
+    }
+
+    function loadTeamDrillDownData() {
+      var sel = document.getElementById("sel-filter-team");
+      var teamFilter = sel ? sel.value : "ALL";
+      var tbody = document.getElementById("tbody-drilldown-sales");
+      if (tbody) tbody.innerHTML = '<tr><td colspan="12" class="text-center text-primary py-4"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tải dữ liệu ma trận chuyển đổi...</td></tr>';
+
+      var reqId = currentUser ? currentUser.userId : "";
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res || res.status !== "success" || !tbody) return;
+        var teamNameEl = document.getElementById("txt-selected-team-name");
+        var countEl = document.getElementById("badge-team-headcount");
+        if (teamNameEl) teamNameEl.innerText = res.summary.teamName;
+        if (countEl) countEl.innerText = res.summary.activeSales + " Nhân Sự";
+
+        if (!res.sales || res.sales.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="12" class="py-3 text-muted text-center">Không có nhân sự trực thuộc team này.</td></tr>';
+          return;
+        }
+
+        var html = "";
+        var totAssigned = 0, totProcessed = 0, totHold = 0, totApp = 0, totLoan = 0;
+
+        res.sales.forEach(function(s) {
+          totAssigned += (s.totalAssigned || s.assigned || 0);
+          totProcessed += (s.processedCount || s.calls || 0);
+          totHold += (s.holdLead || 0);
+          totApp += (s.appCount || 0);
+          totLoan += (s.loanCount || 0);
+
+          var ahtDisplay = s.isFraudSuspect 
+            ? '<span class="badge bg-danger" title="Lướt data!">' + s.avgSec + 's <i class="fa-solid fa-triangle-exclamation"></i></span>' 
+            : s.avgSec + 's';
+          
+          var lockBtn = s.status === "ACTIVE" 
+            ? '<button class="btn btn-outline-danger btn-sm py-0 px-1" title="Khóa data" onclick="handleToggleLock(\''+s.userId+'\', true)"><i class="fa-solid fa-lock"></i></button>' 
+            : '<button class="btn btn-success btn-sm py-0 px-1" title="Mở khóa" onclick="handleToggleLock(\''+s.userId+'\', false)"><i class="fa-solid fa-lock-open"></i></button>';
+          
+          var editBtn = '<button class="btn btn-outline-secondary btn-sm py-0 px-1" title="Sửa thông tin" onclick="openEditUserModal(\''+s.userId+'\', \''+s.name+'\', \''+s.role+'\', \''+s.ext+'\', \''+s.team+'\')"><i class="fa-solid fa-pen"></i></button>';
+          var pushBtn = '<button class="btn btn-outline-primary btn-sm py-0 px-1" title="Giao data" onclick="openAdminDispatchModalForUser(\''+s.userId+'\')"><i class="fa-solid fa-paper-plane"></i></button>';
+          var revokeBtn = '<button class="btn btn-outline-warning btn-sm py-0 px-1" title="Thu hồi data chưa gọi" onclick="handleAdminRevokeBatch(\''+s.userId+'\')"><i class="fa-solid fa-arrow-rotate-left"></i></button>';
+          var transferBtn = '<button class="btn btn-outline-info btn-sm py-0 px-1 text-dark" title="Chuyển Lead của Sale" onclick="handleTransferLeadPrompt(\''+s.userId+'\')"><i class="fa-solid fa-people-arrows"></i></button>';
+
+          var nameLink = '<a href="javascript:void(0)" class="fw-bold text-primary text-decoration-none" onclick="openUserHoldDrillDownModal(\'' + s.userId + '\', \'' + s.name + '\')">' + s.name + ' <i class="fa-solid fa-arrow-up-right-from-square small"></i></a>';
+
+          html += '<tr>' +
+            '<td class="text-start">' + nameLink + '<br><small class="text-muted">' + s.userId + ' (' + s.role + ')</small></td>' +
+            '<td>' + (s.ext || '---') + '</td>' +
+            '<td>' + (s.totalAssigned || s.assigned) + '</td>' +
+            '<td><b>' + (s.processedCount || s.calls) + '</b></td>' +
+            '<td><span class="badge bg-info text-dark">' + (s.batchProgressRate || s.rateConnect) + '</span></td>' +
+            '<td>' + (s.quality30s || s.holdLead) + '</td>' +
+            '<td>' + ahtDisplay + '</td>' +
+            '<td class="text-warning fw-bold fs-6">' + s.holdLead + '</td>' +
+            '<td><span class="badge bg-primary">' + s.rateLeadHold + '</span></td>' +
+            '<td class="text-danger fw-bold">' + s.appCount + '</td>' +
+            '<td class="text-success fw-bold">' + s.loanCount + '</td>' +
+            '<td><div class="d-flex justify-content-center gap-1">' + lockBtn + editBtn + pushBtn + revokeBtn + transferBtn + '</div></td>' +
+          '</tr>';
+        });
+
+        var teamProgress = totAssigned > 0 ? Math.round((totProcessed / totAssigned) * 100) + "%" : "0%";
+        var totalRowHtml = '<tr class="table-dark fw-bold text-center border-top border-3 border-primary">' +
+          '<td colspan="2" class="text-warning py-2"><i class="fa-solid fa-calculator me-1"></i> TỔNG CỘNG TEAM (' + res.sales.length + ' Sale)</td>' +
+          '<td class="text-white">' + totAssigned + '</td>' +
+          '<td class="text-primary">' + totProcessed + '</td>' +
+          '<td class="text-info">' + teamProgress + '</td>' +
+          '<td colspan="2" class="text-white">---</td>' +
+          '<td class="text-warning fs-6">' + totHold + '</td>' +
+          '<td class="text-white">---</td>' +
+          '<td class="text-danger fs-6">' + totApp + '</td>' +
+          '<td class="text-success fs-6">' + totLoan + '</td>' +
+          '<td>---</td>' +
+        '</tr>';
+
+        tbody.innerHTML = html + totalRowHtml;
+      }).getTeamDrillDownStats(teamFilter, reqId);
+    }
+
+    function loadSaleAuditData() {
+      var tbody = document.getElementById("tbody-sale-audit");
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center text-primary py-3"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tính toán dữ liệu kiểm toán...</td></tr>';
+
+      var reqId = currentUser ? currentUser.userId : "";
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res || res.status !== "success" || !res.sales) {
+          tbody.innerHTML = '<tr><td colspan="9" class="text-center py-3 text-muted">Chưa có dữ liệu kiểm toán.</td></tr>';
+          return;
+        }
+        var html = "";
+        res.sales.forEach(function(s) {
+          var fraudBadge = s.isFraudSuspect 
+            ? '<span class="badge bg-danger"><i class="fa-solid fa-triangle-exclamation"></i> Lướt Data (&lt;15s)</span>' 
+            : '<span class="badge bg-success">Bình thường</span>';
+            
+          var actionBtn = s.status === "ACTIVE"
+            ? '<button type="button" class="btn btn-outline-danger btn-sm py-0 px-2" onclick="handleToggleLock(\'' + s.userId + '\', true)">Khóa Data</button>'
+            : '<button type="button" class="btn btn-success btn-sm py-0 px-2" onclick="handleToggleLock(\'' + s.userId + '\', false)">Mở Khóa</button>';
+
+          var nameLink = '<a href="javascript:void(0)" class="fw-bold text-dark text-decoration-none" onclick="openUserHoldDrillDownModal(\'' + s.userId + '\', \'' + s.name + '\')">' + s.name + '</a>';
+
+          html += '<tr>' +
+            '<td><b>' + s.userId + '</b></td>' +
+            '<td>' + nameLink + '</td>' +
+            '<td>' + (s.ext || '---') + '</td>' +
+            '<td>' + s.team + '</td>' +
+            '<td>' + s.batchProgress + '</td>' +
+            '<td>' + s.quality30sCount + ' Lead</td>' +
+            '<td>' + s.avgDurationSec + 's</td>' +
+            '<td>' + fraudBadge + '</td>' +
+            '<td>' + actionBtn + '</td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+      }).getSaleAuditMatrix(reqId);
+    }
+
+    function loadPipelineRecoveryData() {
+      var tbody = document.getElementById("tbody-lead-pipeline");
+      if (!tbody) return;
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center text-primary py-3"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang quét phễu Lead cần thu hồi...</td></tr>';
+
+      var reqId = currentUser ? currentUser.userId : "";
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res || res.status !== "success" || !res.leads || res.leads.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted">Hiện không có Lead nào trong diện thu hồi khẩn cấp.</td></tr>';
+          return;
+        }
+        var html = "";
+        res.leads.forEach(function(l) {
+          var urgentBadge = l.isUrgent 
+            ? '<span class="badge bg-danger">' + l.daysRemaining + ' Ngày (Gấp)</span>' 
+            : '<span class="badge bg-warning text-dark">' + l.daysRemaining + ' Ngày</span>';
+            
+          html += '<tr>' +
+            '<td><b>' + l.leadId + '</b></td>' +
+            '<td>' + l.saleId + '</td>' +
+            '<td>' + l.name + '</td>' +
+            '<td><span class="badge-phone-unmasked">' + l.realPhone + '</span></td>' +
+            '<td>' + l.startDate + '</td>' +
+            '<td><span class="badge bg-info text-dark">' + l.stage + '</span></td>' +
+            '<td>' + urgentBadge + '</td>' +
+            '<td><button type="button" class="btn btn-outline-danger btn-sm" onclick="handleForceRecycle(\'' + l.leadId + '\')"><i class="fa-solid fa-rotate-left"></i> Thu Hồi</button></td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+      }).getLeadPipelineStats(reqId);
+    }
+
+    function openUserHoldDrillDownModal(userId, userName) {
+      var modalId = "modalUserHoldDrillDown";
+      var modalEl = document.getElementById(modalId);
+      if (!modalEl) {
+        var div = document.createElement("div");
+        div.id = modalId;
+        div.className = "modal fade";
+        div.tabIndex = -1;
+        div.innerHTML = 
+          '<div class="modal-dialog modal-lg modal-dialog-centered">' +
+            '<div class="modal-content border-0 shadow-lg">' +
+              '<div class="modal-header bg-primary text-white">' +
+                '<h6 class="modal-title"><i class="fa-solid fa-folder-open me-2"></i>Sổ Tay Hold Lead: <span id="drilldown-user-title"></span></h6>' +
+                '<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>' +
+              '</div>' +
+              '<div class="modal-body p-0">' +
+                '<div class="table-responsive" style="max-height: 400px;">' +
+                  '<table class="table table-striped table-hover mb-0 text-center align-middle">' +
+                    '<thead class="table-light"><tr><th>STT</th><th>Họ Tên</th><th>SĐT Gốc</th><th>Ngày Nhận</th><th>Trạng Thái</th><th>Hạn Còn</th><th>Ghi Chú</th></tr></thead>' +
+                    '<tbody id="tbody-user-hold-drilldown"><tr><td colspan="7" class="py-4 text-primary"><i class="fa-solid fa-spinner fa-spin me-2"></i>Đang truy vấn hồ sơ...</td></tr></tbody>' +
+                  '</table>' +
+                '</div>' +
+              '</div>' +
+              '<div class="modal-footer py-1">' +
+                '<button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>' +
+              '</div>' +
+            '</div>' +
+          '</div>';
+        document.body.appendChild(div);
+        modalEl = div;
+      }
+
+      document.getElementById("drilldown-user-title").innerText = userName + " (" + userId + ")";
+      var tbody = document.getElementById("tbody-user-hold-drilldown");
+      tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-primary"><i class="fa-solid fa-spinner fa-spin me-2"></i>Đang truy vấn hồ sơ...</td></tr>';
+      
+      var bsModal = new bootstrap.Modal(modalEl);
+      bsModal.show();
+
+      google.script.run.withSuccessHandler(function(res) {
+        if (!res || res.status !== "success" || !res.leads || res.leads.length === 0) {
+          tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-muted">Nhân sự này hiện chưa lưu Lead tiềm năng nào vào Sổ tay.</td></tr>';
+          return;
+        }
+        var html = "";
+        res.leads.forEach(function(l, i) {
+          html += '<tr>' +
+            '<td>' + (i+1) + '</td>' +
+            '<td class="fw-bold text-start">' + l.name + '</td>' +
+            '<td><span class="badge bg-success">' + l.realPhone + '</span></td>' +
+            '<td>' + l.startDate + '</td>' +
+            '<td><span class="badge bg-info text-dark">' + l.status + '</span></td>' +
+            '<td><span class="badge bg-warning text-dark">' + l.daysRemaining + ' Ngày</span></td>' +
+            '<td class="text-start small">' + (l.note || "--") + '</td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+      }).getLeadHoldDetailsByUser(userId);
+    }
+
+    function handleToggleLock(userId, status) {
+      if (!confirm((status ? "Khóa quyền cấp data của " : "Mở khóa cấp data cho ") + userId + "?")) return;
+      google.script.run.withSuccessHandler(function(res){ 
+        alert(res.message); 
+        loadAdminDashboardData(); 
+      }).toggleSaleLock(userId, status);
+    }
+
+    function handleAdminRevokeBatch(saleId) {
+      if (confirm("Thu hồi toàn bộ data chưa gọi của [" + saleId + "] về lại kho đấu trường?")) {
+        google.script.run.withSuccessHandler(function(res){ 
+          alert(res.message); 
+          loadAdminDashboardData(); 
+        }).adminRevokeBatchFromSale(saleId);
+      }
+    }
+
+    function handleForceRecycle(leadId) {
+      if (confirm("Thu hồi cưỡng chế Lead [" + leadId + "] về kho đấu trường?")) {
+        google.script.run.withSuccessHandler(function(res){ 
+          alert(res.message); 
+          loadAdminDashboardData(); 
+        }).forceRecycleLead(leadId);
+      }
+    }
+
+    function handleTransferLeadPrompt(fromSaleId) {
+      var leadId = prompt("Nhập LEAD_ID cần chuyển từ Sale [" + fromSaleId + "]:");
+      if (!leadId) return;
+      var toSaleId = prompt("Nhập MÃ SALE mới sẽ tiếp nhận:");
+      if (!toSaleId) return;
+
+      google.script.run.withSuccessHandler(function(res){
+        alert(res.message);
+        loadAdminDashboardData();
+      }).transferHoldLeadOwner(leadId.trim(), fromSaleId.trim().toUpperCase(), toSaleId.trim().toUpperCase());
+    }
+
+    function openCreateUserModal() {
+      document.getElementById("modal-user-title").innerHTML = '<i class="fa-solid fa-user-plus me-1"></i> Khởi Tạo Nhân Sự Mới';
+      document.getElementById("new-user-id").value = "";
+      document.getElementById("new-user-id").readOnly = false; 
+      document.getElementById("new-user-name").value = "";
+      document.getElementById("new-user-ext").value = "";
+      document.getElementById("new-user-team").value = "TEAM_01";
+      document.getElementById("new-user-role").value = "SALE";
+      document.getElementById("new-user-password").value = "123456";
+      document.getElementById("btn-save-user").setAttribute("onclick", "submitCreateNewUser()");
+      new bootstrap.Modal(document.getElementById("createUserModal")).show();
+    }
+
+    function openEditUserModal(id, name, role, ext, team) {
+      document.getElementById("modal-user-title").innerHTML = '<i class="fa-solid fa-user-pen me-1"></i> Chỉnh Sửa Thông Tin Nhân Sự';
+      document.getElementById("new-user-id").value = id;
+      document.getElementById("new-user-id").readOnly = true; 
+      document.getElementById("new-user-name").value = name;
+      document.getElementById("new-user-role").value = role;
+      document.getElementById("new-user-ext").value = ext;
+      document.getElementById("new-user-team").value = team;
+      document.getElementById("new-user-password").value = "";
+      document.getElementById("new-user-password").placeholder = "Bỏ trống nếu giữ MK cũ";
+      document.getElementById("btn-save-user").setAttribute("onclick", "submitUpdateUser()");
+      new bootstrap.Modal(document.getElementById("createUserModal")).show();
+    }
+
+    function submitCreateNewUser() {
+      var payload = { 
+        userId: document.getElementById("new-user-id").value.trim().toUpperCase(), 
+        name: document.getElementById("new-user-name").value.trim(), 
+        role: document.getElementById("new-user-role").value.trim().toUpperCase(), 
+        ext: document.getElementById("new-user-ext").value.trim(), 
+        hotline: document.getElementById("new-user-hotline") ? document.getElementById("new-user-hotline").value.trim() : "0979531213", 
+        team: document.getElementById("new-user-team").value.trim().toUpperCase(), 
+        password: document.getElementById("new-user-password").value.trim() 
+      };
+
+      if (!payload.userId || !payload.name) { alert("Vui lòng nhập đủ ID và Họ Tên!"); return; }
+      google.script.run.withSuccessHandler(function(res){ 
+        alert(res.message); 
+        if (res.status === "success") { 
+          bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide(); 
+          loadAdminDashboardData(); 
+        } 
+      }).createNewUserByAdmin(payload);
+    }
+
+    function submitUpdateUser() {
+      var payload = { 
+        userId: document.getElementById("new-user-id").value.trim().toUpperCase(), 
+        name: document.getElementById("new-user-name").value.trim(), 
+        role: document.getElementById("new-user-role").value.trim().toUpperCase(), 
+        ext: document.getElementById("new-user-ext").value.trim(), 
+        hotline: document.getElementById("new-user-hotline") ? document.getElementById("new-user-hotline").value.trim() : "0979531213", 
+        team: document.getElementById("new-user-team").value.trim().toUpperCase(), 
+        password: document.getElementById("new-user-password").value.trim() 
+      };
+
+      google.script.run.withSuccessHandler(function(res){ 
+        alert(res.message); 
+        if (res.status === "success") { 
+          bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide(); 
+          loadAdminDashboardData(); 
+        } 
+      }).updateUserByAdmin(payload);
+    }
+
+    function openAdminDispatchModal() { new bootstrap.Modal(document.getElementById("adminDispatchModal")).show(); loadActiveSalesIntoDropdown(""); }
+    function openAdminDispatchModalForUser(uid) { new bootstrap.Modal(document.getElementById("adminDispatchModal")).show(); loadActiveSalesIntoDropdown(uid); }
+    
+    function loadActiveSalesIntoDropdown(preselectUser) {
+      var sel = document.getElementById("dispatch-target-sale"); 
+      if (!sel) return;
+      sel.innerHTML = '<option value="">Đang tải danh sách nhân sự...</option>';
+      google.script.run.withSuccessHandler(function(res){
+        var html = '<option value="">-- Chọn Nhân Sự --</option>';
+        if (res && res.sales) {
+          res.sales.forEach(function(s){ 
+            html += '<option value="'+s.userId+'" '+(s.userId===preselectUser?"selected":"")+'>'+s.name+' ('+s.team+')</option>'; 
+          });
+        }
+        sel.innerHTML = html;
+      }).getTeamDrillDownStats("ALL", currentUser ? currentUser.userId : "");
+    }
+
+    function submitAdminDispatch() {
+      var targetSale = document.getElementById("dispatch-target-sale").value;
+      var batchSize = document.getElementById("dispatch-batch-size").value;
+      var tag = document.getElementById("dispatch-campaign-tag").value.trim() || "ALL";
+      var prov = document.getElementById("dispatch-province").value.trim() || "ALL";
+      if (!targetSale) { alert("Chưa chọn nhân sự nhận số!"); return; }
+      
+      google.script.run.withSuccessHandler(function(res){ 
+        alert(res.message); 
+        bootstrap.Modal.getInstance(document.getElementById("adminDispatchModal")).hide(); 
+        loadAdminDashboardData(); 
+      }).adminDistributeDataToSale(targetSale, batchSize, tag, prov);
+    }
+
+    function handleExcelUpload(input) {
+      if (!input.files || !input.files[0]) return;
+      var file = input.files[0];
+      var dropName = document.getElementById("dropzone-file-name");
+      if (dropName) dropName.innerText = "Đang đọc: " + file.name;
+
+      var tag = document.getElementById("admin-campaign-tag").value.trim() || "BHXH";
+      var prov = document.getElementById("admin-province").value.trim() || "Toàn quốc";
+
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        try {
+          var data = new Uint8Array(e.target.result);
+          var workbook = XLSX.read(data, { type: 'array' });
+          var firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+          var jsonData = XLSX.utils.sheet_to_json(firstSheet, { header: 1, raw: false });
+
+          if (!jsonData || jsonData.length <= 1) { alert("File Excel rỗng!"); return; }
+
+          var colPhone = -1, colName = -1, colSalary = -1, colCompany = -1, headerRowIdx = -1;
+          for (var r = 0; r < Math.min(jsonData.length, 5); r++) {
+            var row = jsonData[r];
+            if (!row || row.length === 0) continue;
+            for (var c = 0; c < row.length; c++) {
+              var cleanH = (row[c] || "").toString().trim().toLowerCase().replace(/[^a-z0-9]/g, "");
+              if (colPhone === -1 && (cleanH.indexOf("sdt") !== -1 || cleanH.indexOf("phone") !== -1 || cleanH === "dt")) { colPhone = c; headerRowIdx = r; }
+              if (colName === -1 && (cleanH.indexOf("ten") !== -1 || cleanH.indexOf("name") !== -1)) colName = c;
+              if (colSalary === -1 && (cleanH.indexOf("luong") !== -1 || cleanH.indexOf("salary") !== -1)) colSalary = c;
+              if (colCompany === -1 && (cleanH.indexOf("donvi") !== -1 || cleanH.indexOf("congty") !== -1)) colCompany = c;
+            }
+            if (colPhone !== -1) break;
+          }
+
+          if (colPhone === -1) { alert("Không tìm thấy cột Số điện thoại trong file!"); return; }
+
+          var startRow = (headerRowIdx !== -1) ? headerRowIdx + 1 : 1;
+          var cleanRows = [];
+          for (var i = startRow; i < jsonData.length; i++) {
+            var row = jsonData[i];
+            if (!row || row.length === 0) continue;
+            var rawP = row[colPhone] ? row[colPhone].toString().trim() : "";
+            var p = rawP.replace(/[^0-9]/g, "");
+            if (p.startsWith("84")) p = "0" + p.substring(2);
+            if (!p.startsWith("0") && p.length === 9) p = "0" + p;
+
+            if (p.length >= 9 && p.length <= 11) {
+              cleanRows.push({
+                name: (colName !== -1 && row[colName]) ? row[colName].toString().trim() : "Khách Hàng",
+                phone: p,
+                salary: (colSalary !== -1 && row[colSalary]) ? row[colSalary].toString().trim() : "",
+                company: (colCompany !== -1 && row[colCompany]) ? row[colCompany].toString().trim() : "",
+                tag: tag, province: prov
+              });
+            }
+          }
+
+          var total = cleanRows.length;
+          if (total === 0) { alert("Không trích xuất được số điện thoại hợp lệ!"); return; }
+
+          var chunkSize = 1000, currentIndex = 0;
+          function sendChunkSequentially() {
+            if (currentIndex >= total) {
+              alert("NẠP THÀNH CÔNG " + total + " DÒNG VÀO KHO RAW_POOL_NEW!");
+              loadAdminDashboardData();
+              return;
+            }
+            var chunk = cleanRows.slice(currentIndex, currentIndex + chunkSize);
+            google.script.run
+              .withSuccessHandler(function(res) {
+                if (res && res.status === "success") {
+                  currentIndex += chunk.length;
+                  sendChunkSequentially();
+                } else { alert("Lỗi nạp: " + (res.message || "Lỗi ghi dữ liệu")); }
+              })
+              .ingestLeadChunk(chunk);
+          }
+          sendChunkSequentially();
+        } catch (err) { alert("Lỗi đọc Excel: " + err.toString()); }
+      };
+      reader.readAsArrayBuffer(file);
+    }
+
+    function processCallLogReconciliation() {
+      var fileInput = document.getElementById("file-callio-log");
+      if (!fileInput.files || !fileInput.files[0]) { alert("Vui lòng chọn file CSV!"); return; }
+      var reader = new FileReader();
+      reader.onload = function(e) {
+        google.script.run.withSuccessHandler(function(res) {
+          alert(res.message || "Đối soát Callio hoàn tất!");
+          loadAdminDashboardData();
+        }).reconcileCallioLogs(e.target.result);
+      };
+      reader.readAsText(fileInput.files[0]);
+    }
+
+    // 3. PHÂN HỆ TELESALE WORKSPACE
     function switchMainTab(tab) {
-      document.getElementById("view-batch-container").style.display = (tab === 'batch') ? "block" : "none";
-      document.getElementById("view-hold-container").style.display = (tab === 'hold') ? "block" : "none";
-      document.getElementById("tab-btn-batch").className = (tab === 'batch') ? "tab-item-btn active" : "tab-item-btn";
-      document.getElementById("tab-btn-hold").className = (tab === 'hold') ? "tab-item-btn hold-active" : "tab-item-btn";
+      var vBatch = document.getElementById("view-batch-container");
+      var vHold = document.getElementById("view-hold-container");
+      var tBtnBatch = document.getElementById("tab-btn-batch");
+      var tBtnHold = document.getElementById("tab-btn-hold");
+
+      if (vBatch) vBatch.style.display = (tab === 'batch') ? "block" : "none";
+      if (vHold) vHold.style.display = (tab === 'hold') ? "block" : "none";
+      if (tBtnBatch) tBtnBatch.className = (tab === 'batch') ? "tab-item-btn active" : "tab-item-btn";
+      if (tBtnHold) tBtnHold.className = (tab === 'hold') ? "tab-item-btn hold-active" : "tab-item-btn";
       if (tab === 'hold') fetchHoldLeadsData();
     }
 
-    async function claimNewBatch() {
-      if (AppState.activeBatchLeads.length > 5) {
+    function claimNewBatch() {
+      if (activeBatchLeads.length > 5) {
         alert("⚠️ BẠN CHƯA HOÀN THÀNH LÔ HIỆN TẠI!\nCần báo cáo đạt tối thiểu 90% (chỉ còn tồn tối đa 5 số) mới được nhận lô mới.");
         return;
       }
       var btn = document.getElementById("btn-claim-batch");
-      btn.disabled = true;
-      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang tải Data...';
-
-      var res = await ApiClient.request({
-        action: "claimBatch",
-        userId: AppState.currentUser.userId,
-        ext: AppState.currentUser.ext,
-        batchSize: 50
-      }, "POST");
-
-      btn.disabled = false;
-      btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down me-1"></i> Nhận Lô Mới';
-
-      if (res && res.status === "success") {
-        AppState.activeBatchLeads = res.leads || [];
-        renderBatchTable();
-        updateDashboardKpi();
-      } else {
-        alert(res ? res.message : "Không nhận được dữ liệu!");
-      }
+      if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tải Data...'; }
+      
+      google.script.run
+        .withSuccessHandler(function(res){
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Nhận Lô Mới'; }
+          if (res && res.status === "success") { 
+            activeBatchLeads = res.leads || []; 
+            reportedCount = 0; 
+            renderBatchTable(); 
+            updateDashboardKpi(); 
+          } else {
+            alert(res ? res.message : "Không nhận được dữ liệu!");
+          }
+        })
+        .withFailureHandler(function(err){
+          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Nhận Lô Mới'; }
+          alert("Lỗi tải data: " + err.toString());
+        })
+        .fetchNewBatchForSale(currentUser.userId, currentUser.ext, 50);
     }
 
     function renderBatchTable() {
       var tbody = document.getElementById("tbody-batch-leads");
-      document.getElementById("badge-count-batch").innerText = AppState.activeBatchLeads.length;
+      var badgeCount = document.getElementById("badge-count-batch");
+      if (badgeCount) badgeCount.innerText = activeBatchLeads.length;
       if (!tbody) return;
 
-      if (AppState.activeBatchLeads.length === 0) {
+      if (activeBatchLeads.length === 0) {
         tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-success fw-bold">Lô Data đã hoàn tất. Bấm nhận thêm lô mới!</td></tr>';
         return;
       }
-
+      
       var html = "";
-      AppState.activeBatchLeads.forEach(function(l, idx) {
+      activeBatchLeads.forEach(function(l, idx){
+        var historyBadge = "";
+        if (l.cycle > 1) {
+          historyBadge = '<div class="mt-1"><span class="badge bg-warning text-dark border border-secondary" style="font-size: 0.72rem;">' +
+                         '<i class="fa-solid fa-clock-rotate-left"></i> VÒNG ' + l.cycle + ' | ' + (l.historyNote || "Tái cấp") +
+                         '</span></div>';
+        } else {
+          historyBadge = '<div class="mt-1"><span class="badge bg-success" style="font-size: 0.72rem;">Số Mới Tinh</span></div>';
+        }
+
         html += '<tr>' +
-          '<td>' + (idx + 1) + '</td>' +
-          '<td><b>' + l.name + '</b></td>' +
+          '<td>' + (idx+1) + '</td>' +
+          '<td class="text-start"><b>' + l.name + '</b>' + historyBadge + '</td>' +
           '<td><span class="badge-phone-masked">' + l.maskedPhone + '</span></td>' +
           '<td>' + (l.company || l.salary || '--') + '</td>' +
-          '<td>' + l.tag + '</td>' +
+          '<td><span class="badge bg-light text-dark border">' + l.tag + '</span></td>' +
           '<td>Vòng ' + l.cycle + '</td>' +
-          '<td><button class="btn-callio-call" onclick="executeCallioCopy(\'' + l.rawPhoneRef + '\', this)"><i class="fa-regular fa-copy"></i> Copy SĐT</button></td>' +
+          '<td>' +
+            '<div class="d-flex gap-1 justify-content-center">' +
+              '<button class="btn btn-sm btn-primary py-1 px-2 fw-bold" onclick="triggerCallioClickToCall(\''+l.rawPhoneRef+'\', this)" title="Gọi trực tiếp qua Callio">' +
+                '<i class="fa-solid fa-phone-volume"></i> Gọi' +
+              '</button>' +
+              '<button class="btn-callio-call py-1 px-2" onclick="executeCallioCopy(\''+l.rawPhoneRef+'\', this)" title="Copy số để gọi ngoài">' +
+                '<i class="fa-regular fa-copy"></i>' +
+              '</button>' +
+            '</div>' +
+          '</td>' +
           '<td>' +
             '<div class="d-flex gap-1">' +
-              '<select class="form-select form-select-sm" id="sel-status-' + idx + '">' +
-                '<option value="">-- Kết Quả --</option>' +
+              '<select class="form-select form-select-sm border-primary" id="sel-status-'+idx+'">' +
+                '<option value="">-- Chọn Kết Quả --</option>' +
                 '<option value="POTENTIAL" class="text-success fw-bold">⭐ Tiềm Năng (Vào CRM)</option>' +
                 '<option value="FOLLOW_UP" class="text-primary fw-bold">📞 Hẹn Gọi Lại (&ge;30s)</option>' +
                 '<option value="BUSY">Máy bận / Không nghe</option>' +
-                '<option value="NO_NEED" class="text-warning">Không Nhu Cầu (Tái cấp tháng sau)</option>' +
+                '<option value="NO_NEED" class="text-warning">Không Nhu Cầu (Chờ 30 ngày)</option>' +
                 '<option value="WRONG_NUMBER" class="text-danger">Sai số / Thuê bao (Hủy)</option>' +
                 '<option value="DNC_REFUSE" class="text-danger fw-bold">Cấm Gọi (Blacklist)</option>' +
               '</select>' +
-              '<button class="btn btn-sm btn-dark" onclick="processLeadReport(' + idx + ')">Lưu</button>' +
+              '<button class="btn btn-sm btn-primary fw-bold" onclick="processLeadReport('+idx+')">LƯU</button>' +
             '</div>' +
           '</td>' +
         '</tr>';
@@ -811,460 +1493,420 @@
       tbody.innerHTML = html;
     }
 
+    function fallbackCopyTextToClipboard(text) {
+      var ta = document.createElement("textarea"); 
+      ta.value = text; ta.style.position = "fixed"; 
+      document.body.appendChild(ta); ta.focus(); ta.select();
+      try { document.execCommand('copy'); } catch (err) {} 
+      document.body.removeChild(ta);
+    }
+
     function executeCallioCopy(rawPhoneRef, btnElem) {
       try {
         var realPhone = atob(rawPhoneRef);
-        navigator.clipboard.writeText(realPhone);
-        var oldText = btnElem.innerHTML;
-        btnElem.innerHTML = '<i class="fa-solid fa-check"></i> Đã Copy';
+        if (navigator.clipboard && window.isSecureContext) { 
+          navigator.clipboard.writeText(realPhone); 
+        } else { 
+          fallbackCopyTextToClipboard(realPhone); 
+        }
+        var old = btnElem.innerHTML; 
+        btnElem.innerHTML = '<i class="fa-solid fa-check"></i>'; 
         btnElem.classList.replace('btn-callio-call', 'btn-success');
-        setTimeout(function() {
-          btnElem.innerHTML = oldText;
-          btnElem.classList.replace('btn-success', 'btn-callio-call');
+        setTimeout(function() { 
+          btnElem.innerHTML = old; 
+          if (btnElem.classList.contains('btn-success')) btnElem.classList.replace('btn-success', 'btn-callio-call'); 
         }, 1500);
-      } catch (e) {
-        alert("Lỗi giải mã số điện thoại: " + e.toString());
-      }
+      } catch (e) { alert("Lỗi giải mã số điện thoại: " + e.toString()); }
     }
 
-   // [NEW] - TỐI ƯU HÓA GIAO DIỆN PHẢN HỒI TỨC THÌ (OPTIMISTIC UI - ĐỘ TRỄ 0 GIÂY)
-    function processLeadReport(idx) {
-      var val = document.getElementById("sel-status-" + idx).value;
-      if (!val) { 
-        alert("Vui lòng chọn kết quả cuộc gọi!"); 
-        return; 
-      }
-      var lead = AppState.activeBatchLeads[idx];
+    function triggerCallioClickToCall(rawPhoneRef, btnElem) {
+      if (!currentUser) return;
 
-      // Nếu là Lead Tiềm năng hoặc Hẹn gọi lại -> Mở Modal chi tiết
+      if (!currentUser.personalToken) {
+        alert("Bạn chưa kết nối tài khoản Callio! Vui lòng nhập Email & Mật khẩu Callio cá nhân.");
+        new bootstrap.Modal(document.getElementById("callioConfigModal")).show();
+        return;
+      }
+
+      var oldText = btnElem.innerHTML;
+      btnElem.disabled = true;
+      btnElem.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          btnElem.disabled = false;
+          btnElem.innerHTML = oldText;
+          if (res && res.status === "success") {
+            btnElem.classList.replace("btn-primary", "btn-success");
+            btnElem.innerHTML = '<i class="fa-solid fa-phone-volume"></i> Đang reo...';
+            setTimeout(function() {
+              btnElem.classList.replace("btn-success", "btn-primary");
+              btnElem.innerHTML = oldText;
+            }, 4000);
+          } else if (res && res.status === "require_auth") {
+            alert(res.message);
+            new bootstrap.Modal(document.getElementById("callioConfigModal")).show();
+          } else {
+            alert(res ? res.message : "Tổng đài từ chối cuộc gọi!");
+          }
+        })
+        .withFailureHandler(function(err) {
+          btnElem.disabled = false;
+          btnElem.innerHTML = oldText;
+          alert("Lỗi kết nối Callio: " + err.toString());
+        })
+        .makeCallioClickToCall(currentUser.userId, currentUser.ext, rawPhoneRef, currentUser.team, currentUser.personalToken);
+    }
+
+    function processLeadReport(idx) {
+      var val = document.getElementById("sel-status-"+idx).value;
+      if (!val) { alert("Vui lòng chọn kết quả cuộc gọi!"); return; }
+      var lead = activeBatchLeads[idx];
+      
       if (val === "POTENTIAL" || val === "FOLLOW_UP") {
         openCRMModalNewLead(lead, val);
-        return;
+        return; 
       }
 
       var now = new Date().getTime();
-      var interval = (AppState.lastReportTime === 0) ? 10 : Math.round((now - AppState.lastReportTime) / 1000);
-      AppState.lastReportTime = now;
+      var interval = (lastReportTime === 0) ? 10 : Math.round((now - lastReportTime)/1000);
+      lastReportTime = now;
+      reportedCount++;
 
-      // 1. TÁCH LEADER ĐANG BÁO CÁO RA KHỎI BỘ NHỚ LOCAL NGAY LẬP TỨC
-      var reportingLead = AppState.activeBatchLeads.splice(idx, 1)[0];
-
-      // 2. CẬP NHẬT GIAO DIỆN NGAY TRONG 0.01 GIÂY (SALE KHÔNG CẦN CHỜ SERVER)
-      renderBatchTable();
+      var reportingLead = activeBatchLeads.splice(idx, 1)[0];
+      renderBatchTable(); 
       updateDashboardKpi();
 
-      // 3. ĐẨY DỮ LIỆU LÊN SERVER CHẠY NGẦM HOÀN TOÀN (BACKGROUND ASYNC)
-      ApiClient.request({
-        action: "recordReport",
-        userId: AppState.currentUser.userId,
-        report: {
-          leadId: reportingLead.leadId,
-          status: val,
-          rawPhoneRef: reportingLead.rawPhoneRef,
-          reportIntervalSec: interval,
-          rowIndex: reportingLead.rowIndex || -1 // [NEW] Gửi kèm Row Index nếu có để Backend ghi đè tức thì
-        }
-      }, "POST").then(function(res) {
-        if (!res || res.status !== "success") {
-          console.warn("Lỗi đồng bộ ngầm cho lead:", reportingLead.leadId, res ? res.message : "");
-        }
-      }).catch(function(err) {
-        console.error("Lỗi mạng đồng bộ ngầm:", err);
+      google.script.run.recordLeadReport(currentUser.userId, { 
+        leadId: reportingLead.leadId, 
+        status: val, 
+        rawPhoneRef: reportingLead.rawPhoneRef, 
+        reportIntervalSec: interval,
+        rowIndex: reportingLead.rowIndex || reportingLead.rowIdx || -1
       });
     }
-      function updateDashboardKpi() {
-      var pendingCount = AppState.activeBatchLeads.length;
-      document.getElementById("val-kpi-progress").innerText = pendingCount + " Số Tồn";
+
+    function updateDashboardKpi() {
+      var pendingCount = activeBatchLeads.length;
+      var progressText = document.getElementById("val-kpi-progress");
+      if (progressText) progressText.innerHTML = `<span class="text-danger">${pendingCount}</span> Số Tồn`;
       var btn = document.getElementById("btn-claim-batch");
-      if (pendingCount > 5) btn.classList.replace("btn-success", "btn-secondary");
-      else btn.classList.replace("btn-secondary", "btn-success");
+      if (btn) {
+        if (pendingCount > 5) btn.classList.replace("btn-success", "btn-secondary"); 
+        else btn.classList.replace("btn-secondary", "btn-success"); 
+      }
     }
 
-    // -------------------------------------------------------------
-    // MODULE 5: SỔ TAY HOLD LEAD & PIPELINE CRM
-    // -------------------------------------------------------------
-    async function fetchHoldLeadsData() {
-      if (!AppState.currentUser) return;
-      var res = await ApiClient.request({ action: "getHoldLeads", userId: AppState.currentUser.userId }, "GET");
-      var tbody = document.getElementById("tbody-hold-leads");
+    // 4. PHÂN HỆ SỔ TAY HOLD LEAD & PIPELINE CRM
+    function fetchHoldLeadsData() {
+      if (!currentUser) return;
+      var uId = (currentUser.userId || currentUser.id || "").toString().trim();
       
-      if (!res || !res.data || res.data.length === 0) {
-        if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5">Chưa có Lead bảo lưu.</td></tr>';
-        document.getElementById("badge-count-hold").innerText = "0";
-        document.getElementById("val-kpi-hold").innerText = "0 Lead";
-        document.getElementById("val-kpi-duration").innerText = "0 / 10";
-        document.getElementById("badge-kpi-status").innerText = "TIẾN ĐỘ 0%";
-        return;
+      google.script.run.withSuccessHandler(function(res){
+        var tbody = document.getElementById("tbody-hold-leads");
+        if (!res || !res.data || res.data.length === 0) { 
+          if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5">Chưa có Lead bảo lưu.</td></tr>'; 
+          currentHoldDataCache = [];
+          updateHoldCountDisplay(0);
+          return; 
+        }
+        
+        currentHoldDataCache = res.data; 
+        updateHoldCountDisplay(res.data.length);
+
+        if (!tbody) return;
+        var html = "";
+        res.data.forEach(function(item, i){
+          html += '<tr>' +
+            '<td>' + (i+1) + '</td>' +
+            '<td><b>' + item.name + '</b><br><small class="text-primary">' + item.status + '</small></td>' +
+            '<td><span class="badge-phone-unmasked">' + item.realPhone + '</span></td>' +
+            '<td>' + item.startDate + '</td>' +
+            '<td>' + item.duration + 's</td>' +
+            '<td><span class="badge bg-warning text-dark">' + item.daysRemaining + ' Ngày</span></td>' +
+            '<td><a href="https://zalo.me/' + item.realPhone + '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-comment-dots"></i> Zalo</a></td>' +
+            '<td><button class="btn btn-sm btn-outline-secondary" onclick="openCRMModalExisting(' + i + ')"><i class="fa-solid fa-pen-to-square"></i> Cập Nhật</button></td>' +
+          '</tr>';
+        });
+        tbody.innerHTML = html;
+      }).fetchHoldLeads(uId);
+    }
+
+    function updateHoldCountDisplay(count) {
+      var tabBtnHold = document.getElementById("tab-btn-hold");
+      if (tabBtnHold) tabBtnHold.innerHTML = '<i class="fa-solid fa-star text-warning me-1"></i> Sổ Tay Hold Lead ( ' + count + ' )';
+      
+      var valKpiHold = document.getElementById("val-kpi-hold");
+      if (valKpiHold) valKpiHold.innerText = count + " Lead";
+
+      var valKpiDur = document.getElementById("val-kpi-duration");
+      var badgeKpiSt = document.getElementById("badge-kpi-status");
+      if (valKpiDur) valKpiDur.innerText = count + " / 10";
+      if (badgeKpiSt) {
+        var pct = Math.min(100, Math.round((count / 10) * 100));
+        badgeKpiSt.innerText = "TIẾN ĐỘ " + pct + "%";
+        if (pct >= 100) {
+          badgeKpiSt.className = "kpi-badge-success";
+        } else {
+          badgeKpiSt.className = "kpi-badge-alert";
+        }
       }
-
-      AppState.currentHoldDataCache = res.data;
-      document.getElementById("badge-count-hold").innerText = res.data.length;
-      document.getElementById("val-kpi-hold").innerText = res.data.length + " Lead";
-
-      var prog = Math.min(100, Math.round((res.data.length / 10) * 100));
-      document.getElementById("val-kpi-duration").innerText = res.data.length + " / 10";
-      document.getElementById("badge-kpi-status").innerText = "TIẾN ĐỘ " + prog + "%";
-
-      var html = "";
-      res.data.forEach(function(item, i) {
-        html += '<tr>' +
-          '<td>' + (i + 1) + '</td>' +
-          '<td><b>' + item.name + '</b><br><small class="text-primary">' + item.status + '</small></td>' +
-          '<td><span class="badge-phone-unmasked">' + item.realPhone + '</span></td>' +
-          '<td>' + item.startDate + '</td>' +
-          '<td>' + item.duration + 's</td>' +
-          '<td><span class="badge bg-warning text-dark">' + item.daysRemaining + ' Ngày</span></td>' +
-          '<td><a href="https://zalo.me/' + item.realPhone + '" target="_blank" class="btn btn-sm btn-outline-primary"><i class="fa-solid fa-comment-dots"></i> Zalo</a></td>' +
-          '<td><button class="btn btn-sm btn-outline-secondary" onclick="openCRMModalExisting(' + i + ')"><i class="fa-solid fa-pen-to-square"></i> Cập Nhật</button></td>' +
-        '</tr>';
-      });
-      tbody.innerHTML = html;
     }
 
     function togglePipelineFields() {
-      var status = document.getElementById("crm-status").value;
-      document.getElementById("box-checklist").style.display = (status === "Thu hồ sơ") ? "block" : "none";
-      document.getElementById("box-loan-details").style.display = (status === "Giải ngân") ? "block" : "none";
-      document.getElementById("box-reject-details").style.display = (status === "Từ chối") ? "block" : "none";
+      var statusEl = document.getElementById("crm-status");
+      if (!statusEl) return;
+      var status = statusEl.value;
+      var boxChecklist = document.getElementById("box-checklist");
+      var boxLoan = document.getElementById("box-loan-details");
+      if (boxChecklist) boxChecklist.style.display = (status === "Thu hồ sơ") ? "block" : "none";
+      if (boxLoan) boxLoan.style.display = (status === "Giải ngân") ? "block" : "none";
     }
 
     function openCRMModalNewLead(leadObj, initialStatus) {
-      AppState.isNewLeadFlow = true;
-      AppState.pendingLeadIndex = AppState.activeBatchLeads.findIndex(function(l) { return l.leadId === leadObj.leadId; });
+      isNewLeadFlow = true;
+      pendingLeadIndex = activeBatchLeads.findIndex(function(l) { return l.leadId === leadObj.leadId; });
+      
       document.getElementById("crm-lead-id").value = leadObj.leadId;
       document.getElementById("crm-name").innerText = leadObj.name;
-      document.getElementById("crm-phone").innerText = leadObj.maskedPhone;
+      document.getElementById("crm-phone").innerText = leadObj.maskedPhone + " (Gỡ mặt nạ khi lưu)";
+      
+      document.getElementById("crm-job").value = "";
+      document.getElementById("crm-income").value = leadObj.salary || "";
+      document.getElementById("crm-location").value = leadObj.province || "";
+      document.getElementById("crm-debt").value = "";
+      document.getElementById("crm-note").value = "";
       document.getElementById("crm-status").value = "Đang theo dõi";
+
+      document.getElementById("chk-cccd").checked = false;
+      document.getElementById("chk-vssid").checked = false;
+      document.getElementById("chk-banking").checked = false;
+      document.getElementById("chk-cic").checked = false;
+      
       togglePipelineFields();
       new bootstrap.Modal(document.getElementById("crmPipelineModal")).show();
     }
 
     function openCRMModalExisting(index) {
-      AppState.isNewLeadFlow = false;
-      var lead = AppState.currentHoldDataCache[index];
+      isNewLeadFlow = false;
+      var lead = currentHoldDataCache[index];
+      if (!lead) return;
+      
       document.getElementById("crm-lead-id").value = lead.leadId;
       document.getElementById("crm-name").innerText = lead.name;
-      document.getElementById("crm-phone").innerText = lead.realPhone;
-      document.getElementById("crm-status").value = lead.status || "Đang theo dõi";
+      document.getElementById("crm-phone").innerText = lead.realPhone; 
+      
+      var ext = lead.extraData || {};
+      document.getElementById("crm-job").value = ext.congViec || "";
+      document.getElementById("crm-income").value = ext.thuNhap || "";
+      document.getElementById("crm-location").value = ext.noiSong || "";
+      document.getElementById("crm-debt").value = ext.duNo || "";
       document.getElementById("crm-note").value = lead.note || "";
+      
+      var selStatus = document.getElementById("crm-status");
+      if (selStatus) selStatus.value = lead.status || "Đang theo dõi";
+      
+      var chk = ext.checkList || {};
+      document.getElementById("chk-cccd").checked = chk.cccd || false;
+      document.getElementById("chk-vssid").checked = chk.vssid || false;
+      document.getElementById("chk-banking").checked = chk.banking || false;
+      document.getElementById("chk-cic").checked = chk.cic || false;
+      
+      var gn = ext.giaiNgan || {};
+      document.getElementById("crm-loan-term").value = gn.kyHan || "";
+      document.getElementById("crm-loan-date").value = gn.ngayThanhToan || "";
+      document.getElementById("crm-loan-rate").value = gn.laiSuat || "";
+      document.getElementById("crm-loan-ins").value = gn.baoHiem || "Không";
+
       togglePipelineFields();
       new bootstrap.Modal(document.getElementById("crmPipelineModal")).show();
     }
 
-    async function saveCRMDetails() {
+    function saveCRMDetails() {
       var leadId = document.getElementById("crm-lead-id").value;
       var status = document.getElementById("crm-status").value;
       var note = document.getElementById("crm-note").value;
-
+      
       var extraData = {
         congViec: document.getElementById("crm-job").value,
         thuNhap: document.getElementById("crm-income").value,
         noiSong: document.getElementById("crm-location").value,
         duNo: document.getElementById("crm-debt").value,
-        checkList: {
-          cccd: document.getElementById("chk-cccd").checked,
-          vssid: document.getElementById("chk-vssid").checked,
-          banking: document.getElementById("chk-banking").checked,
-          cic: document.getElementById("chk-cic").checked
+        checkList: { 
+          cccd: document.getElementById("chk-cccd").checked, 
+          vssid: document.getElementById("chk-vssid").checked, 
+          banking: document.getElementById("chk-banking").checked, 
+          cic: document.getElementById("chk-cic").checked 
+        },
+        giaiNgan: { 
+          kyHan: document.getElementById("crm-loan-term").value, 
+          ngayThanhToan: document.getElementById("crm-loan-date").value, 
+          laiSuat: document.getElementById("crm-loan-rate").value, 
+          baoHiem: document.getElementById("crm-loan-ins").value 
         }
       };
 
-      bootstrap.Modal.getInstance(document.getElementById("crmPipelineModal")).hide();
+      var modalEl = document.getElementById("crmPipelineModal");
+      var modalInstance = bootstrap.Modal.getInstance(modalEl);
+      if (modalInstance) modalInstance.hide();
 
-      if (AppState.isNewLeadFlow) {
-        var leadObj = AppState.activeBatchLeads[AppState.pendingLeadIndex];
-        var realPhoneDirect = atob(leadObj.rawPhoneRef);
+      var uId = (currentUser.userId || currentUser.id || "").toString().trim();
 
-        await ApiClient.request({
-          action: "saveHoldPipeline",
-          userId: AppState.currentUser.userId,
-          leadData: {
-            leadId: leadId,
-            name: leadObj.name,
-            rawPhoneRef: leadObj.rawPhoneRef,
-            realPhone: realPhoneDirect,
-            status: status,
-            duration: 35,
-            note: note,
-            extraData: extraData
-          }
-        }, "POST");
+      if (isNewLeadFlow) {
+        var leadObj = activeBatchLeads[pendingLeadIndex];
+        if (!leadObj) return;
 
-        AppState.activeBatchLeads.splice(AppState.pendingLeadIndex, 1);
+        var now = new Date().getTime();
+        var interval = (lastReportTime === 0) ? 10 : Math.round((now - lastReportTime) / 1000);
+        lastReportTime = now;
+        reportedCount++;
+        qualityCall30sCount++;
+
+        var realPhoneDirect = "";
+        try { realPhoneDirect = atob(leadObj.rawPhoneRef); } catch(e) { realPhoneDirect = leadObj.maskedPhone; }
+
+        var payloadSave = {
+          leadId: leadId,
+          name: leadObj.name,
+          rawPhoneRef: leadObj.rawPhoneRef,
+          realPhone: realPhoneDirect,
+          status: status,
+          duration: 35,
+          note: note,
+          extraData: extraData
+        };
+
+        currentHoldDataCache.unshift({
+          leadId: leadId,
+          name: leadObj.name,
+          realPhone: realPhoneDirect,
+          startDate: new Date().toLocaleDateString('vi-VN'),
+          status: status,
+          duration: 35,
+          note: note,
+          daysRemaining: 30,
+          extraData: extraData
+        });
+
+        updateHoldCountDisplay(currentHoldDataCache.length);
+        activeBatchLeads.splice(pendingLeadIndex, 1);
         renderBatchTable();
         updateDashboardKpi();
-        fetchHoldLeadsData();
+
+        google.script.run
+          .withSuccessHandler(function(res) { setTimeout(fetchHoldLeadsData, 400); })
+          .withFailureHandler(function(err) { 
+            if (typeof google.script.run.pushToHoldStorage === 'function') {
+              google.script.run.pushToHoldStorage(uId, payloadSave); 
+            }
+          })
+          .saveLeadToHoldAndPipeline(uId, payloadSave);
+
       } else {
         if (status === "Giải ngân" || status === "Từ chối") {
-          await ApiClient.request({
-            action: "submitCustomerLifecycle",
-            userId: AppState.currentUser.userId,
-            data: {
-              leadId: leadId,
-              name: document.getElementById("crm-name").innerText,
-              phone: document.getElementById("crm-phone").innerText,
-              status: (status === "Giải ngân") ? "LOAN" : "REJECT",
-              rejectReason: document.getElementById("crm-reject-reason").value,
-              rejectCooldownDays: document.getElementById("crm-reject-cooldown").value,
-              loanAmount: document.getElementById("crm-loan-amount").value,
-              interestRate: document.getElementById("crm-loan-rate").value,
-              loanTerm: document.getElementById("crm-loan-term").value,
-              emi: document.getElementById("crm-loan-emi").value,
-              note: note
+          var lifecyclePayload = {
+            leadId: leadId,
+            name: document.getElementById("crm-name").innerText,
+            phone: document.getElementById("crm-phone").innerText,
+            status: (status === "Giải ngân") ? "LOAN" : "REJECT",
+            rejectReason: (status === "Từ chối") ? note : "",
+            rejectCooldownDays: 90,
+            loanAmount: "",
+            interestRate: document.getElementById("crm-loan-rate").value,
+            loanTerm: document.getElementById("crm-loan-term").value,
+            emi: "",
+            note: note
+          };
+
+          if (typeof google.script.run.processCustomerAppLoanLifecycle === 'function') {
+            google.script.run.processCustomerAppLoanLifecycle(uId, lifecyclePayload);
+          }
+        }
+
+        google.script.run
+          .withSuccessHandler(function(res) { 
+            alert(res.message || "Cập nhật hồ sơ CRM thành công!"); 
+            fetchHoldLeadsData(); 
+          })
+          .saveLeadToHoldAndPipeline(uId, { leadId: leadId, status: status, note: note, extraData: extraData });
+      }
+    }
+
+    // 5. XÁC THỰC CALLIO BẰNG EMAIL & MẬT KHẨU
+    function submitCallioHandshake() {
+      var emailInput = document.getElementById("cfg-callio-email") || document.getElementById("cfg-ext-value");
+      var passInput = document.getElementById("cfg-callio-password") || document.getElementById("cfg-token-value");
+      var statusEl = document.getElementById("callio-connect-status");
+
+      var email = emailInput ? emailInput.value.trim() : "";
+      var pass = passInput ? passInput.value.trim() : "";
+
+      if (!email || !pass) {
+        alert("Vui lòng nhập đầy đủ Email và Mật khẩu Callio của bạn!");
+        return;
+      }
+
+      var btn = document.getElementById("btn-submit-callio-auth");
+      if (btn) {
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang xác thực với Callio...';
+      }
+
+      if (statusEl) {
+        statusEl.style.display = "block";
+        statusEl.className = "small fw-bold text-primary text-center mt-2";
+        statusEl.innerText = "Đang kết nối tới máy chủ Callio Phonenet...";
+      }
+
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+          }
+
+          if (res && res.status === "success") {
+            if (statusEl) {
+              statusEl.className = "small fw-bold text-success text-center mt-2";
+              statusEl.innerText = "✅ Kết nối Callio thành công!";
             }
-          }, "POST");
-        }
 
-        await ApiClient.request({
-          action: "saveHoldPipeline",
-          userId: AppState.currentUser.userId,
-          leadData: { leadId: leadId, status: status, note: note, extraData: extraData }
-        }, "POST");
-        fetchHoldLeadsData();
-      }
+            currentUser.personalToken = res.token;
+            currentUser.ext = res.callioEmail || email;
+            sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+            
+            renderUserHeader();
+            alert(res.message);
+
+            var modalEl = document.getElementById("callioConfigModal");
+            if (modalEl) {
+              var modalInstance = bootstrap.Modal.getInstance(modalEl);
+              if (modalInstance) modalInstance.hide();
+            }
+          } else {
+            if (statusEl) {
+              statusEl.className = "small fw-bold text-danger text-center mt-2";
+              statusEl.innerText = "❌ " + (res ? res.message : "Xác thực Callio thất bại!");
+            }
+            alert(res ? res.message : "Xác thực thất bại!");
+          }
+        })
+        .withFailureHandler(function(err) {
+          if (btn) {
+            btn.disabled = false;
+            btn.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+          }
+          if (statusEl) {
+            statusEl.className = "small fw-bold text-danger text-center mt-2";
+            statusEl.innerText = "Lỗi kết nối máy chủ: " + err.toString();
+          }
+          alert("Lỗi: " + err.toString());
+        })
+        .handshakeCallioUserCredentials(currentUser.userId, email, pass);
     }
 
-    // -------------------------------------------------------------
-    // MODULE 6: PHÂN HỆ QUẢN TRỊ ADMIN (MA TRẬN & DÒNG TỔNG CỘNG)
-    // -------------------------------------------------------------
-    function toggleAdminPanel() {
-      var p = document.getElementById("admin-panel");
-      p.style.display = (p.style.display === "none") ? "block" : "none";
-      if (p.style.display === "block") loadAdminDashboardData();
-    }
-
-    function switchAdminSubTab(idx) {
-      for (var i = 1; i <= 4; i++) {
-        document.getElementById("atab-btn-" + i).className = (i === idx) ? "admin-tab-btn active" : "admin-tab-btn";
-        document.getElementById("atab-content-" + i).style.display = (i === idx) ? "block" : "none";
-      }
-      if (idx === 1) loadTeamDrillDownData();
-    }
-
-    async function loadAdminDashboardData() {
-      if (!AppState.currentUser) return;
-      var role = (AppState.currentUser.role || "").toUpperCase();
-      if (role !== "ADMIN" && role !== "LEADER" && role !== "TEAMLEAD") return;
-
-      var currentUserId = AppState.currentUser.userId;
-
-      var overviewRes = await ApiClient.request({ action: "getFloorOverview", requesterId: currentUserId }, "GET");
-      if (overviewRes && overviewRes.status === "success" && overviewRes.stats) {
-        document.getElementById("adm-total-data").innerText = overviewRes.stats.totalDistributedToday + " Số";
-        document.getElementById("adm-total-calls").innerText = overviewRes.stats.totalProcessedToday + " Đã Xử Lý";
-        document.getElementById("adm-rate-30s").innerText = overviewRes.stats.batchProgressRate;
-        document.getElementById("adm-apps").innerText = overviewRes.stats.appsSummary;
-      }
-
-      var teamRes = await ApiClient.request({ action: "getTeams", requesterId: currentUserId }, "GET");
-      var sel = document.getElementById("sel-filter-team");
-      sel.innerHTML = "";
-
-      if (teamRes && teamRes.teams) {
-        if (teamRes.isRestricted) {
-          teamRes.teams.forEach(function(t) {
-            sel.innerHTML += '<option value="' + t + '" selected>🔒 ' + t + ' (Team của bạn)</option>';
-          });
-          sel.disabled = true;
-        } else {
-          sel.disabled = false;
-          sel.innerHTML = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
-          teamRes.teams.forEach(function(t) {
-            sel.innerHTML += '<option value="' + t + '">' + t + '</option>';
-          });
-        }
-      }
-
-      loadTeamDrillDownData();
-    }
-
-    async function loadTeamDrillDownData() {
-      var teamFilter = document.getElementById("sel-filter-team").value || "ALL";
-      var tbody = document.getElementById("tbody-drilldown-sales");
-      tbody.innerHTML = '<tr><td colspan="10" class="py-4 text-primary"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tải dữ liệu phạm vi Team...</td></tr>';
-
-      var res = await ApiClient.request({ 
-        action: "getStats", 
-        team: teamFilter,
-        requesterId: AppState.currentUser.userId
-      }, "GET");
-
-      if (!res || res.status !== "success" || !res.sales) return;
-
-      document.getElementById("txt-selected-team-name").innerText = res.summary.teamName;
-      document.getElementById("badge-team-headcount").innerText = res.sales.length + " Nhân Sự";
-
-      var html = "";
-      var totAssigned = 0;
-      var totProcessed = 0;
-      var totHold = 0;
-      var totApp = 0;
-      var totLoan = 0;
-      var activeHeadcount = res.sales.length;
-
-      res.sales.forEach(function(s) {
-        totAssigned += s.totalAssigned;
-        totProcessed += s.processedCount;
-        totHold += s.holdLead;
-        totApp += s.appCount;
-        totLoan += s.loanCount;
-
-        var kpiPercent = Math.min(100, Math.round((s.holdLead / 10) * 100));
-        var kpiBarColor = kpiPercent >= 100 ? "bg-success" : (kpiPercent >= 50 ? "bg-primary" : "bg-warning");
-        var kpiDisplay = '<div class="d-flex align-items-center justify-content-center gap-1">' +
-          '<div class="progress flex-grow-1" style="height: 14px; max-width: 75px;">' +
-            '<div class="progress-bar ' + kpiBarColor + ' fw-bold" style="width: ' + kpiPercent + '%; font-size: 9px;">' + kpiPercent + '%</div>' +
-          '</div>' +
-          '<span class="small fw-bold ' + (s.holdLead >= 10 ? 'text-success' : 'text-dark') + '">(' + s.holdLead + '/10)</span>' +
-        '</div>';
-
-        var alertBadge = s.isSuspect 
-          ? '<span class="badge bg-danger ms-1" title="Xử lý nhiều nhưng không ra Lead"><i class="fa-solid fa-triangle-exclamation"></i> Lướt data</span>' 
-          : '';
-
-        var lockBtn = s.status === "ACTIVE"
-          ? '<button class="btn btn-outline-danger btn-sm py-0 px-1" title="Khóa data" onclick="handleToggleLock(\'' + s.userId + '\', true)"><i class="fa-solid fa-lock"></i></button>'
-          : '<button class="btn btn-success btn-sm py-0 px-1" title="Mở khóa" onclick="handleToggleLock(\'' + s.userId + '\', false)"><i class="fa-solid fa-lock-open"></i></button>';
-
-        var editBtn = '<button class="btn btn-outline-secondary btn-sm py-0 px-1" title="Sửa thông tin" onclick="openEditUserModal(\'' + s.userId + '\', \'' + s.name + '\', \'' + s.role + '\', \'' + s.ext + '\', \'' + s.team + '\')"><i class="fa-solid fa-pen"></i></button>';
-        var pushBtn = '<button class="btn btn-outline-primary btn-sm py-0 px-1" title="Giao data" onclick="openAdminDispatchModalForUser(\'' + s.userId + '\')"><i class="fa-solid fa-paper-plane"></i></button>';
-        var revokeBtn = '<button class="btn btn-outline-warning btn-sm py-0 px-1" title="Thu hồi data chưa gọi" onclick="handleAdminRevokeBatch(\'' + s.userId + '\')"><i class="fa-solid fa-arrow-rotate-left"></i></button>';
-        var transferBtn = '<button class="btn btn-outline-info btn-sm py-0 px-1 text-dark" title="Chuyển Lead của Sale này" onclick="openTransferHoldModal(\'' + s.userId + '\')"><i class="fa-solid fa-people-arrows"></i></button>';
-
-        html += '<tr>' +
-          '<td class="text-start"><b>' + s.name + '</b>' + alertBadge + '<br><small class="text-muted">' + s.userId + '</small></td>' +
-          '<td>' + (s.ext ? s.ext : '<span class="badge bg-secondary">---</span>') + '</td>' +
-          '<td><b>' + s.totalAssigned + '</b></td>' +
-          '<td><b class="text-primary">' + s.processedCount + '</b></td>' +
-          '<td><span class="badge bg-info text-dark">' + s.batchProgressRate + '</span></td>' +
-          '<td class="text-warning fw-bold fs-6">' + s.holdLead + '</td>' +
-          '<td>' + kpiDisplay + '</td>' +
-          '<td class="text-danger fw-bold">' + s.appCount + '</td>' +
-          '<td class="text-success fw-bold">' + s.loanCount + '</td>' +
-          '<td><div class="d-flex justify-content-center gap-1">' + lockBtn + editBtn + pushBtn + revokeBtn + transferBtn + '</div></td>' +
-        '</tr>';
-      });
-
-      var teamTargetHold = activeHeadcount * 10;
-      var teamKpiPercent = teamTargetHold > 0 ? Math.min(100, Math.round((totHold / teamTargetHold) * 100)) : 0;
-      var teamBatchProgress = totAssigned > 0 ? Math.round((totProcessed / totAssigned) * 100) + "%" : "0%";
-
-      var totalRowHtml = '<tr class="table-dark fw-bold text-center border-top border-3 border-primary" style="font-size: 0.92rem;">' +
-        '<td colspan="2" class="text-uppercase text-warning text-center py-2"><i class="fa-solid fa-calculator me-1"></i> TỔNG CỘNG TEAM (' + activeHeadcount + ' Sale)</td>' +
-        '<td class="text-white">' + totAssigned + '</td>' +
-        '<td class="text-primary">' + totProcessed + '</td>' +
-        '<td class="text-info">' + teamBatchProgress + '</td>' +
-        '<td class="text-warning fs-6">' + totHold + ' Lead</td>' +
-        '<td class="text-white">' + teamKpiPercent + '% (' + totHold + '/' + teamTargetHold + ')</td>' +
-        '<td class="text-danger fs-6">' + totApp + '</td>' +
-        '<td class="text-success fs-6">' + totLoan + '</td>' +
-        '<td class="text-muted small">---</td>' +
-      '</tr>';
-
-      tbody.innerHTML = html + totalRowHtml;
-    }
-
-    async function handleToggleLock(userId, lockStatus) {
-      if (!confirm((lockStatus ? "Khóa cấp data cho " : "Mở khóa cấp data cho ") + userId + "?")) return;
-      var res = await ApiClient.request({ action: "toggleLock", userId: userId, status: lockStatus }, "POST");
-      alert(res.message);
-      loadAdminDashboardData();
-    }
-
-    async function handleAdminRevokeBatch(saleId) {
-      if (!confirm("Thu hồi toàn bộ data chưa gọi của [" + saleId + "] về lại kho tổng?")) return;
-      var res = await ApiClient.request({ action: "revokeBatch", userId: saleId }, "POST");
-      alert(res.message);
-      loadAdminDashboardData();
-    }
-
-    function openTransferHoldModal(fromSaleId) {
-      var leadId = prompt("Nhập mã LEAD_ID cần chuyển từ Sale [" + fromSaleId + "]:");
-      if (!leadId) return;
-      var toSaleId = prompt("Nhập MÃ SALE mới sẽ tiếp nhận:");
-      if (!toSaleId) return;
-      
-      ApiClient.request({
-        action: "transferHold",
-        leadId: leadId.trim(),
-        fromSaleId: fromSaleId.trim().toUpperCase(),
-        toSaleId: toSaleId.trim().toUpperCase()
-      }, "POST").then(function(res) {
-        alert(res.message);
-        loadAdminDashboardData();
-      });
-    }
-
-    function openAdminDispatchModal() { new bootstrap.Modal(document.getElementById("adminDispatchModal")).show(); }
-    function openAdminDispatchModalForUser(uid) { 
-      openAdminDispatchModal(); 
-      setTimeout(function() { document.getElementById("dispatch-target-sale").value = uid; }, 500); 
-    }
-
-    async function submitAdminDispatch() {
-      var targetSale = document.getElementById("dispatch-target-sale").value;
-      var batchSize = document.getElementById("dispatch-batch-size").value;
-      var tag = document.getElementById("dispatch-campaign-tag").value.trim() || "ALL";
-      var prov = document.getElementById("dispatch-province").value.trim() || "ALL";
-      if (!targetSale) { alert("Chưa chọn nhân sự nhận số!"); return; }
-
-      var res = await ApiClient.request({
-        action: "adminDispatch",
-        targetSaleId: targetSale,
-        batchSize: batchSize,
-        campaignTag: tag,
-        provinceFilter: prov
-      }, "POST");
-
-      alert(res.message);
-      bootstrap.Modal.getInstance(document.getElementById("adminDispatchModal")).hide();
-      loadAdminDashboardData();
-    }
-
-    function openCreateUserModal() { new bootstrap.Modal(document.getElementById("createUserModal")).show(); }
-
-    async function submitCreateNewUser() {
-      var payload = {
-        userId: document.getElementById("new-user-id").value.trim().toUpperCase(),
-        name: document.getElementById("new-user-name").value.trim(),
-        role: document.getElementById("new-user-role").value.trim().toUpperCase(),
-        ext: document.getElementById("new-user-ext").value.trim(),
-        hotline: document.getElementById("new-user-hotline").value.trim(),
-        team: document.getElementById("new-user-team").value.trim().toUpperCase(),
-        password: document.getElementById("new-user-password").value.trim()
-      };
-      if (!payload.userId || !payload.name) { alert("Vui lòng nhập đủ ID và Họ Tên!"); return; }
-
-      var res = await ApiClient.request({ action: "createUser", userData: payload }, "POST");
-      alert(res.message);
-      if (res.status === "success") {
-        bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide();
-        loadAdminDashboardData();
-      }
-    }
-
-    async function submitCallioConfig() {
-      var ext = document.getElementById("cfg-ext-value").value.trim();
-      var token = document.getElementById("cfg-token-value").value.trim();
-      if (!ext) { alert("Bắt buộc nhập số nhánh Ext!"); return; }
-
-      var res = await ApiClient.request({
-        action: "saveCallioConfig",
-        userId: AppState.currentUser.userId,
-        ext: ext,
-        token: token
-      }, "POST");
-
-      alert(res.message);
-      if (res.status === "success") {
-        AppState.currentUser.ext = ext;
-        renderUserHeader();
-        bootstrap.Modal.getInstance(document.getElementById("callioConfigModal")).hide();
-      }
-    }
-
-    function handleExcelUpload(input) {
-      alert("Tính năng nạp Excel Batch Chunk đã sẵn sàng. Hệ thống sẽ chunk 1000 dòng/lần gửi lên API!");
+    function submitCallioConfig() {
+      submitCallioHandshake();
     }
   </script>
 </body>
