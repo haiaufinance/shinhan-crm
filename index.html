@@ -5,7 +5,7 @@
   <title>TRUNG TÂM QUẢN TRỊ CRM TELESALE - SHINHAN FINANCE</title>
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
   
-  <!-- CSS Frameworks & Icon Fonts -->
+  <!-- Thư viện giao diện & Font Icon -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
   <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
@@ -144,7 +144,7 @@
 <body>
 
   <!-- ==============================================================================
-       1. MÀN HÌNH ĐĂNG NHẬP
+       1. MÀN HÌNH ĐĂNG NHẬP (ZERO-TRUST AUTH OVERLAY)
        ============================================================================== -->
   <div id="login-overlay">
     <div class="login-box">
@@ -176,31 +176,32 @@
   </div>
 
   <!-- ==============================================================================
-       2. TOPBAR HEADER NAV
+       2. THANH ĐIỀU HƯỚNG TRÊN CÙNG (TOPBAR HEADER NAV)
        ============================================================================== -->
   <header class="header-nav d-flex justify-content-between align-items-center">
     <div class="d-flex align-items-center gap-3">
       <i class="fa-solid fa-headset fa-2x text-warning"></i>
       <div>
         <h1 class="brand-title">TRUNG TÂM QUẢN TRỊ CRM TELESALE - SHINHAN FINANCE</h1>
-        <div class="user-tag" id="user-header-info">Đang xác thực danh tính...</div>
+        <div class="user-tag" id="user-header-info">Đang xác thực danh tính nhân sự...</div>
       </div>
     </div>
     <div class="d-flex align-items-center gap-2">
+      <!-- Nút kết nối Callio từng User lẻ -->
       <button type="button" class="btn btn-sm btn-outline-light fw-bold" data-bs-toggle="modal" data-bs-target="#callioConfigModal">
         <i class="fa-solid fa-plug me-1"></i> Kết Nối Callio
       </button>
       <button type="button" class="btn btn-sm btn-warning fw-bold text-dark" id="btn-toggle-admin" onclick="toggleAdminPanel()" style="display: none;">
         <i class="fa-solid fa-crown me-1"></i> Bảng Điều Hành Sàn
       </button>
-      <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="logoutSession()" title="Đăng xuất">
+      <button type="button" class="btn btn-sm btn-danger fw-bold" onclick="logoutSession()" title="Đăng xuất khỏi hệ thống">
         <i class="fa-solid fa-right-from-bracket"></i>
       </button>
     </div>
   </header>
 
   <!-- ==============================================================================
-       3. WORKSPACE CONTAINER
+       3. NỘI DUNG CHÍNH (MAIN WORKSPACE CONTAINER)
        ============================================================================== -->
   <main class="container-fluid py-3 px-3 px-md-4">
     
@@ -220,7 +221,7 @@
           </div>
 
           <div class="p-3 bg-white border-top">
-            <!-- TAB 1: Ma trận giám sát -->
+            <!-- ADMIN TAB 1: Ma trận giám sát -->
             <div id="atab-content-1">
               <div class="row g-2 g-md-3 mb-3">
                 <div class="col-6 col-md-3"><div class="p-2 p-md-3 border rounded bg-light text-center"><small class="text-muted fw-bold">TỔNG DATA CẤP HÔM NAY</small><h3 class="fw-bold text-primary my-1" id="adm-total-data">0 Số</h3><small class="text-success fw-bold" id="adm-connect-rate">Đang trực tuyến</small></div></div>
@@ -229,6 +230,7 @@
                 <div class="col-6 col-md-3"><div class="p-2 p-md-3 border rounded bg-light text-center"><small class="text-muted fw-bold">DOANH SỐ HỒ SƠ</small><h3 class="fw-bold text-danger my-1" id="adm-apps">0 App / 0 Loan</h3><small class="text-danger fw-bold">Pipeline giải ngân</small></div></div>
               </div>
 
+              <!-- Thanh công cụ lọc Team & Quản lý User -->
               <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-2 p-2 bg-light rounded border">
                 <div class="d-flex align-items-center gap-2 flex-grow-1 flex-md-grow-0">
                   <i class="fa-solid fa-filter text-primary"></i>
@@ -276,7 +278,7 @@
               </div>
             </div>
 
-            <!-- TAB 2: Bắt gian lận -->
+            <!-- ADMIN TAB 2: Kiểm toán gian lận -->
             <div id="atab-content-2" style="display: none;">
               <div class="table-responsive">
                 <table class="table table-bordered align-middle text-center">
@@ -290,10 +292,10 @@
               </div>
             </div>
 
-            <!-- TAB 3: Phễu thu hồi -->
+            <!-- ADMIN TAB 3: Phễu Lead thu hồi khẩn cấp -->
             <div id="atab-content-3" style="display: none;">
               <div class="alert alert-warning py-2 small mb-2">
-                <i class="fa-solid fa-triangle-exclamation me-1"></i> Danh sách Lead sắp hết hạn bảo lưu 30 ngày (còn &le; 7 ngày) hoặc chưa chuyển đổi. Bấm thu hồi để đưa về kho đấu trường.
+                <i class="fa-solid fa-triangle-exclamation me-1"></i> Danh sách Lead sắp hết hạn bảo lưu 30 ngày (còn &le; 7 ngày) hoặc chưa được Sale chuyển đổi thành App/Loan. Bấm thu hồi để đưa về kho đấu trường.
               </div>
               <div class="table-responsive">
                 <table class="table table-bordered align-middle text-center">
@@ -307,7 +309,7 @@
               </div>
             </div>
 
-            <!-- TAB 4: Kho 3 Rổ Data -->
+            <!-- ADMIN TAB 4: Quản trị kho 3 Rổ Data & Nạp Excel -->
             <div id="atab-content-4" style="display: none;">
               <div class="row g-3">
                 <div class="col-lg-6">
@@ -323,7 +325,7 @@
                       <input type="file" id="file-upload-excel" class="d-none" accept=".xlsx, .xls, .csv" onchange="handleExcelUpload(this)">
                     </div>
                     <div class="progress" style="height: 8px;"><div id="bar-progress-stream" class="progress-bar bg-success" style="width: 0%"></div></div>
-                    <small class="text-muted d-block mt-2"><i class="fa-solid fa-info-circle me-1"></i> Tự động loại bỏ SĐT rác và lọc Blacklist_DNC (Nghị định 91).</small>
+                    <small class="text-muted d-block mt-2"><i class="fa-solid fa-info-circle me-1"></i> Tự động lọc SĐT rác và chặn tự động số thuộc Blacklist_DNC (Nghị định 91).</small>
                   </div>
                 </div>
                 
@@ -350,7 +352,7 @@
       </div>
     </section>
 
-    <!-- DASHBOARD 4 THẺ KPI TÁC CHIẾN -->
+    <!-- DASHBOARD TELESALE PULL MODE (4 THẺ KPI TÁC CHIẾN) -->
     <section class="row g-2 g-md-3 mb-3">
       <div class="col-6 col-md-3">
         <div class="kpi-card">
@@ -384,7 +386,7 @@
       </div>
     </section>
 
-    <!-- WORKSPACE TABS -->
+    <!-- WORKSPACE TABS (CHUYỂN ĐỔI GIAO DIỆN TÁC CHIẾN) -->
     <div class="workspace-tabs">
       <button type="button" class="tab-item-btn active" id="tab-btn-batch" onclick="switchMainTab('batch')">
         <i class="fa-solid fa-list-check"></i> Lô Mới Cấp (<span id="badge-count-batch">0</span>)
@@ -394,7 +396,7 @@
       </button>
     </div>
 
-    <!-- BẢNG LÔ MỚI CẤP -->
+    <!-- BẢNG LÔ MỚI CẤP (HUNTING ARENA) -->
     <section id="view-batch-container" class="content-box">
       <div class="table-responsive">
         <table class="custom-table">
@@ -417,7 +419,7 @@
       </div>
     </section>
 
-    <!-- BẢNG SỔ TAY HOLD LEAD (30 NGÀY) -->
+    <!-- BẢNG SỔ TAY HOLD LEAD (FARMING ARENA - 30 NGÀY) -->
     <section id="view-hold-container" class="content-box" style="display: none;">
       <div class="alert-banner-hold">
         <i class="fa-solid fa-unlock-keyhole me-1"></i> <b>Sổ Tay Hold Lead (30 Ngày):</b> Đã gỡ mặt nạ số điện thoại để kết bạn Zalo và hoàn thiện hồ sơ vay.
@@ -446,10 +448,10 @@
   </main>
 
   <!-- ==============================================================================
-       4. HỆ THỐNG MODAL THAO TÁC
+       4. HỆ THỐNG CÁC CỬA SỔ MODAL THAO TÁC
        ============================================================================== -->
 
-  <!-- MODAL XÁC THỰC CALLIO TỪNG SALE -->
+  <!-- MODAL XÁC THỰC CALLIO THEO TỪNG TÀI KHOẢN SALE LẺ (HANDSHAKE LOGIN) -->
   <div class="modal fade" id="callioConfigModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg">
@@ -489,7 +491,7 @@
     </div>
   </div>
 
-  <!-- MODAL GIAO DATA ADMIN -->
+  <!-- MODAL GIAO DATA CHỦ ĐỘNG TỪ ADMIN -->
   <div class="modal fade" id="adminDispatchModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg">
@@ -531,7 +533,7 @@
     </div>
   </div>
 
-  <!-- MODAL TẠO & SỬA NHÂN SỰ -->
+  <!-- MODAL TẠO & CHỈNH SỬA THÔNG TIN NHÂN SỰ -->
   <div class="modal fade" id="createUserModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
       <div class="modal-content border-0 shadow-lg">
@@ -745,13 +747,99 @@
     </div>
   </div>
 
-  <!-- JavaScript Libraries -->
+  <!-- Thư viện Bootstrap JS -->
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- ==============================================================================
-       5. CLIENT CONTROLLER SCRIPT (ĐẦY ĐỦ 38 HÀM TOÀN BỘ NGHIỆP VỤ)
+       5. CLIENT LOGIC ENGINE (NATIVE RESTFUL API GATEWAY & TÁC CHIẾN WORKSPACE)
        ============================================================================== -->
   <script>
+    // ==============================================================================
+    // CẤU HÌNH KẾT NỐI API BACKEND (THAY THẾ URL WEB APP .EXEC CỦA ANH VÀO ĐÂY)
+    // ==============================================================================
+    var SYSTEM_GATEWAY_CONFIG = {
+      API_URL: "https://script.google.com/macros/s/AKfycbz_YOUR_GAS_DEPLOYMENT_ID_HERE/exec"
+    };
+
+    /**
+     * [NEW] BỘ ĐIỀU KHIỂN GIAO TIẾP MẠNG ĐA TẦNG (FETCH API CLIENT)
+     * Vượt 100% rào cản CORS, tự động bám theo 302 Redirect của Google và hỗ trợ cả google.script.run
+     */
+    var ApiClient = {
+      async request(payload, method) {
+        method = method || "POST";
+        
+        // Ưu tiên 1: Chạy trực tiếp qua google.script.run nếu đang nhúng trong GAS
+        if (typeof google !== 'undefined' && google.script && google.script.run) {
+          return new Promise(function(resolve, reject) {
+            var runner = google.script.run
+              .withSuccessHandler(function(res) { resolve(res); })
+              .withFailureHandler(function(err) { reject(err); });
+            
+            var action = payload.action;
+            if (action === "login") runner.authenticateUser(payload.username, payload.password);
+            else if (action === "claimBatch") runner.fetchNewBatchForSale(payload.userId, payload.ext, payload.batchSize);
+            else if (action === "recordReport") runner.recordLeadReport(payload.userId, payload.report);
+            else if (action === "saveHoldPipeline") runner.saveLeadToHoldAndPipeline(payload.userId, payload.leadData);
+            else if (action === "getFloorOverview") runner.getFloorOverviewStats(payload.requesterId);
+            else if (action === "getStats") runner.getTeamDrillDownStats(payload.team, payload.requesterId);
+            else if (action === "getHoldLeads") runner.fetchHoldLeads(payload.userId);
+            else if (action === "getTeams") runner.getExistingTeamsList(payload.requesterId);
+            else if (action === "getAuditMatrix") runner.getSaleAuditMatrix(payload.requesterId);
+            else if (action === "getLeadPipeline") runner.getLeadPipelineStats(payload.requesterId);
+            else if (action === "handshakeCallio") runner.handshakeCallioUserCredentials(payload.userId, payload.callioEmail, payload.callioPassword);
+            else if (action === "makeCall") runner.makeCallioClickToCall(payload.userId, payload.ext, payload.rawPhoneRef, payload.userTeam, payload.clientToken);
+            else if (action === "toggleLock") runner.toggleSaleLock(payload.userId, payload.status);
+            else if (action === "revokeBatch") runner.adminRevokeBatchFromSale(payload.userId);
+            else if (action === "forceRecycle") runner.forceRecycleLead(payload.leadId);
+            else if (action === "transferHold") runner.transferHoldLeadOwner(payload.leadId, payload.fromSaleId, payload.toSaleId);
+            else if (action === "createUser") runner.createNewUserByAdmin(payload.userData);
+            else if (action === "updateUser") runner.updateUserByAdmin(payload.userData);
+            else if (action === "adminDispatch") runner.adminDistributeDataToSale(payload.targetSaleId, payload.batchSize, payload.campaignTag, payload.provinceFilter);
+            else if (action === "ingestLeadChunk") runner.ingestLeadChunk(payload.chunkRows);
+            else if (action === "reconcileCsv") runner.reconcileCallioLogs(payload.csvData);
+            else if (action === "submitCustomerLifecycle") runner.processCustomerAppLoanLifecycle(payload.userId, payload.data);
+            else runner.authenticateUser(payload.username, payload.password);
+          });
+        }
+
+        // Ưu tiên 2: Chạy độc lập trên GitHub Pages / Vercel qua RESTful API
+        try {
+          var url = SYSTEM_GATEWAY_CONFIG.API_URL;
+          var options = {};
+
+          if (method.toUpperCase() === "GET") {
+            var queryParts = [];
+            for (var k in payload) {
+              if (payload[k] !== undefined && payload[k] !== null) {
+                queryParts.push(encodeURIComponent(k) + "=" + encodeURIComponent(typeof payload[k] === 'object' ? JSON.stringify(payload[k]) : payload[k]));
+              }
+            }
+            url += (url.indexOf("?") === -1 ? "?" : "&") + queryParts.join("&");
+            options = { method: "GET", redirect: "follow" };
+          } else {
+            // Dùng Content-Type: text/plain để trình duyệt bỏ qua Preflight OPTIONS CORS
+            options = {
+              method: "POST",
+              headers: { "Content-Type": "text/plain;charset=utf-8" },
+              body: JSON.stringify(payload),
+              redirect: "follow"
+            };
+          }
+
+          var response = await fetch(url, options);
+          if (!response.ok) throw new Error("Mã phản hồi HTTP: " + response.status);
+          var data = await response.json();
+          return data;
+
+        } catch (err) {
+          console.error("Lỗi ApiClient:", err);
+          return { status: "error", message: "Lỗi kết nối máy chủ: " + err.message };
+        }
+      }
+    };
+
+    // BIẾN TOÀN CỤC & BẢO LƯU PHIÊN LÀM VIỆC
     var currentUser = null;
     var activeBatchLeads = [];
     var reportedCount = 0;
@@ -786,7 +874,7 @@
     });
 
     // 1. XÁC THỰC ĐĂNG NHẬP
-    function processLogin(e) {
+    async function processLogin(e) {
       if (e && e.preventDefault) e.preventDefault();
       var uInput = document.getElementById("login-username");
       var pInput = document.getElementById("login-password");
@@ -816,42 +904,42 @@
         }
       }, 15000);
 
-      google.script.run
-        .withSuccessHandler(function(res) {
-          clearTimeout(loginTimer);
-          if (btn) { 
-            btn.disabled = false; 
-            btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG'; 
-          }
-          if (res && res.status === "success") {
-            currentUser = res.user;
-            sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
-            var overlay = document.getElementById("login-overlay");
-            if (overlay) overlay.style.display = "none";
-            renderUserHeader();
-            fetchHoldLeadsData();
-            loadAdminDashboardData();
-            if (currentUser.role !== "ADMIN") claimNewBatch();
+      try {
+        var res = await ApiClient.request({ action: "login", username: u, password: p }, "GET");
+        clearTimeout(loginTimer);
+
+        if (btn) { 
+          btn.disabled = false; 
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG'; 
+        }
+
+        if (res && res.status === "success") {
+          currentUser = res.user;
+          sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+          var overlay = document.getElementById("login-overlay");
+          if (overlay) overlay.style.display = "none";
+          renderUserHeader();
+          fetchHoldLeadsData();
+          loadAdminDashboardData();
+          if (currentUser.role !== "ADMIN") claimNewBatch();
+        } else {
+          var msg = res ? res.message : "Đăng nhập thất bại!";
+          if (errEl) {
+            errEl.innerText = msg;
+            errEl.style.display = "block";
           } else {
-            var msg = res ? res.message : "Đăng nhập thất bại!";
-            if (errEl) {
-              errEl.innerText = msg;
-              errEl.style.display = "block";
-            } else {
-              alert(msg);
-            }
+            alert(msg);
           }
-        })
-        .withFailureHandler(function(err) {
-          clearTimeout(loginTimer);
-          if (btn) { 
-            btn.disabled = false; 
-            btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG'; 
-          }
-          alert("Lỗi máy chủ: " + err.toString());
-        })
-        .authenticateUser(u, p);
-        
+        }
+      } catch(err) {
+        clearTimeout(loginTimer);
+        if (btn) { 
+          btn.disabled = false; 
+          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG'; 
+        }
+        alert("Lỗi máy chủ: " + err.toString());
+      }
+      
       return false;
     }
 
@@ -903,40 +991,39 @@
       if (idx === 3) loadPipelineRecoveryData();
     }
 
-    function loadAdminDashboardData() {
+    async function loadAdminDashboardData() {
       if (!currentUser || (currentUser.role !== "ADMIN" && currentUser.role !== "LEADER" && currentUser.role !== "TEAMLEAD")) return;
-      
       var reqId = currentUser.userId;
 
-      google.script.run.withSuccessHandler(function(res) {
-        if (res && res.status === "success" && res.stats) {
+      try {
+        var resStats = await ApiClient.request({ action: "getFloorOverview", requesterId: reqId }, "GET");
+        if (resStats && resStats.status === "success" && resStats.stats) {
           var elData = document.getElementById("adm-total-data");
           var elCalls = document.getElementById("adm-total-calls");
           var el30s = document.getElementById("adm-rate-30s");
           var elApps = document.getElementById("adm-apps");
 
-          if (elData) elData.innerText = res.stats.totalDistributedToday + " Số";
-          if (elCalls) elCalls.innerText = res.stats.totalProcessedToday + " Đã Xử Lý";
-          if (el30s) el30s.innerText = res.stats.batchProgressRate;
-          if (elApps) elApps.innerText = res.stats.appsSummary;
+          if (elData) elData.innerText = resStats.stats.totalDistributedToday + " Số";
+          if (elCalls) elCalls.innerText = resStats.stats.totalProcessedToday + " Đã Xử Lý";
+          if (el30s) el30s.innerText = resStats.stats.batchProgressRate;
+          if (elApps) elApps.innerText = resStats.stats.appsSummary;
         }
-      }).getFloorOverviewStats(reqId);
 
-      google.script.run.withSuccessHandler(function(res) {
-        if (res && res.status === "success" && res.teams) {
+        var resTeams = await ApiClient.request({ action: "getTeams", requesterId: reqId }, "GET");
+        if (resTeams && resTeams.status === "success" && resTeams.teams) {
           var sel = document.getElementById("sel-filter-team");
           if (sel) {
             var currentVal = sel.value;
             var html = "";
-            if (res.isRestricted) {
-              res.teams.forEach(function(t) {
+            if (resTeams.isRestricted) {
+              resTeams.teams.forEach(function(t) {
                 html += '<option value="' + t + '" selected>🔒 ' + t + ' (Team của bạn)</option>';
               });
               sel.disabled = true;
             } else {
               sel.disabled = false;
               html = '<option value="ALL">⭐ Xem Tất Cả Các Team</option>';
-              res.teams.forEach(function(t) {
+              resTeams.teams.forEach(function(t) {
                 html += '<option value="' + t + '" ' + (t === currentVal ? "selected" : "") + '>' + t + '</option>';
               });
             }
@@ -944,12 +1031,14 @@
           }
           loadTeamDrillDownData();
         }
-      }).getExistingTeamsList(reqId);
 
-      loadSaleAuditData();
+        loadSaleAuditData();
+      } catch(e) {
+        console.error("Lỗi loadAdminDashboardData:", e);
+      }
     }
 
-    function loadTeamDrillDownData() {
+    async function loadTeamDrillDownData() {
       var sel = document.getElementById("sel-filter-team");
       var teamFilter = sel ? sel.value : "ALL";
       var tbody = document.getElementById("tbody-drilldown-sales");
@@ -957,12 +1046,13 @@
 
       var reqId = currentUser ? currentUser.userId : "";
 
-      google.script.run.withSuccessHandler(function(res) {
+      try {
+        var res = await ApiClient.request({ action: "getStats", team: teamFilter, requesterId: reqId }, "GET");
         if (!res || res.status !== "success" || !tbody) return;
         var teamNameEl = document.getElementById("txt-selected-team-name");
         var countEl = document.getElementById("badge-team-headcount");
         if (teamNameEl) teamNameEl.innerText = res.summary.teamName;
-        if (countEl) countEl.innerText = res.summary.activeSales + " Nhân Sự";
+        if (countEl) countEl.innerText = res.sales.length + " Nhân Sự";
 
         if (!res.sales || res.sales.length === 0) {
           tbody.innerHTML = '<tr><td colspan="12" class="py-3 text-muted text-center">Không có nhân sự trực thuộc team này.</td></tr>';
@@ -1025,17 +1115,20 @@
         '</tr>';
 
         tbody.innerHTML = html + totalRowHtml;
-      }).getTeamDrillDownStats(teamFilter, reqId);
+      } catch(err) {
+        tbody.innerHTML = '<tr><td colspan="12" class="py-3 text-danger text-center">Lỗi tải dữ liệu: ' + err.toString() + '</td></tr>';
+      }
     }
 
-    function loadSaleAuditData() {
+    async function loadSaleAuditData() {
       var tbody = document.getElementById("tbody-sale-audit");
       if (!tbody) return;
       tbody.innerHTML = '<tr><td colspan="9" class="text-center text-primary py-3"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang tính toán dữ liệu kiểm toán...</td></tr>';
 
       var reqId = currentUser ? currentUser.userId : "";
 
-      google.script.run.withSuccessHandler(function(res) {
+      try {
+        var res = await ApiClient.request({ action: "getAuditMatrix", requesterId: reqId }, "GET");
         if (!res || res.status !== "success" || !res.sales) {
           tbody.innerHTML = '<tr><td colspan="9" class="text-center py-3 text-muted">Chưa có dữ liệu kiểm toán.</td></tr>';
           return;
@@ -1065,17 +1158,20 @@
           '</tr>';
         });
         tbody.innerHTML = html;
-      }).getSaleAuditMatrix(reqId);
+      } catch(err) {
+        tbody.innerHTML = '<tr><td colspan="9" class="text-center py-3 text-danger">Lỗi: ' + err.toString() + '</td></tr>';
+      }
     }
 
-    function loadPipelineRecoveryData() {
+    async function loadPipelineRecoveryData() {
       var tbody = document.getElementById("tbody-lead-pipeline");
       if (!tbody) return;
       tbody.innerHTML = '<tr><td colspan="8" class="text-center text-primary py-3"><i class="fa-solid fa-spinner fa-spin me-2"></i> Đang quét phễu Lead cần thu hồi...</td></tr>';
 
       var reqId = currentUser ? currentUser.userId : "";
 
-      google.script.run.withSuccessHandler(function(res) {
+      try {
+        var res = await ApiClient.request({ action: "getLeadPipeline", requesterId: reqId }, "GET");
         if (!res || res.status !== "success" || !res.leads || res.leads.length === 0) {
           tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted">Hiện không có Lead nào trong diện thu hồi khẩn cấp.</td></tr>';
           return;
@@ -1098,10 +1194,12 @@
           '</tr>';
         });
         tbody.innerHTML = html;
-      }).getLeadPipelineStats(reqId);
+      } catch(err) {
+        tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-danger">Lỗi: ' + err.toString() + '</td></tr>';
+      }
     }
 
-    function openUserHoldDrillDownModal(userId, userName) {
+    async function openUserHoldDrillDownModal(userId, userName) {
       var modalId = "modalUserHoldDrillDown";
       var modalEl = document.getElementById(modalId);
       if (!modalEl) {
@@ -1140,13 +1238,14 @@
       var bsModal = new bootstrap.Modal(modalEl);
       bsModal.show();
 
-      google.script.run.withSuccessHandler(function(res) {
-        if (!res || res.status !== "success" || !res.leads || res.leads.length === 0) {
+      try {
+        var res = await ApiClient.request({ action: "getHoldLeads", userId: userId }, "GET");
+        if (!res || res.status !== "success" || !res.data || res.data.length === 0) {
           tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-muted">Nhân sự này hiện chưa lưu Lead tiềm năng nào vào Sổ tay.</td></tr>';
           return;
         }
         var html = "";
-        res.leads.forEach(function(l, i) {
+        res.data.forEach(function(l, i) {
           html += '<tr>' +
             '<td>' + (i+1) + '</td>' +
             '<td class="fw-bold text-start">' + l.name + '</td>' +
@@ -1158,45 +1257,47 @@
           '</tr>';
         });
         tbody.innerHTML = html;
-      }).getLeadHoldDetailsByUser(userId);
+      } catch(err) {
+        tbody.innerHTML = '<tr><td colspan="7" class="py-4 text-danger">Lỗi: ' + err.toString() + '</td></tr>';
+      }
     }
 
-    function handleToggleLock(userId, status) {
+    async function handleToggleLock(userId, status) {
       if (!confirm((status ? "Khóa quyền cấp data của " : "Mở khóa cấp data cho ") + userId + "?")) return;
-      google.script.run.withSuccessHandler(function(res){ 
-        alert(res.message); 
-        loadAdminDashboardData(); 
-      }).toggleSaleLock(userId, status);
+      var res = await ApiClient.request({ action: "toggleLock", userId: userId, status: status }, "POST");
+      alert(res.message);
+      loadAdminDashboardData();
     }
 
-    function handleAdminRevokeBatch(saleId) {
-      if (confirm("Thu hồi toàn bộ data chưa gọi của [" + saleId + "] về lại kho đấu trường?")) {
-        google.script.run.withSuccessHandler(function(res){ 
-          alert(res.message); 
-          loadAdminDashboardData(); 
-        }).adminRevokeBatchFromSale(saleId);
-      }
+    async function handleAdminRevokeBatch(saleId) {
+      if (!confirm("Thu hồi toàn bộ data chưa gọi của [" + saleId + "] về lại kho đấu trường?")) return;
+      var res = await ApiClient.request({ action: "revokeBatch", userId: saleId }, "POST");
+      alert(res.message);
+      loadAdminDashboardData();
     }
 
-    function handleForceRecycle(leadId) {
-      if (confirm("Thu hồi cưỡng chế Lead [" + leadId + "] về kho đấu trường?")) {
-        google.script.run.withSuccessHandler(function(res){ 
-          alert(res.message); 
-          loadAdminDashboardData(); 
-        }).forceRecycleLead(leadId);
-      }
+    async function handleForceRecycle(leadId) {
+      if (!confirm("Thu hồi cưỡng chế Lead [" + leadId + "] về kho đấu trường?")) return;
+      var res = await ApiClient.request({ action: "forceRecycle", leadId: leadId }, "POST");
+      alert(res.message);
+      loadAdminDashboardData();
     }
 
-    function handleTransferLeadPrompt(fromSaleId) {
+    async function handleTransferLeadPrompt(fromSaleId) {
       var leadId = prompt("Nhập LEAD_ID cần chuyển từ Sale [" + fromSaleId + "]:");
       if (!leadId) return;
       var toSaleId = prompt("Nhập MÃ SALE mới sẽ tiếp nhận:");
       if (!toSaleId) return;
 
-      google.script.run.withSuccessHandler(function(res){
-        alert(res.message);
-        loadAdminDashboardData();
-      }).transferHoldLeadOwner(leadId.trim(), fromSaleId.trim().toUpperCase(), toSaleId.trim().toUpperCase());
+      var res = await ApiClient.request({
+        action: "transferHold",
+        leadId: leadId.trim(),
+        fromSaleId: fromSaleId.trim().toUpperCase(),
+        toSaleId: toSaleId.trim().toUpperCase()
+      }, "POST");
+
+      alert(res.message);
+      loadAdminDashboardData();
     }
 
     function openCreateUserModal() {
@@ -1226,7 +1327,7 @@
       new bootstrap.Modal(document.getElementById("createUserModal")).show();
     }
 
-    function submitCreateNewUser() {
+    async function submitCreateNewUser() {
       var payload = { 
         userId: document.getElementById("new-user-id").value.trim().toUpperCase(), 
         name: document.getElementById("new-user-name").value.trim(), 
@@ -1238,16 +1339,16 @@
       };
 
       if (!payload.userId || !payload.name) { alert("Vui lòng nhập đủ ID và Họ Tên!"); return; }
-      google.script.run.withSuccessHandler(function(res){ 
-        alert(res.message); 
-        if (res.status === "success") { 
-          bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide(); 
-          loadAdminDashboardData(); 
-        } 
-      }).createNewUserByAdmin(payload);
+
+      var res = await ApiClient.request({ action: "createUser", userData: payload }, "POST");
+      alert(res.message);
+      if (res.status === "success") { 
+        bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide(); 
+        loadAdminDashboardData(); 
+      }
     }
 
-    function submitUpdateUser() {
+    async function submitUpdateUser() {
       var payload = { 
         userId: document.getElementById("new-user-id").value.trim().toUpperCase(), 
         name: document.getElementById("new-user-name").value.trim(), 
@@ -1258,45 +1359,50 @@
         password: document.getElementById("new-user-password").value.trim() 
       };
 
-      google.script.run.withSuccessHandler(function(res){ 
-        alert(res.message); 
-        if (res.status === "success") { 
-          bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide(); 
-          loadAdminDashboardData(); 
-        } 
-      }).updateUserByAdmin(payload);
+      var res = await ApiClient.request({ action: "updateUser", userData: payload }, "POST");
+      alert(res.message);
+      if (res.status === "success") { 
+        bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide(); 
+        loadAdminDashboardData(); 
+      }
     }
 
     function openAdminDispatchModal() { new bootstrap.Modal(document.getElementById("adminDispatchModal")).show(); loadActiveSalesIntoDropdown(""); }
     function openAdminDispatchModalForUser(uid) { new bootstrap.Modal(document.getElementById("adminDispatchModal")).show(); loadActiveSalesIntoDropdown(uid); }
     
-    function loadActiveSalesIntoDropdown(preselectUser) {
+    async function loadActiveSalesIntoDropdown(preselectUser) {
       var sel = document.getElementById("dispatch-target-sale"); 
       if (!sel) return;
       sel.innerHTML = '<option value="">Đang tải danh sách nhân sự...</option>';
-      google.script.run.withSuccessHandler(function(res){
-        var html = '<option value="">-- Chọn Nhân Sự --</option>';
-        if (res && res.sales) {
-          res.sales.forEach(function(s){ 
-            html += '<option value="'+s.userId+'" '+(s.userId===preselectUser?"selected":"")+'>'+s.name+' ('+s.team+')</option>'; 
-          });
-        }
-        sel.innerHTML = html;
-      }).getTeamDrillDownStats("ALL", currentUser ? currentUser.userId : "");
+      
+      var res = await ApiClient.request({ action: "getStats", team: "ALL", requesterId: currentUser ? currentUser.userId : "" }, "GET");
+      var html = '<option value="">-- Chọn Nhân Sự --</option>';
+      if (res && res.sales) {
+        res.sales.forEach(function(s){ 
+          html += '<option value="'+s.userId+'" '+(s.userId===preselectUser?"selected":"")+'>'+s.name+' ('+s.team+')</option>'; 
+        });
+      }
+      sel.innerHTML = html;
     }
 
-    function submitAdminDispatch() {
+    async function submitAdminDispatch() {
       var targetSale = document.getElementById("dispatch-target-sale").value;
       var batchSize = document.getElementById("dispatch-batch-size").value;
       var tag = document.getElementById("dispatch-campaign-tag").value.trim() || "ALL";
       var prov = document.getElementById("dispatch-province").value.trim() || "ALL";
       if (!targetSale) { alert("Chưa chọn nhân sự nhận số!"); return; }
       
-      google.script.run.withSuccessHandler(function(res){ 
-        alert(res.message); 
-        bootstrap.Modal.getInstance(document.getElementById("adminDispatchModal")).hide(); 
-        loadAdminDashboardData(); 
-      }).adminDistributeDataToSale(targetSale, batchSize, tag, prov);
+      var res = await ApiClient.request({
+        action: "adminDispatch",
+        targetSaleId: targetSale,
+        batchSize: batchSize,
+        campaignTag: tag,
+        provinceFilter: prov
+      }, "POST");
+
+      alert(res.message); 
+      bootstrap.Modal.getInstance(document.getElementById("adminDispatchModal")).hide(); 
+      loadAdminDashboardData(); 
     }
 
     function handleExcelUpload(input) {
@@ -1359,21 +1465,20 @@
           if (total === 0) { alert("Không trích xuất được số điện thoại hợp lệ!"); return; }
 
           var chunkSize = 1000, currentIndex = 0;
-          function sendChunkSequentially() {
+          async function sendChunkSequentially() {
             if (currentIndex >= total) {
               alert("NẠP THÀNH CÔNG " + total + " DÒNG VÀO KHO RAW_POOL_NEW!");
               loadAdminDashboardData();
               return;
             }
             var chunk = cleanRows.slice(currentIndex, currentIndex + chunkSize);
-            google.script.run
-              .withSuccessHandler(function(res) {
-                if (res && res.status === "success") {
-                  currentIndex += chunk.length;
-                  sendChunkSequentially();
-                } else { alert("Lỗi nạp: " + (res.message || "Lỗi ghi dữ liệu")); }
-              })
-              .ingestLeadChunk(chunk);
+            var res = await ApiClient.request({ action: "ingestLeadChunk", chunkRows: chunk }, "POST");
+            if (res && res.status === "success") {
+              currentIndex += chunk.length;
+              sendChunkSequentially();
+            } else {
+              alert("Lỗi nạp: " + (res.message || "Lỗi ghi dữ liệu"));
+            }
           }
           sendChunkSequentially();
         } catch (err) { alert("Lỗi đọc Excel: " + err.toString()); }
@@ -1385,11 +1490,10 @@
       var fileInput = document.getElementById("file-callio-log");
       if (!fileInput.files || !fileInput.files[0]) { alert("Vui lòng chọn file CSV!"); return; }
       var reader = new FileReader();
-      reader.onload = function(e) {
-        google.script.run.withSuccessHandler(function(res) {
-          alert(res.message || "Đối soát Callio hoàn tất!");
-          loadAdminDashboardData();
-        }).reconcileCallioLogs(e.target.result);
+      reader.onload = async function(e) {
+        var res = await ApiClient.request({ action: "reconcileCsv", csvData: e.target.result }, "POST");
+        alert(res.message || "Đối soát Callio hoàn tất!");
+        loadAdminDashboardData();
       };
       reader.readAsText(fileInput.files[0]);
     }
@@ -1408,31 +1512,35 @@
       if (tab === 'hold') fetchHoldLeadsData();
     }
 
-    function claimNewBatch() {
+    async function claimNewBatch() {
       if (activeBatchLeads.length > 5) {
         alert("⚠️ BẠN CHƯA HOÀN THÀNH LÔ HIỆN TẠI!\nCần báo cáo đạt tối thiểu 90% (chỉ còn tồn tối đa 5 số) mới được nhận lô mới.");
         return;
       }
       var btn = document.getElementById("btn-claim-batch");
       if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Đang tải Data...'; }
-      
-      google.script.run
-        .withSuccessHandler(function(res){
-          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Nhận Lô Mới'; }
-          if (res && res.status === "success") { 
-            activeBatchLeads = res.leads || []; 
-            reportedCount = 0; 
-            renderBatchTable(); 
-            updateDashboardKpi(); 
-          } else {
-            alert(res ? res.message : "Không nhận được dữ liệu!");
-          }
-        })
-        .withFailureHandler(function(err){
-          if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down"></i> Nhận Lô Mới'; }
-          alert("Lỗi tải data: " + err.toString());
-        })
-        .fetchNewBatchForSale(currentUser.userId, currentUser.ext, 50);
+
+      try {
+        var res = await ApiClient.request({
+          action: "claimBatch",
+          userId: currentUser.userId,
+          ext: currentUser.ext,
+          batchSize: 50
+        }, "POST");
+
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down me-1"></i> Nhận Lô Mới'; }
+        if (res && res.status === "success") { 
+          activeBatchLeads = res.leads || []; 
+          reportedCount = 0; 
+          renderBatchTable(); 
+          updateDashboardKpi(); 
+        } else {
+          alert(res ? res.message : "Không nhận được dữ liệu!");
+        }
+      } catch(err) {
+        if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down me-1"></i> Nhận Lô Mới'; }
+        alert("Lỗi tải data: " + err.toString());
+      }
     }
 
     function renderBatchTable() {
@@ -1519,7 +1627,7 @@
       } catch (e) { alert("Lỗi giải mã số điện thoại: " + e.toString()); }
     }
 
-    function triggerCallioClickToCall(rawPhoneRef, btnElem) {
+    async function triggerCallioClickToCall(rawPhoneRef, btnElem) {
       if (!currentUser) return;
 
       if (!currentUser.personalToken) {
@@ -1532,30 +1640,37 @@
       btnElem.disabled = true;
       btnElem.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
 
-      google.script.run
-        .withSuccessHandler(function(res) {
-          btnElem.disabled = false;
-          btnElem.innerHTML = oldText;
-          if (res && res.status === "success") {
-            btnElem.classList.replace("btn-primary", "btn-success");
-            btnElem.innerHTML = '<i class="fa-solid fa-phone-volume"></i> Đang reo...';
-            setTimeout(function() {
-              btnElem.classList.replace("btn-success", "btn-primary");
-              btnElem.innerHTML = oldText;
-            }, 4000);
-          } else if (res && res.status === "require_auth") {
-            alert(res.message);
-            new bootstrap.Modal(document.getElementById("callioConfigModal")).show();
-          } else {
-            alert(res ? res.message : "Tổng đài từ chối cuộc gọi!");
-          }
-        })
-        .withFailureHandler(function(err) {
-          btnElem.disabled = false;
-          btnElem.innerHTML = oldText;
-          alert("Lỗi kết nối Callio: " + err.toString());
-        })
-        .makeCallioClickToCall(currentUser.userId, currentUser.ext, rawPhoneRef, currentUser.team, currentUser.personalToken);
+      try {
+        var res = await ApiClient.request({
+          action: "makeCall",
+          userId: currentUser.userId,
+          ext: currentUser.ext,
+          rawPhoneRef: rawPhoneRef,
+          userTeam: currentUser.team,
+          clientToken: currentUser.personalToken
+        }, "POST");
+
+        btnElem.disabled = false;
+        btnElem.innerHTML = oldText;
+
+        if (res && res.status === "success") {
+          btnElem.classList.replace("btn-primary", "btn-success");
+          btnElem.innerHTML = '<i class="fa-solid fa-phone-volume"></i> Đang reo...';
+          setTimeout(function() {
+            btnElem.classList.replace("btn-success", "btn-primary");
+            btnElem.innerHTML = oldText;
+          }, 4000);
+        } else if (res && res.status === "require_auth") {
+          alert(res.message);
+          new bootstrap.Modal(document.getElementById("callioConfigModal")).show();
+        } else {
+          alert(res ? res.message : "Tổng đài từ chối cuộc gọi!");
+        }
+      } catch(err) {
+        btnElem.disabled = false;
+        btnElem.innerHTML = oldText;
+        alert("Lỗi kết nối Callio: " + err.toString());
+      }
     }
 
     function processLeadReport(idx) {
@@ -1573,17 +1688,22 @@
       lastReportTime = now;
       reportedCount++;
 
+      // Optimistic UI: Xóa dòng ngay tức thì
       var reportingLead = activeBatchLeads.splice(idx, 1)[0];
       renderBatchTable(); 
       updateDashboardKpi();
 
-      google.script.run.recordLeadReport(currentUser.userId, { 
-        leadId: reportingLead.leadId, 
-        status: val, 
-        rawPhoneRef: reportingLead.rawPhoneRef, 
-        reportIntervalSec: interval,
-        rowIndex: reportingLead.rowIndex || reportingLead.rowIdx || -1
-      });
+      ApiClient.request({
+        action: "recordReport",
+        userId: currentUser.userId,
+        report: {
+          leadId: reportingLead.leadId, 
+          status: val, 
+          rawPhoneRef: reportingLead.rawPhoneRef, 
+          reportIntervalSec: interval,
+          rowIndex: reportingLead.rowIndex || reportingLead.rowIdx || -1
+        }
+      }, "POST");
     }
 
     function updateDashboardKpi() {
@@ -1598,14 +1718,15 @@
     }
 
     // 4. PHÂN HỆ SỔ TAY HOLD LEAD & PIPELINE CRM
-    function fetchHoldLeadsData() {
+    async function fetchHoldLeadsData() {
       if (!currentUser) return;
       var uId = (currentUser.userId || currentUser.id || "").toString().trim();
-      
-      google.script.run.withSuccessHandler(function(res){
+
+      try {
+        var res = await ApiClient.request({ action: "getHoldLeads", userId: uId }, "GET");
         var tbody = document.getElementById("tbody-hold-leads");
         if (!res || !res.data || res.data.length === 0) { 
-          if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5">Chưa có Lead bảo lưu.</td></tr>'; 
+          if (tbody) tbody.innerHTML = '<tr><td colspan="8" class="text-center py-5 text-muted">Chưa có Lead bảo lưu.</td></tr>'; 
           currentHoldDataCache = [];
           updateHoldCountDisplay(0);
           return; 
@@ -1629,7 +1750,9 @@
           '</tr>';
         });
         tbody.innerHTML = html;
-      }).fetchHoldLeads(uId);
+      } catch(e) {
+        console.error("Lỗi fetchHoldLeadsData:", e);
+      }
     }
 
     function updateHoldCountDisplay(count) {
@@ -1722,7 +1845,7 @@
       new bootstrap.Modal(document.getElementById("crmPipelineModal")).show();
     }
 
-    function saveCRMDetails() {
+    async function saveCRMDetails() {
       var leadId = document.getElementById("crm-lead-id").value;
       var status = document.getElementById("crm-status").value;
       var note = document.getElementById("crm-note").value;
@@ -1793,14 +1916,8 @@
         renderBatchTable();
         updateDashboardKpi();
 
-        google.script.run
-          .withSuccessHandler(function(res) { setTimeout(fetchHoldLeadsData, 400); })
-          .withFailureHandler(function(err) { 
-            if (typeof google.script.run.pushToHoldStorage === 'function') {
-              google.script.run.pushToHoldStorage(uId, payloadSave); 
-            }
-          })
-          .saveLeadToHoldAndPipeline(uId, payloadSave);
+        await ApiClient.request({ action: "saveHoldPipeline", userId: uId, leadData: payloadSave }, "POST");
+        setTimeout(fetchHoldLeadsData, 500);
 
       } else {
         if (status === "Giải ngân" || status === "Từ chối") {
@@ -1818,22 +1935,22 @@
             note: note
           };
 
-          if (typeof google.script.run.processCustomerAppLoanLifecycle === 'function') {
-            google.script.run.processCustomerAppLoanLifecycle(uId, lifecyclePayload);
-          }
+          ApiClient.request({ action: "submitCustomerLifecycle", userId: uId, data: lifecyclePayload }, "POST");
         }
 
-        google.script.run
-          .withSuccessHandler(function(res) { 
-            alert(res.message || "Cập nhật hồ sơ CRM thành công!"); 
-            fetchHoldLeadsData(); 
-          })
-          .saveLeadToHoldAndPipeline(uId, { leadId: leadId, status: status, note: note, extraData: extraData });
+        var res = await ApiClient.request({
+          action: "saveHoldPipeline",
+          userId: uId,
+          leadData: { leadId: leadId, status: status, note: note, extraData: extraData }
+        }, "POST");
+
+        alert(res.message || "Cập nhật hồ sơ CRM thành công!"); 
+        fetchHoldLeadsData();
       }
     }
 
     // 5. XÁC THỰC CALLIO BẰNG EMAIL & MẬT KHẨU
-    function submitCallioHandshake() {
+    async function submitCallioHandshake() {
       var emailInput = document.getElementById("cfg-callio-email") || document.getElementById("cfg-ext-value");
       var passInput = document.getElementById("cfg-callio-password") || document.getElementById("cfg-token-value");
       var statusEl = document.getElementById("callio-connect-status");
@@ -1858,51 +1975,55 @@
         statusEl.innerText = "Đang kết nối tới máy chủ Callio Phonenet...";
       }
 
-      google.script.run
-        .withSuccessHandler(function(res) {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+      try {
+        var res = await ApiClient.request({
+          action: "handshakeCallio",
+          userId: currentUser.userId,
+          callioEmail: email,
+          callioPassword: pass
+        }, "POST");
+
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+        }
+
+        if (res && res.status === "success") {
+          if (statusEl) {
+            statusEl.className = "small fw-bold text-success text-center mt-2";
+            statusEl.innerText = "✅ Kết nối Callio thành công!";
           }
 
-          if (res && res.status === "success") {
-            if (statusEl) {
-              statusEl.className = "small fw-bold text-success text-center mt-2";
-              statusEl.innerText = "✅ Kết nối Callio thành công!";
-            }
+          currentUser.personalToken = res.token;
+          currentUser.ext = res.callioEmail || email;
+          sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+          
+          renderUserHeader();
+          alert(res.message);
 
-            currentUser.personalToken = res.token;
-            currentUser.ext = res.callioEmail || email;
-            sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
-            
-            renderUserHeader();
-            alert(res.message);
-
-            var modalEl = document.getElementById("callioConfigModal");
-            if (modalEl) {
-              var modalInstance = bootstrap.Modal.getInstance(modalEl);
-              if (modalInstance) modalInstance.hide();
-            }
-          } else {
-            if (statusEl) {
-              statusEl.className = "small fw-bold text-danger text-center mt-2";
-              statusEl.innerText = "❌ " + (res ? res.message : "Xác thực Callio thất bại!");
-            }
-            alert(res ? res.message : "Xác thực thất bại!");
+          var modalEl = document.getElementById("callioConfigModal");
+          if (modalEl) {
+            var modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
           }
-        })
-        .withFailureHandler(function(err) {
-          if (btn) {
-            btn.disabled = false;
-            btn.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
-          }
+        } else {
           if (statusEl) {
             statusEl.className = "small fw-bold text-danger text-center mt-2";
-            statusEl.innerText = "Lỗi kết nối máy chủ: " + err.toString();
+            statusEl.innerText = "❌ " + (res ? res.message : "Xác thực Callio thất bại!");
           }
-          alert("Lỗi: " + err.toString());
-        })
-        .handshakeCallioUserCredentials(currentUser.userId, email, pass);
+          alert(res ? res.message : "Xác thực thất bại!");
+        }
+      } catch(err) {
+        if (btn) {
+          btn.disabled = false;
+          btn.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+        }
+        if (statusEl) {
+          statusEl.className = "small fw-bold text-danger text-center mt-2";
+          statusEl.innerText = "Lỗi kết nối máy chủ: " + err.toString();
+        }
+        alert("Lỗi: " + err.toString());
+      }
     }
 
     function submitCallioConfig() {
