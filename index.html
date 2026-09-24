@@ -1947,47 +1947,77 @@
   // 5. CẤU HÌNH API GATEWAY RESTFUL KẾT NỐI GOOGLE APPS SCRIPT (ENTERPRISE V3.0)
   // ==============================================================================
   
-  // URL Web App Google Apps Script chính thức của hệ thống CRM
-  const GAS_BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec";
+  // URL Web App Google Apps Script chính thức mới nhất của anh Hải Âu
+  var GAS_BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec";
 
   /**
    * [NEW] - Hàm điều phối gọi API Backend bọc thép:
-   * - Hỗ trợ mode 'cors' và redirect 'follow' để xử lý HTTP 302 từ Google
-   * - Sử dụng 'text/plain;charset=utf-8' để bỏ qua Preflight OPTIONS
-   * - Triệt tiêu 100% lỗi Failed to fetch
+   * - Hỗ trợ cả 2 môi trường: Chạy trên GitHub Pages (qua Fetch) hoặc Web App GAS (qua google.script.run)
+   * - Khử hoàn toàn lỗi CORS và Failed to fetch
    */
   async function callGasBackend(payload) {
-    try {
-      const response = await fetch(GAS_BACKEND_API_URL, {
-        method: "POST",
-        mode: "cors",
-        redirect: "follow",
-        headers: {
-          "Content-Type": "text/plain;charset=utf-8"
-        },
-        body: JSON.stringify(payload)
+    // Nếu đang chạy trực tiếp bên trong iframe của Google Web App
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      return new Promise(function(resolve, reject) {
+        var action = payload.action;
+        if (action === "login") {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(reject)
+            .authenticateUser(payload.username, payload.password);
+        } else if (action === "claimBatch") {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(reject)
+            .fetchNewBatchForSale(payload.userId, payload.ext, payload.batchSize || 50);
+        } else if (action === "handshakeCallio") {
+          google.script.run
+            .withSuccessHandler(resolve)
+            .withFailureHandler(reject)
+            .loginCallioAccount(payload.userId, payload.email, payload.password);
+        } else {
+          // Các action khác fallback về gọi doPost qua fetch
+          executeFetchGateway(payload, resolve, reject);
+        }
       });
-
-      if (!response.ok) {
-        throw new Error("Máy chủ Google phản hồi HTTP " + response.status);
-      }
-
-      const textData = await response.text();
-      let jsonData = {};
-      try {
-        jsonData = JSON.parse(textData);
-      } catch (eParse) {
-        throw new Error("Phản hồi không phải JSON: " + textData.substring(0, 100));
-      }
-
-      return jsonData;
-    } catch (error) {
-      console.error("API Gateway Exception:", error);
-      throw error;
     }
+
+    // Môi trường GitHub Pages (haiaufinance.github.io) -> Bắt buộc dùng Fetch Gateway
+    return new Promise(function(resolve, reject) {
+      executeFetchGateway(payload, resolve, reject);
+    });
   }
 
-  // Lắng nghe sự kiện Enter tại ô mật khẩu đăng nhập & modal Callio
+  function executeFetchGateway(payload, resolve, reject) {
+    fetch(GAS_BACKEND_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "text/plain;charset=utf-8"
+      },
+      body: JSON.stringify(payload)
+    })
+    .then(function(response) {
+      if (!response.ok) {
+        throw new Error("HTTP " + response.status + ": Kiểm tra lại link Web App hoặc quyền Anyone");
+      }
+      return response.text();
+    })
+    .then(function(text) {
+      try {
+        var data = JSON.parse(text);
+        resolve(data);
+      } catch (errJson) {
+        reject(new Error("Phản hồi không phải JSON: " + text.substring(0, 120)));
+      }
+    })
+    .catch(function(err) {
+      reject(err);
+    });
+  }
+
+  // ==============================================================================
+  // 6. LẮNG NGHE SỰ KIỆN ENTER & GẮN SỰ KIỆN TỰ ĐỘNG VÀO NÚT ĐĂNG NHẬP
+  // ==============================================================================
   document.addEventListener("DOMContentLoaded", function() {
     var pInput = document.getElementById("login-password");
     if (pInput) {
@@ -1997,6 +2027,14 @@
           processLogin(event);
         }
       });
+    }
+
+    // Gắn trực tiếp hàm processLogin vào nút Đăng nhập để tránh xung đột HTML inline onclick
+    var btnLogin = document.getElementById("btn-submit-login") || document.querySelector(".btn-login, button[type='submit']");
+    if (btnLogin) {
+      btnLogin.onclick = function(e) {
+        return processLogin(e);
+      };
     }
 
     var callioPass = document.getElementById("callio-login-pass") || document.getElementById("cfg-callio-password");
@@ -2011,7 +2049,7 @@
   });
 
   // ==============================================================================
-  // 6. [NEW] - PHÂN HỆ ĐĂNG NHẬP HỆ THỐNG TRÊN GITHUB PAGES (TRIỆT TIÊU FAILED TO FETCH)
+  // 7. [NEW] - PHÂN HỆ ĐĂNG NHẬP HỆ THỐNG (CHỐNG FAILED TO FETCH TRIỆT ĐỂ)
   // ==============================================================================
   async function processLogin(e) {
     if (e && e.preventDefault) e.preventDefault();
@@ -2088,7 +2126,7 @@
   }
 
   // ==============================================================================
-  // 7. [NEW] - PHÂN HỆ CẤP PHÁT DATA CHO SALE (CHỐNG LỖI claimBatch)
+  // 8. [NEW] - PHÂN HỆ CẤP PHÁT DATA CHO SALE (CHỐNG LỖI claimBatch)
   // ==============================================================================
   async function claimNewBatch() {
     if (typeof activeBatchLeads !== 'undefined' && activeBatchLeads.length > 5) {
@@ -2136,7 +2174,7 @@
   }
 
   // ==============================================================================
-  // 8. [NEW] - PHÂN HỆ XÁC THỰC CALLIO QUA PROXY GAS BACKEND (CHỐNG CORS)
+  // 9. [NEW] - PHÂN HỆ XÁC THỰC CALLIO QUA PROXY GAS BACKEND (CHỐNG CORS)
   // ==============================================================================
   async function submitCallioHandshake() {
     var emailInput = document.getElementById("callio-login-email") || 
@@ -2233,7 +2271,6 @@
     }
   }
 
-  // Hàm tương thích ngược
   function submitCallioConfig(e) {
     if (e && e.preventDefault) e.preventDefault();
     submitCallioHandshake();
@@ -2243,6 +2280,6 @@
     if (e && e.preventDefault) e.preventDefault();
     submitCallioHandshake();
   }
-          </script>
+              </script>
 </body>
 </html>
