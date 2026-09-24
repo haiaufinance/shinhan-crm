@@ -943,29 +943,41 @@
       location.reload();
     }
 
-    function renderUserHeader() {
-      if (!currentUser) return;
-      var isAdmin = currentUser.role === "ADMIN";
-      var roleBadge = isAdmin 
-        ? '<span class="badge-role-admin">ADMIN TOÀN SÀN</span>' 
-        : '<span class="badge-role-sale">' + currentUser.role + '</span>';
-        
-      var infoEl = document.getElementById("user-header-info");
-      var extDisplay = currentUser.ext || "Chưa kết nối";
-      if (infoEl) infoEl.innerHTML = 'Tài khoản: <b>' + currentUser.name + '</b> | Cấp: ' + roleBadge + ' | Callio: <b>' + extDisplay + '</b>';
-      
-      var txtExt = document.getElementById("txt-active-ext");
-      if (txtExt) txtExt.innerText = 'Tài khoản Callio: ' + extDisplay;
+    // ==============================================================================
+// [NEW V3.0] RENDER THÔNG TIN HEADER USER (CHỐNG LỖI HIỂN THỊ UNDEFINED)
+// ==============================================================================
+function renderUserHeader() {
+  if (typeof currentUser === 'undefined' || !currentUser) {
+    try {
+      currentUser = JSON.parse(sessionStorage.getItem("SHN_CRM_USER") || "{}");
+    } catch(e) { currentUser = {}; }
+  }
 
-      var cfgEmail = document.getElementById("cfg-callio-email");
-      if (cfgEmail && currentUser.ext && currentUser.ext.indexOf("@") !== -1) {
-        cfgEmail.value = currentUser.ext;
-      }
+  // Tương thích đa thuộc tính Họ Tên: fullName || name || hoTen || userId
+  var displayName = currentUser.fullName || currentUser.hoTen || currentUser.name || currentUser.userId || "Telesale";
+  var roleDisplay = (currentUser.role || "SALE").toUpperCase();
+  var extDisplay  = currentUser.ext || "11113";
 
-      var btnAdmin = document.getElementById("btn-toggle-admin");
-      if (btnAdmin) btnAdmin.style.display = (isAdmin || currentUser.role === "LEADER" || currentUser.role === "TEAMLEAD") ? "inline-block" : "none";
-    }
+  // Cập nhật lên các phần tử DOM trên Header
+  var elUserName = document.getElementById("user-name") || document.getElementById("header-user-fullname");
+  if (elUserName) elUserName.innerText = displayName;
 
+  var elUserRole = document.getElementById("user-role") || document.getElementById("header-user-role");
+  if (elUserRole) elUserRole.innerText = roleDisplay;
+
+  var elUserExt = document.getElementById("user-ext") || document.getElementById("header-user-ext");
+  if (elUserExt) elUserExt.innerText = extDisplay;
+
+  var headerInfoContainer = document.querySelector(".header-user-info");
+  if (headerInfoContainer) {
+    headerInfoContainer.innerHTML = 'Tài khoản: <strong>' + displayName + '</strong> | Cấp: <span class="badge bg-success">' + roleDisplay + '</span> | Callio: <strong>' + extDisplay + '</strong>';
+  }
+
+  // Đồng bộ đèn trạng thái tổng đài
+  if (typeof updateCallioStatusBadge === "function") {
+    updateCallioStatusBadge();
+  }
+}
     // 2. PHÂN HỆ ADMIN / LEADER
     function toggleAdminPanel() {
       var p = document.getElementById("admin-panel");
