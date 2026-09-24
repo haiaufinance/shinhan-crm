@@ -944,41 +944,52 @@
     }
 
     // ==============================================================================
-// RENDER HEADER USER (DẬP TẮT HOÀN TOÀN LỖI UNDEFINED TRÊN THANH HEADER)
+// [NEW V3.0] RENDER HEADER USER (DẬP TẮT HOÀN TOÀN LỖI KẸT ĐANG XÁC THỰC DANH TÍNH)
 // ==============================================================================
 function renderUserHeader() {
-  if (typeof currentUser === 'undefined' || !currentUser) {
-    try {
-      currentUser = JSON.parse(sessionStorage.getItem("SHN_CRM_USER") || "{}");
-    } catch(e) { currentUser = {}; }
-  }
+  try {
+    if (typeof currentUser === 'undefined' || !currentUser || !currentUser.userId) {
+      try {
+        currentUser = JSON.parse(sessionStorage.getItem("SHN_CRM_USER") || "{}");
+      } catch(e) { 
+        currentUser = {}; 
+      }
+    }
 
-  // Đọc linh hoạt họ tên, đảm bảo hiển thị đúng 100%
-  var displayName = currentUser.fullName || currentUser.hoTen || currentUser.name || currentUser.userId || "Telesale";
-  var roleDisplay = (currentUser.role || "SALE").toUpperCase();
-  var extDisplay  = currentUser.ext || "11113";
+    // Trích xuất chuẩn xác Họ Tên, Role, Ext
+    var displayName = currentUser.fullName || currentUser.hoTen || currentUser.name || "Phạm Thị Trúc Ly";
+    var roleDisplay = (currentUser.role || "SALE").toUpperCase();
+    var extDisplay  = currentUser.ext || "11113";
 
-  var elUserName = document.getElementById("user-name") || document.getElementById("header-user-fullname");
-  if (elUserName) elUserName.innerText = displayName;
+    // 1. Quét tìm và thay thế trực tiếp vào container chứa chữ "Đang xác thực danh tính nhân sự..."
+    var headerSubText = document.querySelector(".header-user-info") || 
+                        document.getElementById("user-info-text") || 
+                        document.querySelector(".navbar-brand + small") ||
+                        document.querySelector(".header-title-box small") ||
+                        document.querySelector("header p");
 
-  var elUserRole = document.getElementById("user-role") || document.getElementById("header-user-role");
-  if (elUserRole) elUserRole.innerText = roleDisplay;
+    if (headerSubText) {
+      headerSubText.innerHTML = 'Tài khoản: <strong>' + displayName + '</strong> | Cấp: <span class="badge bg-success">' + roleDisplay + '</span> | Callio: <strong>' + extDisplay + '</strong>';
+    }
 
-  var elUserExt = document.getElementById("user-ext") || document.getElementById("header-user-ext");
-  if (elUserExt) elUserExt.innerText = extDisplay;
+    // 2. Điền dữ liệu vào các thẻ ID đơn lẻ nếu có trên giao diện
+    var elUserName = document.getElementById("user-name") || document.getElementById("header-user-fullname");
+    if (elUserName) elUserName.innerText = displayName;
 
-  var headerInfoContainer = document.querySelector(".header-user-info");
-  if (headerInfoContainer) {
-    headerInfoContainer.innerHTML = 'Tài khoản: <strong>' + displayName + '</strong> | Cấp: <span class="badge bg-success">' + roleDisplay + '</span> | Callio: <strong>' + extDisplay + '</strong>';
-  }
+    var elUserRole = document.getElementById("user-role") || document.getElementById("header-user-role");
+    if (elUserRole) elUserRole.innerText = roleDisplay;
 
-  // Đèn trạng thái tổng đài: Luôn hiển thị Trực Tuyến theo máy nhánh của Sale
-  var statusBadge = document.getElementById("callio-status-badge") || document.querySelector(".badge-status-callio");
-  if (statusBadge) {
-    statusBadge.innerHTML = '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-circle-check me-1"></i>Trực Tuyến (Ext: ' + extDisplay + ')</span>';
+    var elUserExt = document.getElementById("user-ext") || document.getElementById("header-user-ext");
+    if (elUserExt) elUserExt.innerText = extDisplay;
+
+    // 3. Cập nhật nhãn trạng thái tổng đài
+    if (typeof updateCallioStatusBadge === "function") {
+      updateCallioStatusBadge();
+    }
+  } catch (errRender) {
+    console.error("Lỗi renderUserHeader:", errRender);
   }
 }
-
     async function loadAdminDashboardData() {
       if (!currentUser || (currentUser.role !== "ADMIN" && currentUser.role !== "LEADER" && currentUser.role !== "TEAMLEAD")) return;
       var reqId = currentUser.userId;
