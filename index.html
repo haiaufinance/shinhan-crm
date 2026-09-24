@@ -447,10 +447,6 @@
 
   </main>
 
-  <!-- ==============================================================================
-       4. HỆ THỐNG CÁC CỬA SỔ MODAL THAO TÁC
-       ============================================================================== -->
-
   <!-- MODAL XÁC THỰC CALLIO THEO TỪNG TÀI KHOẢN SALE LẺ (HANDSHAKE LOGIN) -->
   <div class="modal fade" id="callioConfigModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -459,38 +455,37 @@
           <h6 class="modal-title fw-bold">
             <i class="fa-solid fa-headset me-1"></i> Kết Nối Tài Khoản Callio Cá Nhân
           </h6>
-          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+          <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
         </div>
-        <div class="modal-body bg-light">
+        <div class="modal-body p-4">
           <div class="alert alert-info py-2 small mb-3">
             <i class="fa-solid fa-circle-info me-1"></i> Nhập Email và Mật khẩu Callio của riêng bạn một lần duy nhất để kích hoạt gọi trực tiếp 1-chạm từ CRM.
           </div>
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Email Đăng Nhập Callio:</label>
+          <div class="mb-3 text-start">
+            <label class="form-label small fw-bold text-muted">Email Đăng Nhập Callio:</label>
             <div class="input-group">
-              <span class="input-group-text bg-white"><i class="fa-solid fa-envelope text-muted"></i></span>
-              <input type="email" id="cfg-callio-email" class="form-control" placeholder="VD: sale01@gmail.com">
+              <span class="input-group-text bg-light"><i class="fa-solid fa-envelope text-muted"></i></span>
+              <input type="email" class="form-control" id="callio-login-email" placeholder="name@shinhan.com.vn" required>
             </div>
           </div>
-          <div class="mb-3">
-            <label class="form-label small fw-bold">Mật Khẩu Callio:</label>
+          <div class="mb-3 text-start">
+            <label class="form-label small fw-bold text-muted">Mật Khẩu Callio:</label>
             <div class="input-group">
-              <span class="input-group-text bg-white"><i class="fa-solid fa-lock text-muted"></i></span>
-              <input type="password" id="cfg-callio-password" class="form-control" placeholder="Nhập mật khẩu Callio của bạn">
+              <span class="input-group-text bg-light"><i class="fa-solid fa-lock text-muted"></i></span>
+              <input type="password" class="form-control" id="callio-login-pass" placeholder="••••••••" required>
             </div>
           </div>
-          <div id="callio-connect-status" class="small fw-bold text-center mt-2" style="display: none;"></div>
+          <div id="callio-connect-status" class="small fw-bold text-center mt-2 text-primary" style="display: none;"></div>
         </div>
         <div class="modal-footer py-2 bg-white">
           <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
-          <button type="button" class="btn btn-primary btn-sm fw-bold" id="btn-submit-callio-auth" onclick="submitCallioHandshake()">
+          <button type="button" class="btn btn-primary btn-sm fw-bold" id="btn-submit-callio-login" onclick="submitCallioAccountLogin(event)">
             <i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay
           </button>
         </div>
       </div>
     </div>
   </div>
-
   <!-- MODAL GIAO DATA CHỦ ĐỘNG TỪ ADMIN -->
   <div class="modal fade" id="adminDispatchModal" tabindex="-1" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
@@ -1948,87 +1943,127 @@
         fetchHoldLeadsData();
       }
     }
+    // ==============================================================================
+  // 5. [NEW] - XÁC THỰC CALLIO QUA PROXY GOOGLE APPS SCRIPT (CHỐNG CORS GITHUB PAGES)
+  // ==============================================================================
+  const GAS_BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbyzlClWGpoga7WyeQBJWxUmDGpbuGGRZBIesUu56OH6AkF91K13kU1exZGM0NolZm0Rp3w/exec";
 
-    // 5. XÁC THỰC CALLIO BẰNG EMAIL & MẬT KHẨU
-    async function submitCallioHandshake() {
-      var emailInput = document.getElementById("cfg-callio-email") || document.getElementById("cfg-ext-value");
-      var passInput = document.getElementById("cfg-callio-password") || document.getElementById("cfg-token-value");
-      var statusEl = document.getElementById("callio-connect-status");
+  async function submitCallioHandshake() {
+    var emailInput = document.getElementById("callio-login-email") || document.getElementById("cfg-callio-email") || document.getElementById("cfg-ext-value");
+    var passInput  = document.getElementById("callio-login-pass")  || document.getElementById("cfg-callio-password") || document.getElementById("cfg-token-value");
+    var statusEl   = document.getElementById("callio-connect-status") || document.getElementById("callio-status-msg");
+    var btnSubmit  = document.getElementById("btn-submit-callio-login") || document.getElementById("btn-submit-callio-auth");
 
-      var email = emailInput ? emailInput.value.trim() : "";
-      var pass = passInput ? passInput.value.trim() : "";
+    var email = emailInput ? emailInput.value.trim() : "";
+    var pass  = passInput  ? passInput.value.trim()  : "";
 
-      if (!email || !pass) {
-        alert("Vui lòng nhập đầy đủ Email và Mật khẩu Callio của bạn!");
-        return;
-      }
+    if (!email || !pass) {
+      alert("Vui lòng nhập đầy đủ Email và Mật khẩu Callio của bạn!");
+      return;
+    }
 
-      var btn = document.getElementById("btn-submit-callio-auth");
-      if (btn) {
-        btn.disabled = true;
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang xác thực với Callio...';
-      }
+    // Cập nhật trạng thái UI
+    if (btnSubmit) {
+      btnSubmit.disabled = true;
+      btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang xác thực với Callio...';
+    }
+    if (statusEl) {
+      statusEl.className = "small fw-bold text-primary text-center mt-2";
+      statusEl.innerText = "Đang kết nối tới máy chủ Callio Phonenet...";
+      statusEl.style.display = "block";
+    }
 
-      if (statusEl) {
-        statusEl.style.display = "block";
-        statusEl.className = "small fw-bold text-primary text-center mt-2";
-        statusEl.innerText = "Đang kết nối tới máy chủ Callio Phonenet...";
-      }
+    var currentUserId = (typeof currentUser !== 'undefined' && currentUser && currentUser.userId) 
+      ? currentUser.userId 
+      : "ADMIN";
 
-      try {
-        var res = await ApiClient.request({
-          action: "handshakeCallio",
-          userId: currentUser.userId,
-          callioEmail: email,
-          callioPassword: pass
-        }, "POST");
+    var requestPayload = {
+      action: "loginCallio",
+      userId: currentUserId,
+      email: email,
+      password: pass
+    };
 
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
-        }
-
-        if (res && res.status === "success") {
-          if (statusEl) {
-            statusEl.className = "small fw-bold text-success text-center mt-2";
-            statusEl.innerText = "✅ Kết nối Callio thành công!";
-          }
-
-          currentUser.personalToken = res.token;
-          currentUser.ext = res.callioEmail || email;
-          sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
-          
-          renderUserHeader();
-          alert(res.message);
-
-          var modalEl = document.getElementById("callioConfigModal");
-          if (modalEl) {
-            var modalInstance = bootstrap.Modal.getInstance(modalEl);
-            if (modalInstance) modalInstance.hide();
-          }
-        } else {
-          if (statusEl) {
-            statusEl.className = "small fw-bold text-danger text-center mt-2";
-            statusEl.innerText = "❌ " + (res ? res.message : "Xác thực Callio thất bại!");
-          }
-          alert(res ? res.message : "Xác thực thất bại!");
-        }
-      } catch(err) {
-        if (btn) {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
-        }
+    // Timeout an toàn 15 giây
+    var handshakeTimer = setTimeout(function() {
+      if (btnSubmit && btnSubmit.disabled) {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
         if (statusEl) {
           statusEl.className = "small fw-bold text-danger text-center mt-2";
-          statusEl.innerText = "Lỗi kết nối máy chủ: " + err.toString();
+          statusEl.innerText = "Lỗi: Quá thời gian phản hồi từ máy chủ Callio!";
         }
-        alert("Lỗi: " + err.toString());
+        alert("Kết nối tới Callio quá hạn. Vui lòng kiểm tra lại đường truyền!");
       }
-    }
+    }, 15000);
 
-    function submitCallioConfig() {
-      submitCallioHandshake();
+    try {
+      const response = await fetch(GAS_BACKEND_API_URL, {
+        method: "POST",
+        headers: {
+          "Content-Type": "text/plain;charset=utf-8"
+        },
+        body: JSON.stringify(requestPayload)
+      });
+
+      clearTimeout(handshakeTimer);
+      const res = await response.json();
+
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+      }
+
+      if (res && res.status === "success") {
+        if (statusEl) {
+          statusEl.className = "small fw-bold text-success text-center mt-2";
+          statusEl.innerText = "Kết nối thành công! Đã lưu Token tổng đài.";
+        }
+        alert(res.message || "Xác thực tài khoản Callio thành công!");
+
+        if (typeof currentUser !== 'undefined' && currentUser) {
+          currentUser.personalToken = res.token;
+          sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+        }
+
+        // Đóng Modal Callio
+        var modalEl = document.getElementById("callioConfigModal") || document.getElementById("callioLoginModal");
+        if (modalEl && typeof bootstrap !== 'undefined') {
+          var modalInstance = bootstrap.Modal.getInstance(modalEl);
+          if (modalInstance) modalInstance.hide();
+        }
+
+        // Cập nhật trạng thái tổng đài trên thanh Dashboard
+        var statusBadge = document.getElementById("callio-status-badge") || document.querySelector(".badge-status-callio");
+        if (statusBadge) {
+          statusBadge.innerHTML = '<span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i>Tổng Đài Trực Tuyến</span>';
+        }
+      } else {
+        if (statusEl) {
+          statusEl.className = "small fw-bold text-danger text-center mt-2";
+          statusEl.innerText = res ? res.message : "Đăng nhập Callio thất bại!";
+        }
+        alert(res ? res.message : "Đăng nhập Callio thất bại! Vui lòng kiểm tra lại tài khoản.");
+      }
+
+    } catch (err) {
+      clearTimeout(handshakeTimer);
+      if (btnSubmit) {
+        btnSubmit.disabled = false;
+        btnSubmit.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+      }
+      if (statusEl) {
+        statusEl.className = "small fw-bold text-danger text-center mt-2";
+        statusEl.innerText = "Lỗi kết nối máy chủ: " + err.toString();
+      }
+      alert("Lỗi kết nối: " + err.toString());
     }
-  </script>
+  }
+
+  function submitCallioConfig() {
+    submitCallioHandshake();
+  }
+
+      </script>
 </body>
 </html>
