@@ -868,76 +868,76 @@
       if (overlay) overlay.style.display = "flex";
     });
 
-    // 1. XÁC THỰC ĐĂNG NHẬP
-    async function processLogin(e) {
-      if (e && e.preventDefault) e.preventDefault();
-      var uInput = document.getElementById("login-username");
-      var pInput = document.getElementById("login-password");
-      var btn = document.getElementById("btn-submit-login");
-      var errEl = document.getElementById("login-error-msg");
+    // ==============================================================================
+  // [NEW V3.0] TỰ ĐỘNG THU THẬP TOKEN TỪ ĐĂNG NHẬP CRM (ZERO-TOUCH SSO NGẦM)
+  // ==============================================================================
+  async function processLogin(username, password) {
+    var btnLogin = document.getElementById("btn-login-submit");
+    var errorEl = document.getElementById("login-error-msg");
 
-      var u = uInput ? uInput.value.trim().toUpperCase() : "";
-      var p = pInput ? pInput.value.trim() : "";
-
-      if (errEl) { errEl.style.display = "none"; errEl.innerText = ""; }
-
-      if (!u || !p) { 
-        alert("Vui lòng nhập đầy đủ Mã NV và Mật khẩu!"); 
-        return false; 
-      }
-      
-      if (btn) { 
-        btn.disabled = true; 
-        btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> ĐANG XÁC THỰC...'; 
-      }
-
-      var loginTimer = setTimeout(function() {
-        if (btn && btn.disabled) {
-          btn.disabled = false;
-          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG';
-          alert("Kết nối máy chủ bị quá hạn (Timeout). Vui lòng thử lại!");
-        }
-      }, 15000);
-
-      try {
-        var res = await ApiClient.request({ action: "login", username: u, password: p }, "GET");
-        clearTimeout(loginTimer);
-
-        if (btn) { 
-          btn.disabled = false; 
-          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG'; 
-        }
-
-        if (res && res.status === "success") {
-          currentUser = res.user;
-          sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
-          var overlay = document.getElementById("login-overlay");
-          if (overlay) overlay.style.display = "none";
-          renderUserHeader();
-          fetchHoldLeadsData();
-          loadAdminDashboardData();
-          if (currentUser.role !== "ADMIN") claimNewBatch();
-        } else {
-          var msg = res ? res.message : "Đăng nhập thất bại!";
-          if (errEl) {
-            errEl.innerText = msg;
-            errEl.style.display = "block";
-          } else {
-            alert(msg);
-          }
-        }
-      } catch(err) {
-        clearTimeout(loginTimer);
-        if (btn) { 
-          btn.disabled = false; 
-          btn.innerHTML = '<i class="fa-solid fa-right-to-bracket me-1"></i> ĐĂNG NHẬP HỆ THỐNG'; 
-        }
-        alert("Lỗi máy chủ: " + err.toString());
-      }
-      
-      return false;
+    if (btnLogin) {
+      btnLogin.disabled = true;
+      btnLogin.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang Xác Thực...';
     }
+    if (errorEl) errorEl.style.display = "none";
 
+    try {
+      const res = await callGasBackend({
+        action: "login",
+        username: username,
+        password: password
+      });
+
+      if (btnLogin) {
+        btnLogin.disabled = false;
+        btnLogin.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i>Đăng Nhập Hệ Thống';
+      }
+
+      if (res && res.status === "success") {
+        currentUser = res.user;
+        sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+
+        // [CỐT LÕI]: Nạp Token được Backend cấp tự động vào bộ nhớ trình duyệt
+        if (currentUser.callioToken) {
+          localStorage.setItem("SHN_CALLIO_TOKEN", currentUser.callioToken);
+          sessionStorage.setItem("SHN_CALLIO_TOKEN", currentUser.callioToken);
+        }
+
+        // Ẩn màn hình đăng nhập
+        var overlay = document.getElementById("login-overlay");
+        if (overlay) overlay.style.display = "none";
+
+        // Cập nhật nhãn trạng thái tổng đài trên Header sang Trực Tuyến ngay lập tức
+        updateCallioStatusBadge();
+
+        // Nạp dữ liệu các phân hệ tác chiến
+        if (typeof renderUserHeader === 'function') renderUserHeader();
+        if (typeof fetchHoldLeadsData === 'function') fetchHoldLeadsData();
+        if (typeof loadAdminDashboardData === 'function') loadAdminDashboardData();
+        if (currentUser.role !== "ADMIN" && typeof claimNewBatch === 'function') claimNewBatch();
+
+      } else {
+        var msg = res ? (res.message || "Tài khoản hoặc mật khẩu không chính xác!") : "Lỗi kết nối máy chủ!";
+        if (errorEl) {
+          errorEl.innerText = msg;
+          errorEl.style.display = "block";
+        } else {
+          alert(msg);
+        }
+      }
+    } catch (err) {
+      if (btnLogin) {
+        btnLogin.disabled = false;
+        btnLogin.innerHTML = '<i class="fa-solid fa-right-to-bracket me-2"></i>Đăng Nhập Hệ Thống';
+      }
+      if (errorEl) {
+        errorEl.innerText = "Lỗi kết nối API Gateway: " + err.message;
+        errorEl.style.display = "block";
+      } else {
+        alert("Lỗi kết nối API Gateway: " + err.message);
+      }
+    }
+  }
     function logoutSession() {
       sessionStorage.removeItem("SHN_CRM_USER");
       location.reload();
@@ -2172,13 +2172,40 @@
       alert("Lỗi tải data: " + err.message);
     }
   }
-
     // ==============================================================================
   // 9. [NEW V3.0] - PHÂN HỆ TỔNG ĐÀI CALLIO: XÁC THỰC PROXY & BỌC THÉP NÚT GỌI
   // ==============================================================================
 
   /**
-   * [NEW] - 9.1: XÁC THỰC ĐĂNG NHẬP CALLIO (LẤY JWT TOKEN MỚI VÀ ĐỒNG BỘ NGUỒN ĐÔI)
+   * [NEW] - 9.1: CẬP NHẬT TRẠNG THÁI HIỂN THỊ TỔNG ĐÀI CHUẨN XÁC (CHỐNG BÁO ẢO)
+   */
+  function updateCallioStatusBadge() {
+    var statusBadge = document.getElementById("callio-status-badge") || document.querySelector(".badge-status-callio");
+    if (!statusBadge) return;
+
+    var token = localStorage.getItem("SHN_CALLIO_TOKEN") || 
+                sessionStorage.getItem("SHN_CALLIO_TOKEN") || 
+                (typeof currentUser !== 'undefined' && currentUser && (currentUser.callioToken || currentUser.personalToken)) || "";
+
+    var ext = (typeof currentUser !== 'undefined' && currentUser && currentUser.ext) ? currentUser.ext : "11113";
+
+    if (token && token.length > 20) {
+      statusBadge.innerHTML = '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-circle-check me-1"></i>Trực Tuyến (Ext: ' + ext + ')</span>';
+    } else {
+      statusBadge.innerHTML = '<span class="badge bg-danger py-1 px-2" style="cursor:pointer;" onclick="openCallioLoginModal()"><i class="fa-solid fa-plug-circle-xmark me-1"></i>Chưa Kết Nối Callio</span>';
+    }
+  }
+
+  function openCallioLoginModal() {
+    var modalEl = document.getElementById("callioConfigModal") || document.getElementById("callioLoginModal");
+    if (modalEl && typeof bootstrap !== 'undefined') {
+      var modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+      modalInstance.show();
+    }
+  }
+
+  /**
+   * [NEW] - 9.2: XÁC THỰC ĐĂNG NHẬP CALLIO THỦ CÔNG (DỰ PHÒNG KHI ĐỔI MẬT KHẨU TỔNG ĐÀI)
    */
   async function submitCallioHandshake() {
     var emailInput = document.getElementById("callio-login-email") || 
@@ -2216,7 +2243,6 @@
       statusEl.style.display = "block";
     }
 
-    // [NEW] - Lấy chính xác User ID của Sale đang đăng nhập phiên hiện tại
     var currentUserId = (typeof currentUser !== 'undefined' && currentUser && currentUser.userId) 
       ? currentUser.userId 
       : "114154";
@@ -2237,12 +2263,13 @@
       if (res && res.status === "success") {
         var jwtToken = res.token || "";
 
-        // [CỐT LÕI]: Lưu Token vào cả localStorage và sessionStorage để dùng trực tiếp khi gọi
+        // Lưu Token vào cả localStorage và sessionStorage
         localStorage.setItem("SHN_CALLIO_TOKEN", jwtToken);
         sessionStorage.setItem("SHN_CALLIO_TOKEN", jwtToken);
 
         if (typeof currentUser !== 'undefined' && currentUser) {
           currentUser.personalToken = jwtToken;
+          currentUser.callioToken = jwtToken;
           if (res.ext) currentUser.ext = res.ext;
           sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
         }
@@ -2261,12 +2288,8 @@
           if (modalInstance) modalInstance.hide();
         }
 
-        // Cập nhật nhãn trạng thái tổng đài trên Header
-        var statusBadge = document.getElementById("callio-status-badge") || document.querySelector(".badge-status-callio");
-        if (statusBadge) {
-          var extDisplay = (currentUser && currentUser.ext) ? currentUser.ext : (res.ext || "11113");
-          statusBadge.innerHTML = '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-circle-check me-1"></i>Trực Tuyến (' + extDisplay + ')</span>';
-        }
+        // Cập nhật trạng thái tổng đài
+        updateCallioStatusBadge();
 
       } else {
         var errMsg = res ? (res.message || res.error) : "Đăng nhập Callio thất bại!";
@@ -2290,8 +2313,8 @@
   }
 
   /**
-   * [NEW] - 9.2: HÀM THỰC THI CUỘC GỌI BỌC THÉP TRUYỀN TOKEN TRỰC TIẾP
-   * (Đính kèm chuỗi Token Client vào Payload để Backend bắn thẳng sang Callio)
+   * [NEW] - 9.3: HÀM THỰC THI CUỘC GỌI BỌC THÉP TRUYỀN TOKEN TRỰC TIẾP (DUAL-SOURCE)
+   * (Nạp trực tiếp chuỗi Token Client vào Payload để triệt tiêu hoàn toàn mã lỗi HTTP 401)
    */
   async function executeClickToCall(leadId, rawPhoneRef, btnElement) {
     var uId = (typeof currentUser !== 'undefined' && currentUser && currentUser.userId) 
@@ -2308,12 +2331,8 @@
                       (currentUser && (currentUser.personalToken || currentUser.callioToken)) || "";
 
     if (!tokenClient) {
-      alert("⚠️ BẠN CHƯA KẾT NỐI TỔNG ĐÀI CALLIO!\nVui lòng bấm nút 'Kết Nối Callio' ở góc trên bên phải màn hình để đăng nhập trước khi thực hiện cuộc gọi.");
-      var modalEl = document.getElementById("callioConfigModal") || document.getElementById("callioLoginModal");
-      if (modalEl && typeof bootstrap !== 'undefined') {
-        var modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
-        modalInstance.show();
-      }
+      alert("⚠️ BẠN CHƯA KẾT NỐI TỔNG ĐÀI CALLIO!\nVui lòng bấm 'Đăng Nhập Lại' để hệ thống tự động cấp Token tổng đài.");
+      openCallioLoginModal();
       return;
     }
 
@@ -2332,7 +2351,7 @@
         userId: uId,
         ext: ext,
         rawPhoneRef: rawPhoneRef,
-        token: tokenClient, // [NEW] Nạp trực tiếp Token Client vượt rào lỗi 401
+        token: tokenClient, // [NEW] Nạp trực tiếp Token Client vượt rào 401
         userTeam: (currentUser && currentUser.team) ? currentUser.team : "ALL"
       });
 
@@ -2350,19 +2369,13 @@
           sessionStorage.removeItem("SHN_CALLIO_TOKEN");
           if (typeof currentUser !== 'undefined' && currentUser) {
             currentUser.personalToken = "";
+            currentUser.callioToken = "";
           }
 
-          var statusBadge = document.getElementById("callio-status-badge") || document.querySelector(".badge-status-callio");
-          if (statusBadge) {
-            statusBadge.innerHTML = '<span class="badge bg-danger py-1 px-2"><i class="fa-solid fa-triangle-exclamation me-1"></i>Hết Hạn Token</span>';
-          }
+          updateCallioStatusBadge();
 
-          alert("⚠️ Phiên Callio đã hết hạn bảo mật (HTTP 401)!\nHệ thống sẽ mở bảng xác thực để bạn kết nối lại.");
-          var mEl = document.getElementById("callioConfigModal") || document.getElementById("callioLoginModal");
-          if (mEl && typeof bootstrap !== 'undefined') {
-            var mInst = bootstrap.Modal.getInstance(mEl) || new bootstrap.Modal(mEl);
-            mInst.show();
-          }
+          alert("⚠️ Phiên Callio đã hết hạn bảo mật (HTTP 401)!\nVui lòng đăng xuất và đăng nhập lại CRM để hệ thống tự động cấp Token mới.");
+          openCallioLoginModal();
         } else {
           alert("Lỗi cuộc gọi: " + (res ? res.message : "Tổng đài từ chối lệnh gọi!"));
         }
@@ -2377,7 +2390,7 @@
   }
 
   // ==============================================================================
-  // 9.3: CÁC ALIAS TƯƠNG THÍCH NGƯỢC (ĐẢM BẢO MỌI NÚT GỌI TRÊN BẢNG ĐỀU CHẠY ĐÚNG)
+  // 9.4: CÁC ALIAS TƯƠNG THÍCH NGƯỢC (ĐẢM BẢO MỌI NÚT GỌI TRÊN BẢNG ĐỀU CHẠY ĐÚNG)
   // ==============================================================================
   function triggerCallioClickToCall(phoneRef, leadId, btn) {
     var btnTarget = btn || (typeof event !== 'undefined' && event ? event.currentTarget : null);
@@ -2403,6 +2416,7 @@
     if (e && e.preventDefault) e.preventDefault();
     submitCallioHandshake();
   }
-                    </script>
+
+                       </script>
 </body>
 </html>
