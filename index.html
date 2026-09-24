@@ -1944,61 +1944,114 @@
       }
     }
     // ==============================================================================
-  // 5. [NEW] - XÁC THỰC CALLIO QUA PROXY GOOGLE APPS SCRIPT (CHỐNG CORS GITHUB PAGES)
+  // 5. [NEW V3.0] XÁC THỰC CALLIO QUA PROXY GAS BACKEND (FULL ENTERPRISE PIPELINE)
   // ==============================================================================
-  const GAS_BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbyzlClWGpoga7WyeQBJWxUmDGpbuGGRZBIesUu56OH6AkF91K13kU1exZGM0NolZm0Rp3w/exec";
+  
+  // URL WEB APP GOOGLE APPS SCRIPT ĐIỀU PHỐI CHÍNH (ĐÃ CẤU HÌNH ĐÚNG VERSION /exec)
+  var GAS_BACKEND_API_URL = "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec";
+
+  // Hàm lắng nghe sự kiện Enter tại ô mật khẩu để tiện đăng nhập
+  document.addEventListener("DOMContentLoaded", function() {
+    var pInput = document.getElementById("callio-login-pass") || document.getElementById("cfg-callio-password");
+    if (pInput) {
+      pInput.addEventListener("keydown", function(event) {
+        if (event.key === "Enter") {
+          event.preventDefault();
+          submitCallioHandshake();
+        }
+      });
+    }
+  });
 
   async function submitCallioHandshake() {
-    var emailInput = document.getElementById("callio-login-email") || document.getElementById("cfg-callio-email") || document.getElementById("cfg-ext-value");
-    var passInput  = document.getElementById("callio-login-pass")  || document.getElementById("cfg-callio-password") || document.getElementById("cfg-token-value");
-    var statusEl   = document.getElementById("callio-connect-status") || document.getElementById("callio-status-msg");
-    var btnSubmit  = document.getElementById("btn-submit-callio-login") || document.getElementById("btn-submit-callio-auth");
+    // 1. Quét tìm tất cả các ID có thể có của input để chống lệch DOM
+    var emailInput = document.getElementById("callio-login-email") || 
+                     document.getElementById("cfg-callio-email") || 
+                     document.querySelector("input[type='email']") ||
+                     document.getElementById("cfg-ext-value");
+
+    var passInput  = document.getElementById("callio-login-pass") || 
+                     document.getElementById("cfg-callio-password") || 
+                     document.querySelector("input[type='password']") ||
+                     document.getElementById("cfg-token-value");
+
+    var statusEl   = document.getElementById("callio-connect-status") || 
+                     document.getElementById("callio-status-msg") ||
+                     document.querySelector("#callioConfigModal .text-center");
+
+    var btnSubmit  = document.getElementById("btn-submit-callio-login") || 
+                     document.getElementById("btn-submit-callio-auth") ||
+                     document.querySelector("#callioConfigModal .btn-primary");
 
     var email = emailInput ? emailInput.value.trim() : "";
     var pass  = passInput  ? passInput.value.trim()  : "";
 
+    // 2. Kiểm tra tính hợp lệ của đầu vào
     if (!email || !pass) {
-      alert("Vui lòng nhập đầy đủ Email và Mật khẩu Callio của bạn!");
+      alert("⚠️ Vui lòng nhập đầy đủ Email và Mật khẩu Callio của bạn!");
+      if (emailInput && !email) emailInput.focus();
+      else if (passInput && !pass) passInput.focus();
       return;
     }
 
-    // Cập nhật trạng thái UI
+    // 3. Khóa nút bấm và hiển thị trạng thái đang xử lý (UX Protection)
     if (btnSubmit) {
       btnSubmit.disabled = true;
+      btnSubmit.setAttribute("data-original-text", btnSubmit.innerHTML);
       btnSubmit.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang xác thực với Callio...';
     }
+
     if (statusEl) {
       statusEl.className = "small fw-bold text-primary text-center mt-2";
-      statusEl.innerText = "Đang kết nối tới máy chủ Callio Phonenet...";
+      statusEl.innerText = "Đang kết nối tới máy chủ Callio Phonenet qua Proxy GAS...";
       statusEl.style.display = "block";
     }
 
-    var currentUserId = (typeof currentUser !== 'undefined' && currentUser && currentUser.userId) 
-      ? currentUser.userId 
-      : "ADMIN";
+    // 4. Xác định mã nhân viên gửi lệnh
+    var currentUserId = "ADMIN";
+    try {
+      if (typeof currentUser !== 'undefined' && currentUser && currentUser.userId) {
+        currentUserId = currentUser.userId;
+      } else {
+        var cachedUser = sessionStorage.getItem("SHN_CRM_USER") || localStorage.getItem("SHN_CRM_USER");
+        if (cachedUser) {
+          var uObj = JSON.parse(cachedUser);
+          if (uObj.userId) currentUserId = uObj.userId;
+        }
+      }
+    } catch(errUser) {
+      currentUserId = "ADMIN";
+    }
 
+    // 5. Chuẩn bị Payload gửi lên máy chủ GAS (Hỗ trợ cả 2 Action chống lỗi Action không hợp lệ)
     var requestPayload = {
-      action: "loginCallio",
+      action: "handshakeCallio",
+      subAction: "loginCallio",
       userId: currentUserId,
       email: email,
-      password: pass
+      password: pass,
+      clientOrigin: window.location.origin
     };
 
-    // Timeout an toàn 15 giây
-    var handshakeTimer = setTimeout(function() {
-      if (btnSubmit && btnSubmit.disabled) {
+    // 6. Bật Timeout bảo vệ 20s chống treo nút vĩnh viễn
+    var isTimedOut = false;
+    var callioTimer = setTimeout(function() {
+      isTimedOut = true;
+      if (btnSubmit) {
         btnSubmit.disabled = false;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
-        if (statusEl) {
-          statusEl.className = "small fw-bold text-danger text-center mt-2";
-          statusEl.innerText = "Lỗi: Quá thời gian phản hồi từ máy chủ Callio!";
-        }
-        alert("Kết nối tới Callio quá hạn. Vui lòng kiểm tra lại đường truyền!");
+        var orig = btnSubmit.getAttribute("data-original-text") || '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+        btnSubmit.innerHTML = orig;
       }
-    }, 15000);
+      if (statusEl) {
+        statusEl.className = "small fw-bold text-danger text-center mt-2";
+        statusEl.innerText = "Lỗi kết nối: Quá thời gian phản hồi từ máy chủ Callio (Timeout 20s)!";
+      }
+      alert("Kết nối tới Callio quá hạn. Vui lòng kiểm tra lại tài khoản hoặc đường truyền mạng!");
+    }, 20000);
 
+    // 7. Thực thi gọi qua Proxy GAS bằng Fetch API (Headers text/plain chống CORS Preflight)
     try {
-      const response = await fetch(GAS_BACKEND_API_URL, {
+      var response = await fetch(GAS_BACKEND_API_URL, {
         method: "POST",
         headers: {
           "Content-Type": "text/plain;charset=utf-8"
@@ -2006,64 +2059,98 @@
         body: JSON.stringify(requestPayload)
       });
 
-      clearTimeout(handshakeTimer);
-      const res = await response.json();
+      if (isTimedOut) return;
+      clearTimeout(callioTimer);
 
+      var res = await response.json();
+
+      // Mở lại nút bấm
       if (btnSubmit) {
         btnSubmit.disabled = false;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+        var origText = btnSubmit.getAttribute("data-original-text") || '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+        btnSubmit.innerHTML = origText;
       }
 
+      // 8. Xử lý phản hồi từ Backend
       if (res && res.status === "success") {
+        var token = res.token || "";
+
         if (statusEl) {
           statusEl.className = "small fw-bold text-success text-center mt-2";
-          statusEl.innerText = "Kết nối thành công! Đã lưu Token tổng đài.";
-        }
-        alert(res.message || "Xác thực tài khoản Callio thành công!");
-
-        if (typeof currentUser !== 'undefined' && currentUser) {
-          currentUser.personalToken = res.token;
-          sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+          statusEl.innerText = "Xác thực thành công! Đã kích hoạt tổng đài Callio.";
         }
 
-        // Đóng Modal Callio
+        // Lưu Token vào cả SessionStorage và LocalStorage
+        try {
+          if (typeof currentUser !== 'undefined' && currentUser) {
+            currentUser.personalToken = token;
+            sessionStorage.setItem("SHN_CRM_USER", JSON.stringify(currentUser));
+            localStorage.setItem("SHN_CALLIO_TOKEN", token);
+          }
+        } catch(eStorage) {}
+
+        alert(res.message || "Xác thực tài khoản Callio thành công! Tổng đài đã sẵn sàng kết nối.");
+
+        // Đóng Modal an toàn
         var modalEl = document.getElementById("callioConfigModal") || document.getElementById("callioLoginModal");
-        if (modalEl && typeof bootstrap !== 'undefined') {
-          var modalInstance = bootstrap.Modal.getInstance(modalEl);
-          if (modalInstance) modalInstance.hide();
+        if (modalEl) {
+          if (typeof bootstrap !== 'undefined' && bootstrap.Modal) {
+            var modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (!modalInstance) modalInstance = new bootstrap.Modal(modalEl);
+            modalInstance.hide();
+          } else {
+            modalEl.classList.remove("show");
+            modalEl.style.display = "none";
+            var backdrop = document.querySelector(".modal-backdrop");
+            if (backdrop) backdrop.parentNode.removeChild(backdrop);
+          }
         }
 
-        // Cập nhật trạng thái tổng đài trên thanh Dashboard
-        var statusBadge = document.getElementById("callio-status-badge") || document.querySelector(".badge-status-callio");
+        // Cập nhật trạng thái tổng đài trên Dashboard Header
+        var statusBadge = document.getElementById("callio-status-badge") || 
+                          document.getElementById("txt-callio-status") ||
+                          document.querySelector(".badge-status-callio");
         if (statusBadge) {
-          statusBadge.innerHTML = '<span class="badge bg-success"><i class="fa-solid fa-circle-check me-1"></i>Tổng Đài Trực Tuyến</span>';
+          statusBadge.innerHTML = '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-circle-check me-1"></i>Tổng Đài Trực Tuyến</span>';
         }
+
       } else {
+        var errMsg = res ? (res.message || res.error) : "Đăng nhập Callio thất bại!";
         if (statusEl) {
           statusEl.className = "small fw-bold text-danger text-center mt-2";
-          statusEl.innerText = res ? res.message : "Đăng nhập Callio thất bại!";
+          statusEl.innerText = errMsg;
         }
-        alert(res ? res.message : "Đăng nhập Callio thất bại! Vui lòng kiểm tra lại tài khoản.");
+        alert("Lỗi Callio: " + errMsg);
       }
 
     } catch (err) {
-      clearTimeout(handshakeTimer);
+      if (isTimedOut) return;
+      clearTimeout(callioTimer);
+
       if (btnSubmit) {
         btnSubmit.disabled = false;
-        btnSubmit.innerHTML = '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+        var defaultText = btnSubmit.getAttribute("data-original-text") || '<i class="fa-solid fa-plug me-1"></i> Xác Thực & Kết Nối Ngay';
+        btnSubmit.innerHTML = defaultText;
       }
+
       if (statusEl) {
         statusEl.className = "small fw-bold text-danger text-center mt-2";
         statusEl.innerText = "Lỗi kết nối máy chủ: " + err.toString();
       }
-      alert("Lỗi kết nối: " + err.toString());
+      alert("Lỗi kết nối tới Backend Proxy GAS: " + err.toString());
     }
   }
 
-  function submitCallioConfig() {
+  // Hàm chuyển tiếp tương thích ngược
+  function submitCallioConfig(e) {
+    if (e && e.preventDefault) e.preventDefault();
     submitCallioHandshake();
   }
 
+  function submitCallioAccountLogin(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    submitCallioHandshake();
+  }
       </script>
 </body>
 </html>
