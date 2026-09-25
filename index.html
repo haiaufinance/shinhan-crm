@@ -166,8 +166,8 @@
       color: #0284c7;
     }
 
-    /* NÚT COPY SĐT 1-CHẠM (KẾ THỪA THIẾT KẾ GRADIENT CHUYÊN NGHIỆP) */
-    .btn-copy-phone, .btn-callio-call {
+    /* NÚT COPY SĐT 1-CHẠM */
+    .btn-copy-phone {
       background: linear-gradient(180deg, #0284c7 0%, #0369a1 100%);
       color: #ffffff !important;
       border: none;
@@ -184,7 +184,7 @@
       box-shadow: 0 2px 4px rgba(3, 105, 161, 0.2);
       transition: all 0.15s ease-in-out;
     }
-    .btn-copy-phone:active, .btn-callio-call:active {
+    .btn-copy-phone:active {
       transform: scale(0.96);
     }
     .btn-copy-success {
@@ -232,7 +232,7 @@
           <label class="form-label small fw-bold text-muted">Mã Nhân Viên (User ID):</label>
           <div class="input-group">
             <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
-            <input type="text" class="form-control" id="login-username" placeholder="Nhập Mã NV (VD: 114154, ADMIN...)" required autocomplete="username">
+            <input type="text" class="form-control" id="login-username" placeholder="Nhập Mã NV (VD: HAIAU, 114154...)" required autocomplete="username">
           </div>
         </div>
 
@@ -331,6 +331,10 @@
         <button class="tab-btn" id="tab-btn-hold" onclick="switchMainTab('hold')">
           <i class="fa-solid fa-star text-warning me-1"></i>Sổ Tay Hold Lead (<span id="hold-tab-count">0</span>)
         </button>
+        <!-- [NEW V3.0] TAB QUẢN TRỊ ADMIN (TỰ ĐỘNG HIỆN KHI USER LÀ ADMIN HOẶC LEADER) -->
+        <button class="tab-btn text-danger fw-bold" id="tab-btn-admin" onclick="switchMainTab('admin')" style="display: none;">
+          <i class="fa-solid fa-sliders me-1"></i>⚙️ Trung Tâm Quản Trị Admin
+        </button>
       </div>
 
       <!-- TAB 1: BẢNG LÔ DỮ LIỆU CẤP CHO SALE -->
@@ -387,11 +391,82 @@
           </table>
         </div>
       </div>
+
+      <!-- ============================================================================ -->
+      <!-- [NEW V3.0] TAB 3: TRUNG TÂM ĐIỀU PHỐI VÀ QUẢN TRỊ ADMIN / LEADER             -->
+      <!-- ============================================================================ -->
+      <div id="tab-pane-admin" class="p-4" style="display: none;">
+        <div class="row g-4">
+          <!-- Phân hệ 1: Giao Data Chủ Động (Push Mode) -->
+          <div class="col-md-7">
+            <div class="p-4 border rounded bg-light">
+              <h5 class="fw-bold text-primary mb-3">
+                <i class="fa-solid fa-share-nodes me-2"></i>Điều Phối Dữ Liệu Chủ Động Cho Sale (Push Mode)
+              </h5>
+              <div class="row g-3">
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Chọn Nhân Sự Nhận Data:</label>
+                  <input type="text" class="form-control" id="admin-target-sale" placeholder="Nhập Mã NV (VD: 114154, SALE_01...)">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Số Lượng Data Cần Giao:</label>
+                  <input type="number" class="form-control" id="admin-batch-size" value="50" min="10" max="200">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Lọc Theo Chiến Dịch (Tag):</label>
+                  <select class="form-select" id="admin-filter-tag">
+                    <option value="ALL">-- Tất Cả Chiến Dịch --</option>
+                    <option value="RAW">RAW (Khách Đăng Ký Mới)</option>
+                    <option value="VSSID">VSSID (Bảo Hiểm Xã Hội)</option>
+                    <option value="THE_FIRST">Thẻ Tín Dụng The First</option>
+                    <option value="CTV_500K">CTV Lì Xì 500k</option>
+                  </select>
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small fw-bold">Lọc Theo Tỉnh/Thành Phố:</label>
+                  <select class="form-select" id="admin-filter-province">
+                    <option value="ALL">-- Toàn Quốc --</option>
+                    <option value="Hồ Chí Minh">TP. Hồ Chí Minh</option>
+                    <option value="Hà Nội">Hà Nội</option>
+                    <option value="Tây Ninh">Tây Ninh</option>
+                    <option value="Bình Dương">Bình Dương</option>
+                    <option value="Đồng Nai">Đồng Nai</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mt-4">
+                <button type="button" class="btn btn-primary fw-bold px-4" id="btn-admin-distribute" onclick="executeAdminDistribute()">
+                  <i class="fa-solid fa-paper-plane me-2"></i>Tiến Hành Giao Data
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Phân hệ 2: Thu Hồi Lô Chưa Gọi (Revoke Batch) -->
+          <div class="col-md-5">
+            <div class="p-4 border rounded bg-light">
+              <h5 class="fw-bold text-danger mb-3">
+                <i class="fa-solid fa-rotate-left me-2"></i>Thu Hồi Data Chưa Xử Lý
+              </h5>
+              <p class="text-muted small">
+                Thu hồi toàn bộ các số trạng thái <code>ASSIGNED</code> mà Sale chưa gọi điện hoặc chưa nộp báo cáo về lại kho đấu trường.
+              </p>
+              <div class="mb-3">
+                <label class="form-label small fw-bold">Mã NV Cần Thu Hồi:</label>
+                <input type="text" class="form-control" id="admin-revoke-sale" placeholder="Nhập Mã NV cần thu hồi...">
+              </div>
+              <button type="button" class="btn btn-outline-danger fw-bold w-100" id="btn-admin-revoke" onclick="executeAdminRevoke()">
+                <i class="fa-solid fa-ban me-2"></i>Thu Hồi Data Về Kho Tổng
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </div>
 
   <!-- ============================================================================== -->
-  <!-- 5. [NEW V3.0] MODAL CHI TIẾT KHÁCH HÀNG & TIẾN TRÌNH HỒ SƠ (PIPELINE MODAL)     -->
+  <!-- 5. MODAL CHI TIẾT KHÁCH HÀNG & TIẾN TRÌNH HỒ SƠ (PIPELINE MODAL)                 -->
   <!-- ============================================================================== -->
   <div class="modal fade" id="customerDetailModal" tabindex="-1" aria-labelledby="customerDetailModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -404,15 +479,12 @@
         </div>
         <div class="modal-body p-4">
           <div class="row g-3">
-            <!-- Cột trái: Thông tin định danh & Công cụ Copy -->
             <div class="col-md-5 border-end">
               <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="fa-solid fa-user me-1"></i>Thông Tin Khách Hàng</h6>
-              
               <div class="mb-2">
                 <label class="text-muted small">Họ và Tên:</label>
                 <div class="fw-bold fs-5 text-dark" id="modal-cust-name">---</div>
               </div>
-
               <div class="mb-3">
                 <label class="text-muted small">Số điện thoại liên hệ:</label>
                 <div class="input-group">
@@ -422,32 +494,25 @@
                   </button>
                 </div>
               </div>
-
               <div class="mb-2">
                 <label class="text-muted small">Mức Lương / Thu Nhập:</label>
                 <div class="fw-bold text-success" id="modal-cust-salary">---</div>
               </div>
-
               <div class="mb-2">
                 <label class="text-muted small">Cơ Quan / Đơn Vị:</label>
                 <div class="fw-bold text-secondary" id="modal-cust-company">---</div>
               </div>
-
               <div class="mb-2">
                 <label class="text-muted small">Khu Vực / Tỉnh Thành:</label>
                 <div class="badge bg-info text-dark" id="modal-cust-province">---</div>
               </div>
-
               <div class="mb-2">
                 <label class="text-muted small">Vòng Khai Thác:</label>
                 <span class="badge bg-secondary" id="modal-cust-cycle">Vòng 1</span>
               </div>
             </div>
-
-            <!-- Cột phải: Tiến trình hồ sơ & Ghi chú thẩm định -->
             <div class="col-md-7">
               <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="fa-solid fa-timeline me-1"></i>Tiến Trình Chăm Sóc (Pipeline)</h6>
-
               <div class="row g-2 mb-3">
                 <div class="col-md-6">
                   <label class="form-label small fw-bold">Giai Đoạn Hồ Sơ:</label>
@@ -465,12 +530,10 @@
                   <input type="number" class="form-control form-control-sm" id="modal-loan-amount" placeholder="VD: 50000000">
                 </div>
               </div>
-
               <div class="mb-3">
                 <label class="form-label small fw-bold">Ghi Chú Chi Tiết Tương Tác:</label>
                 <textarea class="form-control form-control-sm" id="modal-pipeline-note" rows="3" placeholder="Nhập nhu cầu khách hàng, hạn mức mong muốn, lịch hẹn..."></textarea>
               </div>
-
               <div class="mb-2">
                 <label class="form-label small fw-bold text-muted">Lịch Sử Chăm Sóc Đa Vòng:</label>
                 <div class="p-2 border rounded bg-light small text-secondary" id="modal-history-notes" style="max-height: 120px; overflow-y: auto;">
@@ -510,7 +573,6 @@
     // Giao tiếp Backend Gas
     async function callGasBackend(payload) {
       var targetUrl = sessionStorage.getItem("SHN_GATEWAY_URL") || GAS_BACKEND_URL;
-      
       const response = await fetch(targetUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -520,7 +582,7 @@
     }
 
     // ============================================================================
-    // QUẢN LÝ PHIÊN ĐĂNG NHẬP & RENDER HEADER ĐỘNG (ZERO HARDCODE)
+    // QUẢN LÝ PHIÊN ĐĂNG NHẬP & PHÂN QUYỀN HEADER / ADMIN TAB
     // ============================================================================
     function initUserSession() {
       try {
@@ -540,7 +602,7 @@
         if (overlay) overlay.style.display = "none";
         renderUserHeader();
         fetchHoldLeadsData();
-        claimNewBatch(); // Tự động khôi phục lô dở dang
+        claimNewBatch();
       }
     }
 
@@ -557,6 +619,16 @@
       var elUserInfo = document.getElementById("user-info-text");
       if (elUserInfo) {
         elUserInfo.innerHTML = headerHtml;
+      }
+
+      // [QUAN TRỌNG]: TỰ ĐỘNG BẬT TAB ADMIN NẾU CẤP BẬC LÀ ADMIN HOẶC LEADER
+      var tabAdmin = document.getElementById("tab-btn-admin");
+      if (tabAdmin) {
+        if (uRole === "ADMIN" || uRole === "LEADER" || uRole === "SUPERVISOR") {
+          tabAdmin.style.display = "flex";
+        } else {
+          tabAdmin.style.display = "none";
+        }
       }
     }
 
@@ -717,12 +789,6 @@
       }, 1200);
     }
 
-    // Tương thích ngược alias cũ
-    function executeClickToCall(leadId, rawPhoneRef, btn) { copyPhoneNumberToClipboard(rawPhoneRef, btn); }
-    function triggerCallioClickToCall(phoneRef, leadId, btn) { copyPhoneNumberToClipboard(phoneRef, btn); }
-    function makeCall(phoneRef, leadId, btn) { copyPhoneNumberToClipboard(phoneRef, btn); }
-    function callLead(phoneRef, leadId, btn) { copyPhoneNumberToClipboard(phoneRef, btn); }
-
     // ============================================================================
     // RENDER BẢNG TELESALE DỮ LIỆU LÔ MỚI
     // ============================================================================
@@ -803,7 +869,6 @@
         return;
       }
 
-      // Kiểm toán gian lận lưu liên tục < 5s (Ghost Reporting)
       var nowTime = new Date().getTime();
       var intervalSec = (nowTime - lastReportActionTimestamp) / 1000;
       lastReportActionTimestamp = nowTime;
@@ -836,7 +901,6 @@
           currentBatch.splice(index, 1);
           renderBatchTable(currentBatch);
 
-          // NẾU LÀ TIỀM NĂNG: Cập nhật ngay Sổ tay Hold Lead và tính lại KPI ngày
           if (chosenStatus === "POTENTIAL" || chosenStatus === "FOLLOW_UP") {
             await fetchHoldLeadsData();
             alert("🌟 Đã lưu thành công khách hàng [" + (targetLead.name || "Khách Hàng") + "] vào Sổ Tay Hold Lead bảo lưu 30 ngày!");
@@ -852,7 +916,7 @@
     }
 
     // ============================================================================
-    // [NEW V3.0] TIỆN ÍCH TÍNH TOÁN ĐẾM NGƯỢC THỜI HẠN BẢO LƯU SỔ TAY HOLD (30 NGÀY)
+    // TIỆN ÍCH TÍNH TOÁN ĐẾM NGƯỢC THỜI HẠN BẢO LƯU SỔ TAY HOLD (30 NGÀY)
     // ============================================================================
     function renderHoldCountdownBadge(expireDateStr) {
       if (!expireDateStr || expireDateStr === "---") {
@@ -893,7 +957,7 @@
     }
 
     // ============================================================================
-    // [NEW V3.0] SỔ TAY HOLD LEAD & TÍNH TOÁN KPI NGÀY (RESET VỀ 0 MỖI NGÀY MỚI)
+    // SỔ TAY HOLD LEAD & TÍNH TOÁN KPI NGÀY (RESET VỀ 0 MỖI NGÀY MỚI)
     // ============================================================================
     async function fetchHoldLeadsData() {
       if (!currentUser || !currentUser.userId) return;
@@ -926,21 +990,16 @@
       if (countTab) countTab.innerText = totalAll;
       if (statTotal) statTotal.innerText = totalAll + " Lead";
 
-      // --------------------------------------------------------------------------
-      // [NEW] BỘ LỌC KPI NGÀY: CHỈ ĐẾM CÁC LEAD TẠO TRONG NGÀY HÔM NAY (00:00 -> 23:59)
-      // Qua ngày mới sẽ tự động tính từ 0 / 10
-      // --------------------------------------------------------------------------
       var today = new Date();
       var d = String(today.getDate()).padStart(2, '0');
       var m = String(today.getMonth() + 1).padStart(2, '0');
       var y = today.getFullYear();
-      var todayStr = d + "/" + m + "/" + y; // Chuỗi định dạng dd/MM/yyyy
+      var todayStr = d + "/" + m + "/" + y;
 
       var todayHoldCount = 0;
       if (holds && holds.length > 0) {
         for (var k = 0; k < holds.length; k++) {
           var cDate = (holds[k].createdAt || "").toString().trim();
-          // Kiểm tra nếu ngày tạo chứa ngày hôm nay
           if (cDate.indexOf(todayStr) !== -1) {
             todayHoldCount++;
           }
@@ -1122,25 +1181,117 @@
     }
 
     // ============================================================================
-    // TIỆN ÍCH CHUYỂN TAB GIAO DIỆN
+    // [NEW V3.0] CÁC HÀM ĐIỀU PHỐI DÀNH RIÊNG CHO ADMIN / LEADER
+    // ============================================================================
+    async function executeAdminDistribute() {
+      var targetSale = document.getElementById("admin-target-sale").value.trim().toUpperCase();
+      var batchSize = document.getElementById("admin-batch-size").value;
+      var campaignTag = document.getElementById("admin-filter-tag").value;
+      var province = document.getElementById("admin-filter-province").value;
+      var btn = document.getElementById("btn-admin-distribute");
+
+      if (!targetSale) {
+        alert("Vui lòng nhập Mã Nhân Viên nhận data!");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang Giao Data...';
+
+      try {
+        const res = await callGasBackend({
+          action: "adminDistribute",
+          adminId: currentUser.userId,
+          targetSaleId: targetSale,
+          batchSize: parseInt(batchSize, 10) || 50,
+          campaignTag: campaignTag,
+          provinceFilter: province
+        });
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane me-2"></i>Tiến Hành Giao Data';
+
+        if (res && res.status === "success") {
+          alert("✅ " + res.message);
+          document.getElementById("admin-target-sale").value = "";
+        } else {
+          alert("Thông báo: " + (res ? res.message : "Kho tổng không có data phù hợp tiêu chí lọc!"));
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-paper-plane me-2"></i>Tiến Hành Giao Data';
+        alert("Lỗi điều phối Admin: " + err.message);
+      }
+    }
+
+    async function executeAdminRevoke() {
+      var targetSale = document.getElementById("admin-revoke-sale").value.trim().toUpperCase();
+      var btn = document.getElementById("btn-admin-revoke");
+
+      if (!targetSale) {
+        alert("Vui lòng nhập Mã NV cần thu hồi data!");
+        return;
+      }
+
+      if (!confirm("Bạn có chắc chắn muốn thu hồi toàn bộ số chưa gọi của nhân sự [" + targetSale + "] về lại kho đấu trường?")) {
+        return;
+      }
+
+      btn.disabled = true;
+      btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-2"></i>Đang Thu Hồi...';
+
+      try {
+        const res = await callGasBackend({
+          action: "adminRevoke",
+          adminId: currentUser.userId,
+          saleId: targetSale
+        });
+
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-ban me-2"></i>Thu Hồi Data Về Kho Tổng';
+
+        if (res && res.status === "success") {
+          alert("✅ " + res.message);
+          document.getElementById("admin-revoke-sale").value = "";
+        } else {
+          alert("Thông báo: " + (res ? res.message : "Lỗi thu hồi data!"));
+        }
+      } catch (err) {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fa-solid fa-ban me-2"></i>Thu Hồi Data Về Kho Tổng';
+        alert("Lỗi thu hồi Admin: " + err.message);
+      }
+    }
+
+    // ============================================================================
+    // TIỆN ÍCH CHUYỂN TAB GIAO DIỆN (HỖ TRỢ CẢ 3 TAB)
     // ============================================================================
     function switchMainTab(tabName) {
       var btnBatch = document.getElementById("tab-btn-batch");
       var btnHold = document.getElementById("tab-btn-hold");
+      var btnAdmin = document.getElementById("tab-btn-admin");
       var paneBatch = document.getElementById("tab-pane-batch");
       var paneHold = document.getElementById("tab-pane-hold");
+      var paneAdmin = document.getElementById("tab-pane-admin");
+
+      btnBatch.classList.remove("active");
+      btnHold.classList.remove("active");
+      if (btnAdmin) btnAdmin.classList.remove("active");
+
+      paneBatch.style.display = "none";
+      paneHold.style.display = "none";
+      if (paneAdmin) paneAdmin.style.display = "none";
 
       if (tabName === 'batch') {
         btnBatch.classList.add("active");
-        btnHold.classList.remove("active");
         paneBatch.style.display = "block";
-        paneHold.style.display = "none";
-      } else {
+      } else if (tabName === 'hold') {
         btnHold.classList.add("active");
-        btnBatch.classList.remove("active");
         paneHold.style.display = "block";
-        paneBatch.style.display = "none";
         fetchHoldLeadsData();
+      } else if (tabName === 'admin') {
+        if (btnAdmin) btnAdmin.classList.add("active");
+        if (paneAdmin) paneAdmin.style.display = "block";
       }
     }
 
