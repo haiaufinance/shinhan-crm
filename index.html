@@ -942,57 +942,56 @@
       sessionStorage.removeItem("SHN_CRM_USER");
       location.reload();
     }
-
     // ==============================================================================
-// [NEW V3.0] RENDER HEADER BỌC THÉP TỰ PHỤC HỒI (DẬP TẮT LỖI TREO XÁC THỰC)
+// [NEW V3.0] RENDER HEADER ĐỘNG 100% THEO PHIÊN USER (LOẠI BỎ TRIỆT ĐỂ HARDCODE)
 // ==============================================================================
 function renderUserHeader() {
   try {
-    // 1. Phục hồi dữ liệu người dùng từ bộ nhớ phiên
     if (typeof currentUser === 'undefined' || !currentUser || !currentUser.userId) {
       try {
-        var savedUser = sessionStorage.getItem("SHN_CRM_USER") || localStorage.getItem("SHN_CRM_USER");
-        if (savedUser) currentUser = JSON.parse(savedUser);
+        var rawUser = sessionStorage.getItem("SHN_CRM_USER") || localStorage.getItem("SHN_CRM_USER");
+        if (rawUser) currentUser = JSON.parse(rawUser);
       } catch (eParse) {
         currentUser = null;
       }
     }
 
-    // 2. Định dạng thông tin hiển thị chuẩn xác (Ưu tiên Trúc Ly / Ext 11113 nếu trống)
-    var uName = (currentUser && (currentUser.fullName || currentUser.hoTen || currentUser.name)) 
-                ? (currentUser.fullName || currentUser.hoTen || currentUser.name) 
-                : "Phạm Thị Trúc Ly";
-                
-    var uRole = (currentUser && currentUser.role) ? currentUser.role.toUpperCase() : "SALE";
-    var uExt  = (currentUser && currentUser.ext)  ? currentUser.ext : "11113";
+    if (!currentUser || !currentUser.userId) {
+      // Nếu chưa có phiên thực sự, đảm bảo hiển thị màn hình đăng nhập
+      var overlay = document.getElementById("login-overlay");
+      if (overlay) overlay.style.display = "flex";
+      return;
+    }
 
-    var newHeaderHtml = 'Tài khoản: <strong>' + uName + '</strong> | Cấp: <span class="badge bg-success">' + uRole + '</span> | Callio: <strong>' + uExt + '</strong>';
+    // Trích xuất chuẩn xác thuộc tính của người dùng đang đăng nhập (KHÔNG HARDCODE)
+    var uId   = (currentUser.userId || "").toUpperCase();
+    var uName = currentUser.fullName || currentUser.hoTen || currentUser.name || uId;
+    var uRole = (currentUser.role || "SALE").toUpperCase();
+    var uTeam = currentUser.team || "TEAM_01";
+    var uExt  = currentUser.ext || "N/A";
 
-    // 3. CHIẾN THUẬT QUÉT TỰ PHỤC HỒI: Tìm chính xác phần tử đang chứa dòng chữ "Đang xác thực..."
+    var newHeaderHtml = 'Mã NV: <strong>' + uId + '</strong> | Tài khoản: <strong>' + uName + '</strong> | Cấp: <span class="badge bg-success">' + uRole + '</span> | Nhóm: <strong>' + uTeam + '</strong>';
+
+    // 1. Quét tìm và thay thế triệt để vào thẻ đang chứa chữ "Đang xác thực..."
+    var allNodes = document.querySelectorAll("header small, header p, header div, .navbar small, .navbar p, .header-user-info");
     var replaced = false;
-    var allSmallAndP = document.querySelectorAll("header small, header p, header div, .navbar small, .navbar p, .navbar div");
-    
-    for (var i = 0; i < allSmallAndP.length; i++) {
-      var el = allSmallAndP[i];
-      if (el.children.length === 0 && el.innerText && el.innerText.indexOf("Đang xác thực") !== -1) {
-        el.innerHTML = newHeaderHtml;
+
+    for (var i = 0; i < allNodes.length; i++) {
+      var node = allNodes[i];
+      if (node.innerText && node.innerText.indexOf("Đang xác thực") !== -1) {
+        node.innerHTML = newHeaderHtml;
         replaced = true;
         break;
       }
     }
 
-    // Nếu không tìm thấy bằng quét text, ghi đè vào các bộ chọn quen thuộc
+    // 2. Dự phòng bộ chọn container chuẩn
     if (!replaced) {
-      var targetBox = document.querySelector(".header-user-info") || 
-                      document.getElementById("user-info-text") || 
-                      document.getElementById("auth-status-desc") ||
-                      document.querySelector(".header-title-box small");
-      if (targetBox) {
-        targetBox.innerHTML = newHeaderHtml;
-      }
+      var box = document.querySelector(".header-user-info") || document.getElementById("user-info-text");
+      if (box) box.innerHTML = newHeaderHtml;
     }
 
-    // 4. Cập nhật thẻ hiển thị lẻ (nếu có)
+    // 3. Cập nhật các ID hiển thị đơn lẻ (nếu có trên giao diện)
     var elUName = document.getElementById("user-name");
     if (elUName) elUName.innerText = uName;
 
@@ -1002,10 +1001,10 @@ function renderUserHeader() {
     var elUExt = document.getElementById("user-ext");
     if (elUExt) elUExt.innerText = uExt;
 
-    // 5. Cập nhật đèn trạng thái tổng đài
-    if (typeof updateCallioStatusBadge === "function") {
-      updateCallioStatusBadge();
-    }
+    // 4. Ẩn nút "Kết Nối Callio" rườm rà ở góc phải
+    var btnCallio = document.getElementById("btn-callio-config") || document.querySelector("button[onclick*='Callio']");
+    if (btnCallio) btnCallio.style.display = "none";
+
   } catch (err) {
     console.warn("Cảnh báo renderUserHeader:", err);
   }
@@ -1016,7 +1015,8 @@ document.addEventListener("DOMContentLoaded", function() {
   setTimeout(renderUserHeader, 100);
   setTimeout(renderUserHeader, 500);
 });
-    async function loadAdminDashboardData() {
+
+        async function loadAdminDashboardData() {
       if (!currentUser || (currentUser.role !== "ADMIN" && currentUser.role !== "LEADER" && currentUser.role !== "TEAMLEAD")) return;
       var reqId = currentUser.userId;
 
@@ -2203,65 +2203,281 @@ document.addEventListener("DOMContentLoaded", function() {
     }
   }
     // ==============================================================================
-  // 9. [NEW V3.0] - PHÂN HỆ TỔNG ĐÀI CALLIO: CLICK-TO-CALL CHUẨN DOCS.CALLIO.VN
+  // [NEW V3.0] PHÂN HỆ ĐIỀU HƯỚNG CUỘC GỌI: COPY SĐT 1-CHẠM & MODAL TIẾN TRÌNH HỒ SƠ
+  // (ĐÃ LOẠI BỎ TOÀN BỘ CALLIO API - THAY BẰNG AUTO CLIPBOARD & PIPELINE NOTE)
   // ==============================================================================
 
-  async function executeClickToCall(leadId, rawPhoneRef, btnElement) {
-    var uId = (typeof currentUser !== 'undefined' && currentUser && currentUser.userId) ? currentUser.userId : "SALE_01";
-    var ext = (typeof currentUser !== 'undefined' && currentUser && currentUser.ext) ? currentUser.ext : "11113";
-    var userToken = (typeof currentUser !== 'undefined' && currentUser && currentUser.callioToken) ? currentUser.callioToken : "";
-
-    var originalBtnHtml = "";
-    if (btnElement) {
-      btnElement.disabled = true;
-      originalBtnHtml = btnElement.innerHTML;
-      btnElement.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+  /**
+   * Tiện ích sao chép số điện thoại thực tế vào bộ nhớ đệm (Clipboard)
+   */
+  function copyPhoneNumberToClipboard(phoneText, btnElement) {
+    if (!phoneText) {
+      alert("Không tìm thấy số điện thoại!");
+      return;
     }
+
+    var cleanPhone = phoneText.toString().trim();
+
+    if (navigator.clipboard && window.isSecureContext) {
+      navigator.clipboard.writeText(cleanPhone).then(function() {
+        showCopySuccessEffect(btnElement);
+      }).catch(function() {
+        fallbackCopyText(cleanPhone, btnElement);
+      });
+    } else {
+      fallbackCopyText(cleanPhone, btnElement);
+    }
+  }
+
+  function fallbackCopyText(text, btnElement) {
+    var textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.style.position = "fixed";
+    textArea.style.left = "-999999px";
+    document.body.appendChild(textArea);
+    textArea.focus();
+    textArea.select();
+    try {
+      document.execCommand('copy');
+      showCopySuccessEffect(btnElement);
+    } catch (err) {
+      alert("Số điện thoại: " + text);
+    }
+    document.body.removeChild(textArea);
+  }
+
+  function showCopySuccessEffect(btnElement) {
+    if (!btnElement) return;
+    var oldHtml = btnElement.innerHTML;
+    btnElement.className = "btn btn-sm btn-success px-2";
+    btnElement.innerHTML = '<i class="fa-solid fa-check me-1"></i>Đã Copy';
+    
+    setTimeout(function() {
+      btnElement.className = "btn btn-sm btn-primary px-2";
+      btnElement.innerHTML = oldHtml;
+    }, 1200);
+  }
+
+  // Tương thích ngược: Gán các alias gọi điện cũ sang hàm Copy SĐT 1-chạm
+  function executeClickToCall(leadId, rawPhoneRef, btn) {
+    copyPhoneNumberToClipboard(rawPhoneRef, btn);
+  }
+  function triggerCallioClickToCall(phoneRef, leadId, btn) {
+    copyPhoneNumberToClipboard(phoneRef, btn);
+  }
+  function makeCall(phoneRef, leadId, btn) {
+    copyPhoneNumberToClipboard(phoneRef, btn);
+  }
+  function callLead(phoneRef, leadId, btn) {
+    var btnTarget = btn || (typeof event !== 'undefined' && event ? event.currentTarget : null);
+    copyPhoneNumberToClipboard(phoneRef, btnTarget);
+  }
+
+  // ==============================================================================
+  // QUẢN LÝ POPUP MODAL THÔNG TIN CHI TIẾT KHÁCH HÀNG & TIẾN TRÌNH HỒ SƠ VAY
+  // ==============================================================================
+  var currentSelectedLead = null;
+
+  function openCustomerDetailModal(leadId) {
+    var lead = null;
+    if (typeof currentBatch !== 'undefined' && currentBatch && currentBatch.length > 0) {
+      lead = currentBatch.find(function(item) { return item.leadId === leadId; });
+    }
+
+    if (!lead) return;
+    currentSelectedLead = lead;
+
+    // Đổ dữ liệu định danh khách hàng lên Modal
+    var elName = document.getElementById("modal-cust-name");
+    var elPhone = document.getElementById("modal-cust-phone");
+    var elSalary = document.getElementById("modal-cust-salary");
+    var elCompany = document.getElementById("modal-cust-company");
+    var elProvince = document.getElementById("modal-cust-province");
+    var elCycle = document.getElementById("modal-cust-cycle");
+    var elHistory = document.getElementById("modal-history-notes");
+
+    if (elName) elName.innerText = lead.name || lead.fullName || "Khách Hàng";
+    if (elPhone) elPhone.value = lead.rawPhone || lead.phone || lead.phoneMask || "---";
+    if (elSalary) elSalary.innerText = lead.salary ? (Number(lead.salary).toLocaleString('vi-VN') + " VNĐ") : "Chưa cập nhật";
+    if (elCompany) elCompany.innerText = lead.company || "Tự do";
+    if (elProvince) elProvince.innerText = lead.province || "Toàn quốc";
+    if (elCycle) elCycle.innerText = "Chu kỳ " + (lead.cycle || 1);
+    if (elHistory) elHistory.innerText = lead.historyNote || "Chưa có lịch sử tương tác trước đó.";
+
+    // Reset biểu mẫu tiến trình
+    var elStage = document.getElementById("modal-pipeline-stage");
+    var elAmount = document.getElementById("modal-loan-amount");
+    var elNote = document.getElementById("modal-pipeline-note");
+    if (elStage) elStage.value = "POTENTIAL";
+    if (elAmount) elAmount.value = "";
+    if (elNote) elNote.value = "";
+
+    // Mở Modal
+    var modalEl = document.getElementById("customerDetailModal");
+    if (modalEl && typeof bootstrap !== 'undefined') {
+      var modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+      modalInstance.show();
+    }
+  }
+
+  function copyModalPhone() {
+    var phoneInput = document.getElementById("modal-cust-phone");
+    var btn = document.getElementById("btn-modal-copy-phone");
+    if (phoneInput) copyPhoneNumberToClipboard(phoneInput.value, btn);
+  }
+
+  async function saveCustomerPipelineFromModal() {
+    if (!currentSelectedLead) return;
+
+    var btnSave = document.getElementById("btn-save-customer-pipeline");
+    var stage = document.getElementById("modal-pipeline-stage").value;
+    var loanAmount = document.getElementById("modal-loan-amount").value;
+    var note = document.getElementById("modal-pipeline-note").value.trim();
+
+    if (btnSave) {
+      btnSave.disabled = true;
+      btnSave.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i>Đang lưu...';
+    }
+
+    var uId = (currentUser && currentUser.userId) ? currentUser.userId : "SALE";
+    var realPhone = currentSelectedLead.rawPhone || currentSelectedLead.phone || "";
 
     try {
       const res = await callGasBackend({
-        action: "clickToCall",
+        action: "updateCustomerPipeline",
         userId: uId,
-        ext: ext,
-        rawPhoneRef: rawPhoneRef,
-        token: userToken,
-        userTeam: (currentUser && currentUser.team) ? currentUser.team : "ALL"
+        payload: {
+          leadId: currentSelectedLead.leadId,
+          phone: realPhone,
+          fullName: currentSelectedLead.name || currentSelectedLead.fullName,
+          stage: stage,
+          loanAmount: Number(loanAmount) || 0,
+          note: note || "Cập nhật qua popup chi tiết"
+        }
       });
 
-      if (btnElement) {
-        btnElement.disabled = false;
-        btnElement.innerHTML = originalBtnHtml;
+      if (btnSave) {
+        btnSave.disabled = false;
+        btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk me-1"></i>Lưu Tiến Trình Hồ Sơ';
       }
 
       if (res && res.status === "success") {
-        alert("📞 " + res.message);
+        alert("✅ " + res.message);
+        var modalEl = document.getElementById("customerDetailModal");
+        if (modalEl && typeof bootstrap !== 'undefined') {
+          var modalInstance = bootstrap.Modal.getInstance(modalEl);
+          if (modalInstance) modalInstance.hide();
+        }
+        if (typeof fetchHoldLeadsData === 'function') fetchHoldLeadsData();
       } else {
-        alert("Lỗi cuộc gọi: " + (res ? res.message : "Tổng đài từ chối lệnh gọi!"));
+        alert("Lỗi lưu tiến trình: " + (res ? res.message : "Máy chủ không phản hồi"));
       }
     } catch (err) {
-      if (btnElement) {
-        btnElement.disabled = false;
-        btnElement.innerHTML = originalBtnHtml;
+      if (btnSave) {
+        btnSave.disabled = false;
+        btnSave.innerHTML = '<i class="fa-solid fa-floppy-disk me-1"></i>Lưu Tiến Trình Hồ Sơ';
       }
-      alert("Lỗi kết nối gọi điện: " + err.message);
+      alert("Lỗi kết nối máy chủ: " + err.message);
     }
-  }
+  }                       </script>
+  <!-- ============================================================================== -->
+<!-- [NEW V3.0] MODAL CHI TIẾT KHÁCH HÀNG & TIẾN TRÌNH HỒ SƠ (TIỀM NĂNG -> APPROVE) -->
+<!-- ============================================================================== -->
+<div class="modal fade" id="customerDetailModal" tabindex="-1" aria-labelledby="customerDetailModalLabel" aria-hidden="true">
+  <div class="modal-dialog modal-dialog-centered modal-lg">
+    <div class="modal-content border-0 shadow-lg">
+      <div class="modal-header bg-primary text-white py-3">
+        <h5 class="modal-title fw-bold" id="customerDetailModalLabel">
+          <i class="fa-solid fa-address-card me-2"></i>Chi Tiết Khách Hàng & Tiến Trình Hồ Sơ
+        </h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body p-4">
+        <div class="row g-3">
+          <!-- Cột Trái: Thông tin khách hàng & Công cụ Copy -->
+          <div class="col-md-5 border-end">
+            <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="fa-solid fa-user me-1"></i>Thông Tin Định Danh</h6>
+            
+            <div class="mb-2">
+              <label class="text-muted small">Họ và Tên:</label>
+              <div class="fw-bold fs-5 text-dark" id="modal-cust-name">---</div>
+            </div>
 
-  // Các Alias tương thích ngược cho bảng Telesale
-  function triggerCallioClickToCall(phoneRef, leadId, btn) {
-    var btnTarget = btn || (typeof event !== 'undefined' && event ? event.currentTarget : null);
-    executeClickToCall(leadId, phoneRef, btnTarget);
-  }
+            <div class="mb-3">
+              <label class="text-muted small">Số điện thoại liên hệ:</label>
+              <div class="input-group">
+                <input type="text" class="form-control fw-bold text-primary bg-light" id="modal-cust-phone" readonly value="---">
+                <button class="btn btn-outline-primary" type="button" id="btn-modal-copy-phone" onclick="copyModalPhone()">
+                  <i class="fa-solid fa-copy me-1"></i>Copy Số
+                </button>
+              </div>
+            </div>
 
-  function makeCall(phoneRef, leadId, btn) {
-    var btnTarget = btn || (typeof event !== 'undefined' && event ? event.currentTarget : null);
-    executeClickToCall(leadId, phoneRef, btnTarget);
-  }
+            <div class="mb-2">
+              <label class="text-muted small">Thu Nhập / Lương:</label>
+              <div class="fw-bold text-success" id="modal-cust-salary">---</div>
+            </div>
 
-  function callLead(phoneRef, leadId, btn) {
-    var btnTarget = btn || (typeof event !== 'undefined' && event ? event.currentTarget : null);
-    executeClickToCall(leadId, phoneRef, btnTarget);
-  }
-                       </script>
+            <div class="mb-2">
+              <label class="text-muted small">Cơ Quan / Đơn Vị:</label>
+              <div class="fw-bold text-secondary" id="modal-cust-company">---</div>
+            </div>
+
+            <div class="mb-2">
+              <label class="text-muted small">Khu Vực / Tỉnh Thành:</label>
+              <div class="badge bg-info text-dark" id="modal-cust-province">---</div>
+            </div>
+
+            <div class="mb-2">
+              <label class="text-muted small">Vòng Khai Thác:</label>
+              <span class="badge bg-secondary" id="modal-cust-cycle">Vòng 1</span>
+            </div>
+          </div>
+
+          <!-- Cột Phải: Tiến trình hồ sơ & Ghi chú thẩm định -->
+          <div class="col-md-7">
+            <h6 class="text-uppercase text-muted fw-bold small mb-3"><i class="fa-solid fa-timeline me-1"></i>Tiến Trình Chăm Sóc (Pipeline)</h6>
+
+            <div class="row g-2 mb-3">
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Giai Đoạn Khách Hàng:</label>
+                <select class="form-select form-select-sm" id="modal-pipeline-stage">
+                  <option value="POTENTIAL">1. Khách Hàng Tiềm Năng</option>
+                  <option value="FOLLOW_UP">2. Hẹn Tư Vấn / Gọi Lại</option>
+                  <option value="SUBMITTED">3. Đã Thu Thập CCCD / Hồ Sơ</option>
+                  <option value="APP_DOCS">4. Đang Thẩm Định Pháp Lý</option>
+                  <option value="APPROVED">5. Đã Phê Duyệt / Giải Ngân</option>
+                  <option value="REJECTED">6. Từ Chối / Không Đạt Điều Kiện</option>
+                </select>
+              </div>
+              <div class="col-md-6">
+                <label class="form-label small fw-bold">Số Tiền Đề Xuất (VNĐ):</label>
+                <input type="number" class="form-control form-control-sm" id="modal-loan-amount" placeholder="VD: 50000000">
+              </div>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label small fw-bold">Ghi Chú Chi Tiết Tương Tác:</label>
+              <textarea class="form-control form-control-sm" id="modal-pipeline-note" rows="3" placeholder="Nhập ghi chú tư vấn: Nhu cầu vay, hạn mức, hẹn giờ gọi lại..."></textarea>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small fw-bold text-muted">Lịch Sử Chăm Sóc Đa Vòng:</label>
+              <div class="p-2 border rounded bg-light small text-secondary" id="modal-history-notes" style="max-height: 120px; overflow-y: auto;">
+                Chưa có lịch sử trước đó.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer bg-light py-2">
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Đóng</button>
+        <button type="button" class="btn btn-primary btn-sm px-3" id="btn-save-customer-pipeline" onclick="saveCustomerPipelineFromModal()">
+          <i class="fa-solid fa-floppy-disk me-1"></i>Lưu Tiến Trình Hồ Sơ
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
 </body>
 </html>
