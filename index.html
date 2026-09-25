@@ -449,7 +449,49 @@
         </table>
       </div>
     </section>
+<!-- MODAL ĐIỀU CHUYỂN LEAD THÔNG MINH CHO ADMIN -->
+  <div class="modal fade" id="transferLeadModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content border-0 shadow-lg">
+        <div class="modal-header bg-info text-dark py-2">
+          <h6 class="modal-title fw-bold"><i class="fa-solid fa-people-arrows me-2"></i>Điều Chuyển Quyền Quản Lý Lead</h6>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body p-3">
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Nhân Sự Hiện Tại (Bị Khóa / Chuyển Đi):</label>
+            <input type="text" class="form-control fw-bold bg-light" id="transfer-from-sale" readonly>
+          </div>
 
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Phạm Vi Chuyển Giao:</label>
+            <select class="form-select form-select-sm" id="transfer-scope" onchange="toggleTransferScope()">
+              <option value="ALL" selected>🌟 Chuyển TOÀN BỘ Lead trong Sổ Tay</option>
+              <option value="SPECIFIC">🎯 Chỉ chuyển 1 Lead cụ thể (Nhập Lead ID)</option>
+            </select>
+          </div>
+
+          <div class="mb-3" id="box-specific-lead-id" style="display: none;">
+            <label class="form-label small fw-bold text-muted">Nhập LEAD_ID cần chuyển:</label>
+            <input type="text" class="form-control form-control-sm" id="transfer-target-lead-id" placeholder="VD: SHN_ABC123 hoặc SĐT">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label small fw-bold text-muted">Chọn Nhân Sự Mới Tiếp Nhận:</label>
+            <select class="form-select form-select-sm" id="transfer-to-sale">
+              <option value="">-- Đang nạp danh sách nhân sự --</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer py-2 bg-light">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Hủy</button>
+          <button type="button" class="btn btn-primary btn-sm fw-bold px-3" id="btn-confirm-transfer" onclick="confirmExecuteTransferLead()">
+            <i class="fa-solid fa-check me-1"></i> Xác Nhận Chuyển Giao
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
   </main>
 
   <!-- ==============================================================================
@@ -1342,21 +1384,117 @@
       loadAdminDashboardData();
     }
 
-    async function handleTransferLeadPrompt(fromSaleId) {
-      var leadId = prompt("Nhập LEAD_ID cần chuyển từ Sale [" + fromSaleId + "]:");
-      if (!leadId) return;
-      var toSaleId = prompt("Nhập MÃ SALE mới sẽ tiếp nhận:");
-      if (!toSaleId) return;
+    // ==============================================================================
+    // [NEW V3.0] PHÂN HỆ ĐIỀU CHUYỂN LEAD CHUYÊN NGHIỆP TỪ MA TRẬN ADMIN
+    // ==============================================================================
+    var currentTransferFromSaleId = "";
 
-      var res = await ApiClient.request({
-        action: "transferHold",
-        leadId: leadId.trim(),
-        fromSaleId: fromSaleId.trim().toUpperCase(),
-        toSaleId: toSaleId.trim().toUpperCase()
-      });
+    function handleTransferLeadPrompt(fromSaleId) {
+      currentTransferFromSaleId = (fromSaleId || "").toString().trim().toUpperCase();
+      document.getElementById("transfer-from-sale").value = currentTransferFromSaleId;
+      document.getElementById("transfer-scope").value = "ALL";
+      document.getElementById("box-specific-lead-id").style.display = "none";
+      document.getElementById("transfer-target-lead-id").value = "";
 
-      alert(res.message);
-      loadAdminDashboardData();
+      // Nạp danh sách Sale khả dụng vào Dropdown
+      loadActiveSalesIntoTransferDropdown(currentTransferFromSaleId);
+
+      var modalEl = document.getElementById("transferLeadModal");
+      if (modalEl && typeof bootstrap !== 'undefined') {
+        var modalInstance = bootstrap.Modal.getInstance(modalEl) || new bootstrap.Modal(modalEl);
+        modalInstance.show();
+      }
+    }
+
+    function toggleTransferScope() {
+      var scope = document.getElementById("transfer-scope").value;
+      var boxSpecific = document.getElementById("box-specific-lead-id");
+      if (boxSpecific) {
+        boxSpecific.style.display = (scope === "SPECIFIC") ? "block" : "none";
+      }
+    }
+
+    async function loadActiveSalesIntoTransferDropdown(excludeSaleId) {
+      var sel = document.getElementById("transfer-to-sale");
+      if (!sel) return;
+      sel.innerHTML = '<option value="">-- Đang nạp danh sách nhân sự --</option>';
+
+      try {
+        var res = await ApiClient.request({ action: "getStats", team: "ALL", requesterId: (currentUser ? currentUser.userId : "HAIAU") });
+        var html = '<option value="">-- Chọn Nhân Sự Tiếp Nhận --</option>';
+        if (res && res.sales) {
+          res.sales.forEach(function(s) {
+            // Không hiển thị lại chính Sale đang bị chuyển
+            if (s.userId !== excludeSaleId && s.status === "ACTIVE") {
+              html += '<option value="' + s.userId + '">' + s.name + ' (' + s.userId + ' - ' + s.team + ')</option>';
+            }
+          });
+        }
+        sel.innerHTML = html;
+      } catch (e) {
+        sel.innerHTML = '<option value="">Lỗi tải danh sách</option>';
+      }
+    }
+
+    async function confirmExecuteTransferLead() {
+      var toSaleId = document.getElementById("transfer-to-sale").value;
+      var scope = document.getElementById("transfer-scope").value;
+      var specificLeadId = document.getElementById("transfer-target-lead-id").value.trim();
+      var btnConfirm = document.getElementById("btn-confirm-transfer");
+
+      if (!toSaleId) {
+        alert("Vui lòng chọn nhân sự tiếp nhận Lead!");
+        return;
+      }
+
+      var finalLeadId = (scope === "ALL") ? "ALL" : specificLeadId;
+      if (scope === "SPECIFIC" && !finalLeadId) {
+        alert("Vui lòng nhập LEAD_ID cần chuyển!");
+        return;
+      }
+
+      var confirmMsg = (scope === "ALL")
+        ? `Xác nhận chuyển TOÀN BỘ Lead từ [${currentTransferFromSaleId}] sang cho [${toSaleId}]?`
+        : `Xác nhận chuyển Lead [${finalLeadId}] từ [${currentTransferFromSaleId}] sang cho [${toSaleId}]?`;
+
+      if (!confirm(confirmMsg)) return;
+
+      if (btnConfirm) {
+        btnConfirm.disabled = true;
+        btnConfirm.innerHTML = '<i class="fa-solid fa-spinner fa-spin me-1"></i> Đang Chuyển...';
+      }
+
+      try {
+        var res = await ApiClient.request({
+          action: "transferHold",
+          leadId: finalLeadId,
+          fromSaleId: currentTransferFromSaleId,
+          toSaleId: toSaleId
+        });
+
+        if (btnConfirm) {
+          btnConfirm.disabled = false;
+          btnConfirm.innerHTML = '<i class="fa-solid fa-check me-1"></i> Xác Nhận Chuyển Giao';
+        }
+
+        alert(res.message);
+
+        if (res && res.status === "success") {
+          var modalEl = document.getElementById("transferLeadModal");
+          if (modalEl && typeof bootstrap !== 'undefined') {
+            var modalInstance = bootstrap.Modal.getInstance(modalEl);
+            if (modalInstance) modalInstance.hide();
+          }
+          // Tải lại Ma trận Admin để cập nhật số lượng Lead Hold mới ngay lập tức
+          loadTeamDrillDownData();
+        }
+      } catch (err) {
+        if (btnConfirm) {
+          btnConfirm.disabled = false;
+          btnConfirm.innerHTML = '<i class="fa-solid fa-check me-1"></i> Xác Nhận Chuyển Giao';
+        }
+        alert("Lỗi kết nối khi chuyển Lead: " + err.message);
+      }
     }
 
     function openCreateUserModal() {
