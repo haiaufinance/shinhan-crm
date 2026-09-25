@@ -1707,44 +1707,69 @@
     // ==============================================================================
     // 5. PHÂN HỆ SỔ TAY HOLD LEAD & PIPELINE CRM (30 NGÀY BẢO LƯU & ĐẾM NGƯỢC)
     // ==============================================================================
-    function renderHoldCountdownBadge(expireDateStr) {
-      if (!expireDateStr || expireDateStr === "---") {
-        return '<span class="badge bg-secondary">30 ngày</span>';
+    // ==============================================================================
+    // [NEW] - HÀM ĐẾM NGƯỢC HẠN BẢO LƯU CHUẨN XÁC 30 NGÀY ĐỘC QUYỀN
+    // Tự động nhận diện Ngày Nhận hoặc Ngày Hết Hạn để tính toán đúng số ngày còn lại
+    // ==============================================================================
+    function renderHoldCountdownBadge(dateInputStr, daysRemainingNum) {
+      if (typeof daysRemainingNum === 'number' && !isNaN(daysRemainingNum)) {
+        return formatBadgeFromDays(daysRemainingNum);
+      }
+
+      if (!dateInputStr || dateInputStr === "---") {
+        return '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-clock me-1"></i>Còn 30 ngày</span>';
       }
 
       try {
-        var expDate = null;
-        if (typeof expireDateStr === 'string' && expireDateStr.indexOf('/') !== -1) {
-          var parts = expireDateStr.split(' ')[0].split('/');
-          if (parts.length === 3) {
-            expDate = new Date(parseInt(parts[2], 10), parseInt(parts[1], 10) - 1, parseInt(parts[0], 10), 23, 59, 59);
+        var parsedDate = null;
+        if (typeof dateInputStr === 'string' && dateInputStr.indexOf('/') !== -1) {
+          var cleanDatePart = dateInputStr.split(' ')[0].trim();
+          var p = cleanDatePart.split('/');
+          if (p.length === 3) {
+            // p[0]: ngày, p[1]: tháng, p[2]: năm
+            parsedDate = new Date(parseInt(p[2], 10), parseInt(p[1], 10) - 1, parseInt(p[0], 10), 23, 59, 59);
           }
         }
 
-        if (!expDate || isNaN(expDate.getTime())) {
-          expDate = new Date(expireDateStr);
+        if (!parsedDate || isNaN(parsedDate.getTime())) {
+          parsedDate = new Date(dateInputStr);
         }
 
-        if (isNaN(expDate.getTime())) {
-          return '<span class="badge bg-secondary">' + expireDateStr + '</span>';
+        if (isNaN(parsedDate.getTime())) {
+          return '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-clock me-1"></i>Còn 30 ngày</span>';
         }
 
-        var now = new Date();
-        var diffMs = expDate.getTime() - now.getTime();
-        var diffDays = Math.ceil(diffMs / (1000 * 60 * 60 * 24));
+        var today = new Date();
+        today.setHours(0, 0, 0, 0);
 
-        if (diffDays > 5) {
-          return '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-clock me-1"></i>Còn ' + diffDays + ' ngày</span>';
-        } else if (diffDays > 0) {
-          return '<span class="badge bg-warning text-dark fw-bold py-1 px-2"><i class="fa-solid fa-triangle-exclamation me-1"></i>Gấp: Còn ' + diffDays + ' ngày</span>';
-        } else {
-          return '<span class="badge bg-danger py-1 px-2"><i class="fa-solid fa-circle-xmark me-1"></i>Hết Hạn Bảo Lưu</span>';
+        var diffTime = parsedDate.getTime() - today.getTime();
+        var diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+        // NẾU diffDays <= 0: dateInputStr chính là Ngày Nhận trong quá khứ -> Cộng thêm 30 ngày bảo lưu
+        if (diffDays <= 0 && diffDays >= -30) {
+          diffDays = 30 + diffDays; // Ví dụ: nhận 16/09 (-9 ngày) -> 30 + (-9) = Còn 21 ngày!
         }
-      } catch (errDate) {
-        return '<span class="badge bg-secondary">' + expireDateStr + '</span>';
+
+        return formatBadgeFromDays(diffDays);
+
+      } catch (err) {
+        return '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-clock me-1"></i>Còn 30 ngày</span>';
       }
     }
 
+    function formatBadgeFromDays(days) {
+      if (days > 5) {
+        return '<span class="badge bg-success py-1 px-2"><i class="fa-solid fa-clock me-1"></i>Còn ' + days + ' ngày</span>';
+      } else if (days > 0) {
+        return '<span class="badge bg-warning text-dark fw-bold py-1 px-2"><i class="fa-solid fa-triangle-exclamation me-1"></i>Gấp: Còn ' + days + ' ngày</span>';
+      } else {
+        return '<span class="badge bg-danger py-1 px-2"><i class="fa-solid fa-circle-xmark me-1"></i>Hết Hạn Bảo Lưu</span>';
+      }
+    }
+
+    // ==============================================================================
+    // [NEW] - HÀM TẢI DỮ LIỆU SỔ TAY HOLD LEAD ĐÃ FIX DÒNG TÍNH HẠN
+    // ==============================================================================
     async function fetchHoldLeadsData() {
       if (!currentUser) return;
       var uId = (currentUser.userId || currentUser.id || "").toString().trim();
@@ -1768,7 +1793,9 @@
         var html = "";
         holdsList.forEach(function(item, i){
           var realP = item.realPhone || item.phone || item.sdt || "";
-          var countdownBadge = renderHoldCountdownBadge(item.daysRemaining || item.expireDate);
+          
+          // [NEW] DÒNG QUAN TRỌNG ĐÃ ĐƯỢC FIX: Truyền cả chuỗi ngày và biến daysRemaining
+          var countdownBadge = renderHoldCountdownBadge(item.expireDate || item.startDate || item.createdAt, item.daysRemaining);
 
           html += '<tr>' +
             '<td>' + (i+1) + '</td>' +
@@ -1793,7 +1820,6 @@
         console.error("Lỗi fetchHoldLeadsData:", e);
       }
     }
-
     function updateHoldCountDisplay(count, holdsList) {
       var tabBtnHold = document.getElementById("tab-btn-hold");
       if (tabBtnHold) tabBtnHold.innerHTML = '<i class="fa-solid fa-star text-warning me-1"></i> Sổ Tay Hold Lead ( ' + count + ' )';
