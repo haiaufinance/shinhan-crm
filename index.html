@@ -726,25 +726,23 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
   <!-- ==============================================================================
-       5. CLIENT LOGIC ENGINE (NATIVE RESTFUL API GATEWAY & TÁC CHIẾN WORKSPACE)
+       5. CLIENT LOGIC ENGINE (BỌC THÉP 100% POST - CHỐNG FAILED TO FETCH TRIỆT ĐỂ)
        ============================================================================== -->
   <script>
     // ==============================================================================
-    // CẤU HÌNH KẾT NỐI API BACKEND (ĐƯỜNG LINK WEB APP .EXEC ĐÃ ĐỐI SOÁT CHUẨN XÁC)
+    // CẤU HÌNH API GATEWAY RESTFUL KẾT NỐI GOOGLE APPS SCRIPT
     // ==============================================================================
     var SYSTEM_GATEWAY_CONFIG = {
-      API_URL: "https://https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec"
+      API_URL: "https://script.google.com/macros/s/AKfycbxMN0aE6rY7xPKXDwBXsn4NUJ_cwElmeia4WEPfZDqTHisCPcBM7F4Cz2SbNBBSf4Je/exec"
     };
 
     /**
-     * BỘ ĐIỀU KHIỂN GIAO TIẾP MẠNG ĐA TẦNG (FETCH API CLIENT)
-     * Vượt 100% rào cản CORS, tự động bám theo 302 Redirect của Google và hỗ trợ cả google.script.run
+     * [CORE]: BỘ ĐIỀU KHIỂN GIAO TIẾP MẠNG DUY NHẤT (POST TEXT/PLAIN GATEWAY)
+     * Chống hoàn toàn lỗi CORS và Failed to fetch giữa GitHub Pages và Apps Script
      */
     var ApiClient = {
-      async request(payload, method) {
-        method = method || "POST";
-        
-        // Ưu tiên 1: Chạy trực tiếp qua google.script.run nếu đang nhúng trong Apps Script
+      async request(payload) {
+        // Ưu tiên 1: Chạy trực tiếp qua google.script.run nếu đang nhúng trong Web App GAS
         if (typeof google !== 'undefined' && google.script && google.script.run) {
           return new Promise(function(resolve, reject) {
             var runner = google.script.run
@@ -776,34 +774,26 @@
           });
         }
 
-        // Ưu tiên 2: Chạy độc lập trên GitHub Pages / Vercel qua RESTful API Gateway
+        // Ưu tiên 2: Chạy độc lập trên GitHub Pages qua RESTful POST text/plain
         try {
           var url = sessionStorage.getItem("SHN_GATEWAY_URL") || SYSTEM_GATEWAY_CONFIG.API_URL;
-          var options = {};
+          
+          var response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
 
-          if (method.toUpperCase() === "GET") {
-            var queryParts = [];
-            for (var k in payload) {
-              if (payload[k] !== undefined && payload[k] !== null) {
-                queryParts.push(encodeURIComponent(k) + "=" + encodeURIComponent(typeof payload[k] === 'object' ? JSON.stringify(payload[k]) : payload[k]));
-              }
-            }
-            url += (url.indexOf("?") === -1 ? "?" : "&") + queryParts.join("&");
-            options = { method: "GET", redirect: "follow" };
-          } else {
-            // Dùng Content-Type text/plain để trình duyệt bỏ qua Preflight OPTIONS CORS
-            options = {
-              method: "POST",
-              headers: { "Content-Type": "text/plain;charset=utf-8" },
-              body: JSON.stringify(payload),
-              redirect: "follow"
-            };
+          if (!response.ok) {
+            throw new Error("HTTP " + response.status + ": Kiểm tra lại quyền Anyone trên Apps Script");
           }
 
-          var response = await fetch(url, options);
-          if (!response.ok) throw new Error("Mã phản hồi HTTP: " + response.status);
-          var data = await response.json();
-          return data;
+          var text = await response.text();
+          try {
+            return JSON.parse(text);
+          } catch(e) {
+            throw new Error("Phản hồi máy chủ không phải JSON: " + text.substring(0, 100));
+          }
 
         } catch (err) {
           console.error("Lỗi ApiClient:", err);
@@ -903,7 +893,6 @@
       copyPhoneNumberToClipboard(phoneText, btn);
     }
 
-    // Gán đè alias cũ
     function triggerCallioClickToCall(phoneRef, btn) { executeCallioCopy(phoneRef, btn); }
     function makeCall(phoneRef, btn) { executeCallioCopy(phoneRef, btn); }
     function callLead(phoneRef, btn) { executeCallioCopy(phoneRef, btn); }
@@ -917,7 +906,7 @@
     }
 
     // ==============================================================================
-    // 2. XÁC THỰC ĐĂNG NHẬP HỆ THỐNG
+    // 2. XÁC THỰC ĐĂNG NHẬP HỆ THỐNG (CHẠY 100% POST BỌC THÉP)
     // ==============================================================================
     async function processLogin(e) {
       if (e && e.preventDefault) e.preventDefault();
@@ -950,7 +939,8 @@
       }, 15000);
 
       try {
-        var res = await ApiClient.request({ action: "login", username: u, password: p }, "GET");
+        // [NEW]: Gửi thuần túy bằng POST qua ApiClient
+        var res = await ApiClient.request({ action: "login", username: u, password: p });
         clearTimeout(loginTimer);
 
         if (btn) { 
@@ -1047,7 +1037,7 @@
       var reqId = currentUser.userId;
 
       try {
-        var resStats = await ApiClient.request({ action: "getFloorOverview", requesterId: reqId }, "GET");
+        var resStats = await ApiClient.request({ action: "getFloorOverview", requesterId: reqId });
         if (resStats && resStats.status === "success" && resStats.stats) {
           var elData = document.getElementById("adm-total-data");
           var elCalls = document.getElementById("adm-total-calls");
@@ -1060,7 +1050,7 @@
           if (elApps) elApps.innerText = resStats.stats.appsSummary;
         }
 
-        var resTeams = await ApiClient.request({ action: "getTeams", requesterId: reqId }, "GET");
+        var resTeams = await ApiClient.request({ action: "getTeams", requesterId: reqId });
         if (resTeams && resTeams.status === "success" && resTeams.teams) {
           var sel = document.getElementById("sel-filter-team");
           if (sel) {
@@ -1098,7 +1088,7 @@
       var reqId = currentUser ? currentUser.userId : "";
 
       try {
-        var res = await ApiClient.request({ action: "getStats", team: teamFilter, requesterId: reqId }, "GET");
+        var res = await ApiClient.request({ action: "getStats", team: teamFilter, requesterId: reqId });
         if (!res || res.status !== "success" || !tbody) return;
         var teamNameEl = document.getElementById("txt-selected-team-name");
         var countEl = document.getElementById("badge-team-headcount");
@@ -1179,7 +1169,7 @@
       var reqId = currentUser ? currentUser.userId : "";
 
       try {
-        var res = await ApiClient.request({ action: "getAuditMatrix", requesterId: reqId }, "GET");
+        var res = await ApiClient.request({ action: "getAuditMatrix", requesterId: reqId });
         if (!res || res.status !== "success" || !res.sales) {
           tbody.innerHTML = '<tr><td colspan="9" class="text-center py-3 text-muted">Chưa có dữ liệu kiểm toán.</td></tr>';
           return;
@@ -1222,7 +1212,7 @@
       var reqId = currentUser ? currentUser.userId : "";
 
       try {
-        var res = await ApiClient.request({ action: "getLeadPipeline", requesterId: reqId }, "GET");
+        var res = await ApiClient.request({ action: "getLeadPipeline", requesterId: reqId });
         if (!res || res.status !== "success" || !res.leads || res.leads.length === 0) {
           tbody.innerHTML = '<tr><td colspan="8" class="text-center py-3 text-muted">Hiện không có Lead nào trong diện thu hồi khẩn cấp.</td></tr>';
           return;
@@ -1290,7 +1280,7 @@
       bsModal.show();
 
       try {
-        var res = await ApiClient.request({ action: "getHoldLeads", userId: userId }, "GET");
+        var res = await ApiClient.request({ action: "getHoldLeads", userId: userId });
         var holdsList = (res && res.data) ? res.data : ((res && res.holds) ? res.holds : []);
 
         if (!holdsList || holdsList.length === 0) {
@@ -1319,14 +1309,14 @@
 
     async function handleToggleLock(userId, status) {
       if (!confirm((status ? "Khóa quyền cấp data của " : "Mở khóa cấp data cho ") + userId + "?")) return;
-      var res = await ApiClient.request({ action: "toggleLock", userId: userId, status: status }, "POST");
+      var res = await ApiClient.request({ action: "toggleLock", userId: userId, status: status });
       alert(res.message);
       loadAdminDashboardData();
     }
 
     async function handleAdminRevokeBatch(saleId) {
       if (!confirm("Thu hồi toàn bộ data chưa gọi của [" + saleId + "] về lại kho đấu trường?")) return;
-      var res = await ApiClient.request({ action: "revokeBatch", userId: saleId, saleId: saleId }, "POST");
+      var res = await ApiClient.request({ action: "revokeBatch", userId: saleId, saleId: saleId });
       alert(res.message);
       loadAdminDashboardData();
     }
@@ -1339,7 +1329,7 @@
 
     async function handleForceRecycle(leadId) {
       if (!confirm("Thu hồi cưỡng chế Lead [" + leadId + "] về kho đấu trường?")) return;
-      var res = await ApiClient.request({ action: "forceRecycle", leadId: leadId }, "POST");
+      var res = await ApiClient.request({ action: "forceRecycle", leadId: leadId });
       alert(res.message);
       loadAdminDashboardData();
     }
@@ -1355,7 +1345,7 @@
         leadId: leadId.trim(),
         fromSaleId: fromSaleId.trim().toUpperCase(),
         toSaleId: toSaleId.trim().toUpperCase()
-      }, "POST");
+      });
 
       alert(res.message);
       loadAdminDashboardData();
@@ -1401,7 +1391,7 @@
 
       if (!payload.userId || !payload.name) { alert("Vui lòng nhập đủ ID và Họ Tên!"); return; }
 
-      var res = await ApiClient.request({ action: "createUser", userData: payload }, "POST");
+      var res = await ApiClient.request({ action: "createUser", userData: payload });
       alert(res.message);
       if (res.status === "success") { 
         bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide(); 
@@ -1420,7 +1410,7 @@
         password: document.getElementById("new-user-password").value.trim() 
       };
 
-      var res = await ApiClient.request({ action: "updateUser", userData: payload }, "POST");
+      var res = await ApiClient.request({ action: "updateUser", userData: payload });
       alert(res.message);
       if (res.status === "success") { 
         bootstrap.Modal.getInstance(document.getElementById("createUserModal")).hide(); 
@@ -1436,7 +1426,7 @@
       if (!sel) return;
       sel.innerHTML = '<option value="">Đang tải danh sách nhân sự...</option>';
       
-      var res = await ApiClient.request({ action: "getStats", team: "ALL", requesterId: currentUser ? currentUser.userId : "" }, "GET");
+      var res = await ApiClient.request({ action: "getStats", team: "ALL", requesterId: currentUser ? currentUser.userId : "" });
       var html = '<option value="">-- Chọn Nhân Sự --</option>';
       if (res && res.sales) {
         res.sales.forEach(function(s){ 
@@ -1459,7 +1449,7 @@
         batchSize: batchSize,
         campaignTag: tag,
         provinceFilter: prov
-      }, "POST");
+      });
 
       alert(res.message); 
       bootstrap.Modal.getInstance(document.getElementById("adminDispatchModal")).hide(); 
@@ -1533,7 +1523,7 @@
               return;
             }
             var chunk = cleanRows.slice(currentIndex, currentIndex + chunkSize);
-            var res = await ApiClient.request({ action: "ingestLeadChunk", chunkRows: chunk }, "POST");
+            var res = await ApiClient.request({ action: "ingestLeadChunk", chunkRows: chunk });
             if (res && res.status === "success") {
               currentIndex += chunk.length;
               var pct = Math.round((currentIndex / total) * 100);
@@ -1588,7 +1578,7 @@
           userId: currentUser.userId,
           ext: currentUser.ext || "",
           batchSize: 50
-        }, "POST");
+        });
 
         if (btn) { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-cloud-arrow-down me-1"></i> Nhận Lô Mới'; }
         if (res && res.status === "success") { 
@@ -1700,7 +1690,7 @@
           reportIntervalSec: interval,
           rowIndex: reportingLead.rowIndex || reportingLead.rowIdx || -1
         }
-      }, "POST");
+      });
     }
 
     function updateDashboardKpi() {
@@ -1760,7 +1750,7 @@
       var uId = (currentUser.userId || currentUser.id || "").toString().trim();
 
       try {
-        var res = await ApiClient.request({ action: "getHoldLeads", userId: uId }, "GET");
+        var res = await ApiClient.request({ action: "getHoldLeads", userId: uId });
         var holdsList = (res && res.data) ? res.data : ((res && res.holds) ? res.holds : []);
 
         var tbody = document.getElementById("tbody-hold-leads");
@@ -1811,10 +1801,7 @@
       var valKpiHold = document.getElementById("val-kpi-hold");
       if (valKpiHold) valKpiHold.innerText = count + " Lead";
 
-      // --------------------------------------------------------------------------
-      // BỘ LỌC KPI NGÀY: CHỈ ĐẾM CÁC LEAD TẠO TRONG NGÀY HÔM NAY (00:00 -> 23:59)
-      // Reset về 0/10 mỗi ngày mới
-      // --------------------------------------------------------------------------
+      // BỘ LỌC KPI NGÀY: Reset về 0/10 mỗi ngày mới
       var today = new Date();
       var d = String(today.getDate()).padStart(2, '0');
       var m = String(today.getMonth() + 1).padStart(2, '0');
@@ -1997,7 +1984,7 @@
         renderBatchTable();
         updateDashboardKpi();
 
-        await ApiClient.request({ action: "saveHoldPipeline", userId: uId, leadData: payloadSave }, "POST");
+        await ApiClient.request({ action: "saveHoldPipeline", userId: uId, leadData: payloadSave });
         setTimeout(fetchHoldLeadsData, 500);
 
       } else {
@@ -2016,14 +2003,14 @@
             note: note
           };
 
-          ApiClient.request({ action: "submitCustomerLifecycle", userId: uId, data: lifecyclePayload }, "POST");
+          ApiClient.request({ action: "submitCustomerLifecycle", userId: uId, data: lifecyclePayload });
         }
 
         var res = await ApiClient.request({
           action: "saveHoldPipeline",
           userId: uId,
           leadData: { leadId: leadId, status: status, note: note, extraData: extraData }
-        }, "POST");
+        });
 
         alert(res.message || "Cập nhật hồ sơ CRM thành công!"); 
         fetchHoldLeadsData();
